@@ -1,6 +1,4 @@
 """
-app.py
-------
 DAPTA Web Application — Full Demo
 
 A Gradio-based web application for the Discourse-Aware Personalised
@@ -31,9 +29,9 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
-# ---------------------------------------------------------------------------
+
 # Lazy imports — app loads even if some deps missing
-# ---------------------------------------------------------------------------
+
 try:
     import gradio as gr
     _GRADIO = True
@@ -78,9 +76,9 @@ try:
 except ImportError:
     _EXPLAINER = False
 
-# ---------------------------------------------------------------------------
+
 # Constants
-# ---------------------------------------------------------------------------
+
 
 APHASIA_SUBTYPES = ["Broca", "Wernicke", "Anomic", "Conduction", "Global", "Other"]
 SEVERITY_LABELS = {
@@ -104,9 +102,9 @@ METRIC_DISPLAY = [
 ]
 
 
-# ---------------------------------------------------------------------------
+
 # Model loader
-# ---------------------------------------------------------------------------
+
 
 class DAPTASystem:
     """Loads and holds all DAPTA models for the web app."""
@@ -298,9 +296,9 @@ class DAPTASystem:
         return next_state
 
 
-# ---------------------------------------------------------------------------
+
 # Chart builders
-# ---------------------------------------------------------------------------
+
 
 def make_radar_chart(
     metrics: np.ndarray,
@@ -412,9 +410,9 @@ def make_metric_bars(metrics: np.ndarray) -> "go.Figure":
     return fig
 
 
-# ---------------------------------------------------------------------------
+
 # Gradio App
-# ---------------------------------------------------------------------------
+
 
 def build_app(system: DAPTASystem) -> "gr.Blocks":
 
@@ -854,9 +852,9 @@ def build_app(system: DAPTASystem) -> "gr.Blocks":
     return app
 
 
-# ---------------------------------------------------------------------------
+
 # Entry point
-# ---------------------------------------------------------------------------
+
 
 def parse_args():
     p = argparse.ArgumentParser(description="DAPTA Web Application")

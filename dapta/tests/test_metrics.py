@@ -1,6 +1,4 @@
 """
-tests/test_metrics.py
-----------------------
 Unit tests for the Discourse Assessment Engine metrics module.
 """
 
@@ -45,9 +43,7 @@ class TestDiscourseMetricExtractor:
             task="cinderella",
         )
 
-    # ------------------------------------------------------------------
     # CIU Rate
-    # ------------------------------------------------------------------
 
     def test_ciu_rate_normal_higher_than_aphasic(self):
         normal_metrics = self.extractor_cookie.compute(NORMAL_SPEECH)
@@ -64,9 +60,7 @@ class TestDiscourseMetricExtractor:
         metrics = self.extractor_cookie.compute(EMPTY_SPEECH)
         assert metrics.ciu_rate == 0.0
 
-    # ------------------------------------------------------------------
     # MC Score
-    # ------------------------------------------------------------------
 
     def test_mc_score_range(self):
         metrics = self.extractor_cookie.compute(NORMAL_SPEECH)
@@ -82,10 +76,7 @@ class TestDiscourseMetricExtractor:
         metrics = extractor.compute(NORMAL_SPEECH)
         assert metrics.mc_score == 0.0
 
-    # ------------------------------------------------------------------
     # MLU
-    # ------------------------------------------------------------------
-
     def test_mlu_positive(self):
         metrics = self.extractor_cookie.compute(NORMAL_SPEECH)
         assert metrics.mlu_morphemes > 0.0
@@ -95,10 +86,7 @@ class TestDiscourseMetricExtractor:
         aphasic_metrics = self.extractor_cookie.compute(APHASIC_SPEECH)
         assert normal_metrics.mlu_morphemes > aphasic_metrics.mlu_morphemes
 
-    # ------------------------------------------------------------------
-    # TTR
-    # ------------------------------------------------------------------
-
+     # TTR
     def test_ttr_range(self):
         metrics = self.extractor_cookie.compute(NORMAL_SPEECH)
         assert 0.0 <= metrics.ttr <= 1.0
@@ -107,9 +95,7 @@ class TestDiscourseMetricExtractor:
         metrics = self.extractor_cookie.compute(["cookie"])
         assert metrics.ttr > 0.0
 
-    # ------------------------------------------------------------------
     # Syntactic complexity
-    # ------------------------------------------------------------------
 
     def test_syn_comp_range(self):
         metrics = self.extractor_cookie.compute(NORMAL_SPEECH)
@@ -126,10 +112,7 @@ class TestDiscourseMetricExtractor:
         simple_m = self.extractor_cookie.compute(simple_speech)
         assert complex_m.syntactic_complexity >= simple_m.syntactic_complexity
 
-    # ------------------------------------------------------------------
     # to_array / to_dict
-    # ------------------------------------------------------------------
-
     def test_to_array_shape(self):
         metrics = self.extractor_cookie.compute(NORMAL_SPEECH)
         arr = metrics.to_array()
@@ -155,10 +138,6 @@ class TestDiscourseMetrics:
         assert m.mc_score == 0.0
         assert m.n_utterances == 0
 
-
-# ------------------------------------------------------------------
 # Run
-# ------------------------------------------------------------------
-
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

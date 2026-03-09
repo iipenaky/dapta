@@ -1,6 +1,4 @@
 """
-scripts/finetune_whisper.py
-----------------------------
 Fine-tune OpenAI Whisper-base on AphasiaBank audio for improved
 transcription of aphasic speech.
 
@@ -21,11 +19,6 @@ Usage (on university A100 cluster):
 Requirements:
   pip install transformers datasets accelerate jiwer librosa soundfile
   apt-get install ffmpeg  (or module load ffmpeg on cluster)
-
-References
-----------
-Radford et al. (2023). Whisper. ICML.
-Manir et al. (2024). LLM-based text prediction for aphasia. IEEE Access.
 """
 
 from __future__ import annotations

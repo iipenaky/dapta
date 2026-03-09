@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
 """
-experiments/run_dae.py
-----------------------
 Phase 1: Discourse Assessment Engine (DAE) Training & Validation.
 
 What this script does:
@@ -43,9 +40,9 @@ from dapta.utils.config import Config
 logger = get_logger(__name__, log_file="logs/run_dae.log")
 
 
-# ---------------------------------------------------------------------------
+
 # Helpers
-# ---------------------------------------------------------------------------
+
 
 def extract_metadata_from_transcript(transcript: PatientTranscript) -> dict:
     """
@@ -142,9 +139,9 @@ def split_participants(
     return train, val, test
 
 
-# ---------------------------------------------------------------------------
+
 # Main
-# ---------------------------------------------------------------------------
+
 
 def main(args) -> None:
     cfg = Config.load()
@@ -157,9 +154,9 @@ def main(args) -> None:
     logger.info("=" * 60)
     logger.info(f"Data directory: {args.data_dir}")
 
-    # ------------------------------------------------------------------
+
     # Step 1: Parse all .cha files
-    # ------------------------------------------------------------------
+
     logger.info("\n[1/5] Parsing AphasiaBank transcripts...")
     parser = CHATParser()
     transcripts = parser.parse_directory(args.data_dir)
@@ -176,9 +173,9 @@ def main(args) -> None:
     for t in transcripts:
         t.metadata["filepath"] = cha_by_stem.get(t.session_id.lower(), "")
 
-    # ------------------------------------------------------------------
+
     # Step 2: Extract discourse metrics
-    # ------------------------------------------------------------------
+
     logger.info("\n[2/5] Extracting discourse metrics...")
 
     all_metrics: List[DiscourseMetrics] = []
@@ -214,9 +211,9 @@ def main(args) -> None:
 
     logger.info(f"Extracted metrics for {len(all_metrics)} transcripts. Failed: {len(failed)}")
 
-    # ------------------------------------------------------------------
+
     # Step 3: RoBERTa surprisal scoring
-    # ------------------------------------------------------------------
+
     if args.skip_roberta:
         logger.info("\n[3/5] Skipping RoBERTa (--skip_roberta flag set). Using zeros.")
         all_surprisals = [0.0] * len(all_metrics)
@@ -246,14 +243,15 @@ def main(args) -> None:
             scorer.fine_tune(
                 train_utterances=train_sub,  # Fixed name
                 val_utterances=val_sub,      # Added required argument
-                num_epochs=1,                # Set to 1 for speed (< 2 hours)
+                num_epochs=15,                # Set to 1 for speed (< 2 hours)
                 batch_size=16,
                 learning_rate=2e-5,
             )
 
         # Score all transcripts
         all_surprisals = []
-        for t in transcripts:
+        from tqdm import tqdm
+        for t in tqdm(transcripts, desc = "Scoring transcripts", unit = "trandcript"):
             if t.session_id in all_session_ids:
                 utts = [u.text for u in t.utterances if u.text.strip()]
                 surprisal = scorer.mean_surprisal(utts) if utts else 0.0
@@ -261,9 +259,9 @@ def main(args) -> None:
 
         logger.info(f"Surprisal scores computed. Mean: {np.mean(all_surprisals):.3f}")
 
-    # ------------------------------------------------------------------
+
     # Step 4: Build patient profiles and state vectors
-    # ------------------------------------------------------------------
+
     logger.info("\n[4/5] Building patient state vectors...")
 
     # Map session_id -> transcript for metadata extraction
@@ -326,9 +324,9 @@ def main(args) -> None:
     logger.info(f"State vectors shape: {state_vectors.shape}")
     logger.info(f"State dim: {state_vectors.shape[1]} (expected 14)")
 
-    # ------------------------------------------------------------------
+
     # Step 5: Save outputs
-    # ------------------------------------------------------------------
+
     logger.info("\n[5/5] Saving outputs...")
 
     # State vectors

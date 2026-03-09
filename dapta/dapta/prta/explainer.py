@@ -1,15 +1,9 @@
 """
-dapta/prta/explainer.py
-------------------------
 XAI explanation module for DAPTA exercise recommendations.
 
 Given a patient state vector and the recommended exercise action,
 generates a plain-English clinical explanation of WHY that exercise
 was chosen — grounded in the patient's discourse metric profile.
-
-This addresses the clinical trust problem identified in:
-  - Privitera et al. (2024). Brain Sciences, 14(4), 383.
-  - Yu et al. (2021). ACM Computing Surveys, 55(1), 1-36.
 """
 
 from __future__ import annotations

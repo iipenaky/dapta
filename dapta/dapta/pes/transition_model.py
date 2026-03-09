@@ -1,6 +1,4 @@
 """
-pes/transition_model.py
------------------------
 Neural transition model for the Patient Environment Simulator.
 
 Learns T(s_{t+1} | s_t, a_t): how a patient's discourse state vector
@@ -12,12 +10,6 @@ Architecture: MLP with Monte Carlo Dropout for uncertainty estimation.
 Trained on AphasiaBank longitudinal samples.
 For patients without multiple sessions, effect size estimates from
 published RCTs are used (Gorshkov et al., 2025).
-
-References
-----------
-Gal & Ghahramani (2016). Dropout as a Bayesian approximation. ICML.
-Yu et al. (2021). RL in healthcare: A survey. ACM Computing Surveys.
-Gorshkov et al. (2025). Brain Sciences, 15(9), 1007.
 """
 
 from __future__ import annotations
@@ -60,9 +52,9 @@ PRIOR_EFFECT_SIZES = {
 }
 
 
-# ---------------------------------------------------------------------------
+
 # Neural network
-# ---------------------------------------------------------------------------
+
 
 class TransitionMLP(nn.Module):
     """
@@ -94,9 +86,9 @@ class TransitionMLP(nn.Module):
         return self.net(x)  # Predict delta
 
 
-# ---------------------------------------------------------------------------
+
 # Transition model wrapper
-# ---------------------------------------------------------------------------
+
 
 class TransitionModel:
     """
@@ -129,9 +121,9 @@ class TransitionModel:
         self._model: Optional[TransitionMLP] = None
         self._fitted = False
 
-    # ------------------------------------------------------------------
+   
     # Training
-    # ------------------------------------------------------------------
+   
 
     def fit(
         self,
@@ -216,9 +208,9 @@ class TransitionModel:
         logger.info(f"Transition model trained. Best val loss: {best_val_loss:.6f}")
         return self
 
-    # ------------------------------------------------------------------
+   
     # Inference
-    # ------------------------------------------------------------------
+   
 
     def predict_next_state(
         self,
@@ -284,9 +276,9 @@ class TransitionModel:
         samples = np.stack(samples)  # (mc_samples, STATE_DIM)
         return samples.mean(axis=0).astype(np.float32), samples.std(axis=0).astype(np.float32)
 
-    # ------------------------------------------------------------------
+   
     # Prior (fallback)
-    # ------------------------------------------------------------------
+   
 
     def _prior_predict(self, state: np.ndarray, action: int) -> np.ndarray:
         """
@@ -301,9 +293,9 @@ class TransitionModel:
         next_state = np.clip(state + delta, 0.0, 1.0)
         return next_state.astype(np.float32)
 
-    # ------------------------------------------------------------------
+   
     # Persistence
-    # ------------------------------------------------------------------
+   
 
     def _save(self) -> None:
         self.checkpoint_path.parent.mkdir(parents=True, exist_ok=True)

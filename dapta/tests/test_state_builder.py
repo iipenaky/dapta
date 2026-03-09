@@ -1,6 +1,4 @@
 """
-tests/test_state_builder.py
-----------------------------
 Unit tests for PatientStateBuilder and PatientProfile.
 """
 

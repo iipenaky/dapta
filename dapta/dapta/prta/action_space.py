@@ -41,9 +41,9 @@ class TherapyExercise:
     generalisation_potential: float
 
 
-# ---------------------------------------------------------------------------
+
 # The 12 therapy exercises
-# ---------------------------------------------------------------------------
+
 
 THERAPY_EXERCISES: List[TherapyExercise] = [
 

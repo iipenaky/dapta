@@ -1,6 +1,4 @@
 """
-utils/metrics_eval.py
----------------------
 Statistical evaluation utilities for the DAPTA evaluation phase.
 
 Implements:
@@ -22,9 +20,9 @@ from typing import Dict, List, Tuple, Optional
 from scipy import stats
 
 
-# ---------------------------------------------------------------------------
+
 # Effect size
-# ---------------------------------------------------------------------------
+
 
 def cohens_d(group_a: np.ndarray, group_b: np.ndarray) -> float:
     """
@@ -64,9 +62,9 @@ def effect_size_label(d: float) -> str:
         return "large"
 
 
-# ---------------------------------------------------------------------------
+
 # Hypothesis tests
-# ---------------------------------------------------------------------------
+
 
 def wilcoxon_test(
     before: np.ndarray,
@@ -151,9 +149,9 @@ def run_pairwise_wilcoxon(
     return results
 
 
-# ---------------------------------------------------------------------------
+
 # Bootstrap confidence intervals
-# ---------------------------------------------------------------------------
+
 
 def bootstrap_ci(
     data: np.ndarray,
@@ -188,9 +186,9 @@ def bootstrap_ci(
     return lower, upper
 
 
-# ---------------------------------------------------------------------------
+
 # Inter-rater reliability
-# ---------------------------------------------------------------------------
+
 
 def cohens_kappa(
     rater_a: np.ndarray,
@@ -227,9 +225,9 @@ def pearson_r(x: np.ndarray, y: np.ndarray) -> Tuple[float, float]:
     return float(r), float(p)
 
 
-# ---------------------------------------------------------------------------
+
 # Summary report
-# ---------------------------------------------------------------------------
+
 
 def format_evaluation_report(results: Dict[str, dict], alpha: float = 0.05) -> str:
     """

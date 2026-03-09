@@ -1,6 +1,4 @@
 """
-prta/trainer.py
----------------
 Training orchestrator for all DAPTA agents and baselines.
 
 Trains:
@@ -9,12 +7,6 @@ Trains:
   3. PPO agent (via Stable-Baselines3)
   4. Rule-Based Difficulty Escalation (RBDE) baseline
   5. Random Therapy Sequencing (RTS) baseline
-
-References
-----------
-van Hasselt et al. (2016). Double DQN. AAAI.
-Schulman et al. (2017). PPO. arXiv:1707.06347.
-Raffin et al. (2021). Stable-Baselines3. JMLR.
 """
 
 from __future__ import annotations
@@ -39,9 +31,9 @@ except ImportError:
     logger.warning("stable-baselines3 not installed. PPO training unavailable.")
 
 
-# ---------------------------------------------------------------------------
+
 # DDQN Training loop
-# ---------------------------------------------------------------------------
+
 
 def train_ddqn(
     agent: DDQNAgent,
@@ -142,9 +134,9 @@ def train_ddqn(
     return logs
 
 
-# ---------------------------------------------------------------------------
+
 # Evaluation helper
-# ---------------------------------------------------------------------------
+
 
 def evaluate_agent(
     agent: DDQNAgent,
@@ -185,9 +177,9 @@ def evaluate_agent(
     return float(np.mean(all_rewards)), float(np.mean(all_ciu_improvements))
 
 
-# ---------------------------------------------------------------------------
+
 # PPO Training
-# ---------------------------------------------------------------------------
+
 
 def train_ppo(
     env: TherapyEnv,
@@ -240,9 +232,9 @@ def train_ppo(
     return model
 
 
-# ---------------------------------------------------------------------------
+
 # Baseline: Rule-Based Difficulty Escalation (RBDE)
-# ---------------------------------------------------------------------------
+
 
 class RuleBasedBaseline:
     """
@@ -281,9 +273,9 @@ class RuleBasedBaseline:
         return total_reward, env.get_cumulative_discourse_improvement()
 
 
-# ---------------------------------------------------------------------------
+
 # Baseline: Random Therapy Sequencing (RTS)
-# ---------------------------------------------------------------------------
+
 
 class RandomBaseline:
     """

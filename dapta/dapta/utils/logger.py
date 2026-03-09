@@ -1,6 +1,4 @@
 """
-utils/logger.py
----------------
 Structured, colour-coded logger used across all DAPTA modules.
 Uses Python's built-in logging + rich for pretty console output.
 """

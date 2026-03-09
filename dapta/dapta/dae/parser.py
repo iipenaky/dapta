@@ -1,6 +1,4 @@
 """
-dae/parser.py
--------------
 CHAT transcript parser for AphasiaBank data.
 
 AphasiaBank uses CLAN's CHAT format for transcription. This module:
@@ -8,12 +6,6 @@ AphasiaBank uses CLAN's CHAT format for transcription. This module:
   2. Extracts participant utterances (tier *PAR:)
   3. Segments by discourse task type
   4. Cleans CHAT markup while preserving linguistically meaningful annotations
-
-References
-----------
-MacWhinney et al. (2011). AphasiaBank: Methods for studying discourse.
-    Aphasiology, 25(11), 1286–1307.
-Lee & Gerlanc (2023). pylangacq. JOSS, 8(82), 5143.
 """
 
 from __future__ import annotations
@@ -33,10 +25,10 @@ from dapta.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-# ---------------------------------------------------------------------------
+
 # Task detection: maps @G: marker values to canonical task names.
 # Covers all spelling variants observed across 19 AphasiaBank corpora.
-# ---------------------------------------------------------------------------
+
 TASK_KEYWORDS: Dict[str, List[str]] = {
     "cookie_theft":     ["cookie", "cookietheft", "wab",
                           "window", "umbrella", "cat", "flood"],
@@ -114,9 +106,9 @@ class PatientTranscript:
         return task in self.tasks and len(self.tasks[task]) > 0
 
 
-# ---------------------------------------------------------------------------
+
 # Parser
-# ---------------------------------------------------------------------------
+
 
 class CHATParser:
     """
@@ -128,9 +120,9 @@ class CHATParser:
     def __init__(self, participant_tier: str = "PAR") -> None:
         self.participant_tier = participant_tier
 
-    # ------------------------------------------------------------------
+   
     # Public API
-    # ------------------------------------------------------------------
+   
 
     def parse_file(self, filepath: str | Path) -> PatientTranscript:
         """
@@ -185,9 +177,9 @@ class CHATParser:
         logger.info(f"Successfully parsed {len(transcripts)} transcripts.")
         return transcripts
 
-    # ------------------------------------------------------------------
+   
     # pylangacq backend
-    # ------------------------------------------------------------------
+   
 
     def _parse_with_pylangacq(self, filepath: Path) -> PatientTranscript:
         reader = pylangacq.read_chat(str(filepath))
@@ -241,9 +233,9 @@ class CHATParser:
             logger.debug(f"Could not extract full metadata from {filepath.name}: {e}")
         return metadata
 
-    # ------------------------------------------------------------------
+   
     # Regex fallback backend
-    # ------------------------------------------------------------------
+   
 
     def _parse_with_regex(self, filepath: Path) -> PatientTranscript:
         with open(filepath, "r", encoding="utf-8", errors="replace") as f:
@@ -294,9 +286,9 @@ class CHATParser:
                 metadata["filename_header"] = line[10:].strip()
         return metadata
 
-    # ------------------------------------------------------------------
+   
     # Shared helpers
-    # ------------------------------------------------------------------
+   
 
     def _clean_utterance(self, raw: str) -> str:
         """Remove CHAT markup noise while preserving meaningful tokens."""

@@ -3,7 +3,7 @@ Automated computation of five validated discourse metrics from
 AphasiaBank transcripts.
 
 Metrics
--------
+-
 1. CIU Rate  — Correct Information Units per minute 
 2. MC Score  — Main Concept completeness [0, 1] 
 3. MLU-m     — Mean Length of Utterance in morphemes
@@ -29,12 +29,7 @@ from dapta.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-
-# ---------------------------------------------------------------------------
 # Main concept checklists
-# Based on Richardson & Dalton (2020) published MC checklists for AphasiaBanks
-# ---------------------------------------------------------------------------
-
 MAIN_CONCEPTS: Dict[str, List[str]] = {
     "cookie_theft": [
         "woman washing dishes",
@@ -69,10 +64,8 @@ MAIN_CONCEPTS: Dict[str, List[str]] = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Dataclass for results
-# ---------------------------------------------------------------------------
 
+# Dataclass for results
 @dataclass
 class DiscourseMetrics:
     """
@@ -111,16 +104,13 @@ class DiscourseMetrics:
         }
 
 
-# ---------------------------------------------------------------------------
-# Metric extractor
-# ---------------------------------------------------------------------------
 
+# Metric extractor
 class DiscourseMetricExtractor:
     """
     Computes all five discourse metrics from a list of utterance strings.
 
     Parameters
-    ----------
     duration_minutes : Optional float
         Duration of the speech sample in minutes. Required for CIU rate.
         If None, CIU rate is computed per utterance (less accurate).
@@ -145,20 +135,16 @@ class DiscourseMetricExtractor:
         self.task = task
         self._nlp = self._load_spacy()
 
-    # ------------------------------------------------------------------
     # Public API
-    # ------------------------------------------------------------------
-
+    
     def compute(self, utterances: List[str]) -> DiscourseMetrics:
         """
         Compute all discourse metrics from a list of utterance strings.
 
         Parameters
-        ----------
         utterances : List of cleaned utterance strings.
 
         Returns
-        -------
         DiscourseMetrics
         """
         if not utterances:
@@ -188,9 +174,7 @@ class DiscourseMetricExtractor:
             task=self.task,
         )
 
-    # ------------------------------------------------------------------
     # CIU Rate
-    # ------------------------------------------------------------------
 
     def _compute_ciu_rate(self, utterances: List[str]) -> float:
         """
@@ -224,9 +208,7 @@ class DiscourseMetricExtractor:
             est_minutes = len(utterances) * 5 / 60
             return round(ciu_count / max(est_minutes, 0.01), 2)
 
-    # ------------------------------------------------------------------
     # Main Concept Score
-    # ------------------------------------------------------------------
 
     def _compute_mc_score(self, utterances: List[str]) -> float:
         """
@@ -259,9 +241,7 @@ class DiscourseMetricExtractor:
 
         return round(total_score / max_score, 4) if max_score > 0 else 0.0
 
-    # ------------------------------------------------------------------
     # MLU in morphemes
-    # ------------------------------------------------------------------
 
     def _compute_mlu(self, utterances: List[str]) -> float:
         """
@@ -300,9 +280,7 @@ class DiscourseMetricExtractor:
 
         return round(np.mean(morpheme_counts), 2) if morpheme_counts else 0.0
 
-    # ------------------------------------------------------------------
     # Type-Token Ratio
-    # ------------------------------------------------------------------
 
     def _compute_ttr(self, utterances: List[str]) -> float:
         """
@@ -326,9 +304,7 @@ class DiscourseMetricExtractor:
         types = set(tokens)
         return round(len(types) / len(tokens), 4)
 
-    # ------------------------------------------------------------------
     # Syntactic complexity
-    # ------------------------------------------------------------------
 
     def _compute_syntactic_complexity(self, utterances: List[str]) -> float:
         """
@@ -357,9 +333,7 @@ class DiscourseMetricExtractor:
 
         return round(complex_count / len(utterances), 4) if utterances else 0.0
 
-    # ------------------------------------------------------------------
     # Helpers
-    # ------------------------------------------------------------------
 
     @staticmethod
     def _load_spacy() -> Optional["spacy.Language"]:

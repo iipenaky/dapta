@@ -1,6 +1,4 @@
 """
-dae/roberta_scorer.py
----------------------
 RoBERTa fine-tuning on AphasiaBank transcripts and per-utterance surprisal scoring.
 
 RoBERTa is fine-tuned via masked language modelling (MLM) to adapt its
@@ -10,12 +8,6 @@ RoBERTa pre-training corpus).
 
 Surprisal score = negative log-likelihood of an utterance given its context.
 Higher surprisal ↔ more unexpected/atypical language ↔ more severe aphasia.
-
-References
-----------
-Liu et al. (2019). RoBERTa. arXiv:1907.11692.
-Rezaii et al. (2024). Scientific Reports, 14, 15626.
-Wolf et al. (2020). Hugging Face Transformers. EMNLP Demos.
 """
 
 from __future__ import annotations
@@ -46,9 +38,9 @@ from dapta.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-# ---------------------------------------------------------------------------
+
 # Dataset
-# ---------------------------------------------------------------------------
+
 
 class AphasiaTranscriptDataset(Dataset):
     """
@@ -80,9 +72,9 @@ class AphasiaTranscriptDataset(Dataset):
         }
 
 
-# ---------------------------------------------------------------------------
+
 # Main scorer class
-# ---------------------------------------------------------------------------
+
 
 class RoBERTaScorer:
     """
@@ -114,9 +106,9 @@ class RoBERTaScorer:
         self.tokenizer: Optional["RobertaTokenizerFast"] = None
         self.model: Optional["RobertaForMaskedLM"] = None
 
-    # ------------------------------------------------------------------
+   
     # Loading
-    # ------------------------------------------------------------------
+   
 
     def load(self, from_checkpoint: bool = True) -> "RoBERTaScorer":
         """
@@ -141,9 +133,9 @@ class RoBERTaScorer:
         self.model.eval()
         return self
 
-    # ------------------------------------------------------------------
+   
     # Fine-tuning
-    # ------------------------------------------------------------------
+   
 
     def fine_tune(
         self,
@@ -236,9 +228,9 @@ class RoBERTaScorer:
         self.checkpoint_path = output_dir
         return self
 
-    # ------------------------------------------------------------------
+   
     # Surprisal scoring
-    # ------------------------------------------------------------------
+   
 
     def compute_surprisal(
         self,
@@ -266,7 +258,12 @@ class RoBERTaScorer:
         surprisals = []
         self.model.eval()
 
-        for utt in utterances:
+        try:
+            from tqdm import tqdm
+            utt_iter = tqdm(utterances, desc = "Scoring utterances", unit = "utt")
+        except ImportError:
+            utt_iter = utterances
+        for utt in utt_iter:
             if not utt.strip():
                 surprisals.append(0.0)
                 continue

@@ -1,6 +1,4 @@
 """
-experiments/run_evaluation.py
-------------------------------
 Phase 3: Full evaluation and generalisation test.
 
 Produces the results tables and statistical analysis for the thesis
@@ -14,12 +12,6 @@ Statistical analysis:
   - Paired Wilcoxon signed-rank test (Bonferroni corrected)
   - Cohen's d effect size (clinically meaningful threshold: d >= 0.40)
   - 95% Bootstrap confidence intervals
-
-References
-----------
-Upton et al. (2024). iTalkBetter (d = 0.42 benchmark). Aphasiology.
-Gorshkov et al. (2025). Brain Sciences, 15(9), 1007.
-Quique et al. (2024). JSLHR, 67(9), 3203-3228.
 """
 
 from __future__ import annotations
@@ -51,9 +43,9 @@ METRIC_NAMES = ["CIU_rate", "MC_score", "MLU_morphemes", "TTR", "SynComp", "Surp
 CLINICAL_THRESHOLD = 0.40  # iTalkBetter benchmark Cohen's d
 
 
-# ---------------------------------------------------------------------------
+
 # Agent runners
-# ---------------------------------------------------------------------------
+
 
 def run_ddqn_episode(agent: DDQNAgent, env: TherapyEnv) -> np.ndarray:
     """Run one DDQN episode. Returns discourse improvement vector (6,)."""
@@ -88,9 +80,9 @@ def run_baseline_episode(baseline, env: TherapyEnv) -> np.ndarray:
     return improvements
 
 
-# ---------------------------------------------------------------------------
+
 # Load agents
-# ---------------------------------------------------------------------------
+
 
 def load_ddqn_agents(
     rl_dir: Path,
@@ -130,9 +122,9 @@ def load_ddqn_agents(
     return cluster_agents, g_ddqn
 
 
-# ---------------------------------------------------------------------------
+
 # Main evaluation loop
-# ---------------------------------------------------------------------------
+
 
 def evaluate_all_agents(
     test_envs: List[TherapyEnv],
@@ -179,9 +171,9 @@ def evaluate_all_agents(
     return {k: np.stack(v) for k, v in results.items()}
 
 
-# ---------------------------------------------------------------------------
+
 # Statistical analysis
-# ---------------------------------------------------------------------------
+
 
 def compute_statistics(
     improvements: Dict[str, np.ndarray],
@@ -305,9 +297,9 @@ def compute_statistics(
     return out
 
 
-# ---------------------------------------------------------------------------
+
 # Pretty print results table
-# ---------------------------------------------------------------------------
+
 
 def print_results_table(stats: dict) -> None:
     """Print a thesis-ready results summary to the console."""
@@ -376,9 +368,9 @@ def print_results_table(stats: dict) -> None:
     print("=" * 70)
 
 
-# ---------------------------------------------------------------------------
+
 # Main
-# ---------------------------------------------------------------------------
+
 
 def parse_args():
     p = argparse.ArgumentParser(description="DAPTA Phase 3: Evaluation")
@@ -408,9 +400,9 @@ def main():
     logger.info("DAPTA Phase 3: Generalisation & Personalisation Evaluation")
     logger.info("=" * 60)
 
-    # ------------------------------------------------------------------
+   
     # 1. Load DAE outputs
-    # ------------------------------------------------------------------
+   
     logger.info("\n[1/5] Loading DAE outputs...")
     dae_data = np.load(dae_dir / "state_vectors.npz", allow_pickle=True)
     state_vectors = dae_data["state_vectors"]       # (N, 14)
@@ -428,9 +420,9 @@ def main():
     test_states = state_vectors[test_indices]
     logger.info(f"  Test set: {len(test_indices)} patients, state_dim={state_dim}")
 
-    # ------------------------------------------------------------------
+   
     # 2. Load PES outputs
-    # ------------------------------------------------------------------
+   
     logger.info("\n[2/5] Loading PES outputs...")
     pes_data = np.load(pes_dir / "env_initial_states.npz", allow_pickle=True)
     with open(pes_dir / "cluster_assignments.json") as _f:
@@ -442,9 +434,9 @@ def main():
     logger.info(f"  Transition model loaded. Test cluster distribution: "
                 f"{np.bincount(test_cluster_labels.astype(int))}")
 
-    # ------------------------------------------------------------------
+   
     # 3. Build test environments
-    # ------------------------------------------------------------------
+   
     logger.info("\n[3/5] Building test environments...")
     test_envs = build_env_population(
         transition_model=transition_model,
@@ -453,9 +445,9 @@ def main():
     )
     logger.info(f"  Built {len(test_envs)} test environments.")
 
-    # ------------------------------------------------------------------
+   
     # 4. Load agents
-    # ------------------------------------------------------------------
+   
     logger.info("\n[4/5] Loading trained agents...")
     cluster_agents, g_ddqn = load_ddqn_agents(
         rl_dir=rl_dir,
@@ -478,9 +470,9 @@ def main():
         except Exception as e:
             logger.warning(f"  Could not load PPO agent: {e}. Skipping.")
 
-    # ------------------------------------------------------------------
+   
     # 5. Run evaluation
-    # ------------------------------------------------------------------
+   
     logger.info("\n[5/5] Running evaluation on test set...")
     improvements = evaluate_all_agents(
         test_envs=test_envs,
@@ -494,9 +486,9 @@ def main():
     logger.info(f"  Evaluated {len(test_envs)} patients across "
                 f"{len(improvements)} agents.")
 
-    # ------------------------------------------------------------------
+   
     # 6. Statistical analysis
-    # ------------------------------------------------------------------
+   
     logger.info("\n[6/6] Computing statistics...")
     stats = compute_statistics(improvements, alpha=0.05)
 

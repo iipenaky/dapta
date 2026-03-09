@@ -67,7 +67,7 @@ dapta/
 ├── configs/
 │   └── default.yaml            # All hyperparameters in one place
 ├── scripts/
-│   └── prepare_aphasiabank.py  # Data preparation script
+│   └── finetune_whisper.py
 ├── requirements.txt
 └── README.md
 ```
@@ -80,18 +80,16 @@ dapta/
 # 1. Install dependencies
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
+pip install -e .
 
-# 2. Prepare AphasiaBank data (point to your local corpus)
-python scripts/prepare_aphasiabank.py --data_dir /path/to/aphasiabank
-
-# 3. Phase 1 — Train DAE
+# 2. Phase 1 — Train DAE
 python experiments/run_dae.py
 
-# 4. Phase 2 — Train PES + RL agents
+# 3. Phase 2 — Train PES + RL agents
 python experiments/run_pes.py
 python experiments/run_rl.py
 
-# 5. Phase 3 — Full evaluation
+# 4. Phase 3 — Full evaluation
 python experiments/run_evaluation.py
 ```
 

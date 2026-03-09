@@ -1,6 +1,4 @@
 """
-tests/test_reward_and_env.py
------------------------------
 Unit tests for reward function and therapy environment.
 """
 

@@ -1,6 +1,4 @@
 """
-utils/reward.py
----------------
 Discourse-level reward function for DAPTA.
 
 The reward is a weighted sum of improvements across six discourse metrics:
@@ -135,9 +133,9 @@ def compute_batch_rewards(
     return np.clip(rewards, clip[0], clip[1]).astype(np.float32)
 
 
-# ---------------------------------------------------------------------------
+
 # Internal helpers
-# ---------------------------------------------------------------------------
+
 def _validate_weights(weights: Dict[str, float]) -> None:
     total = sum(weights.values())
     if not np.isclose(total, 1.0, atol=1e-4):

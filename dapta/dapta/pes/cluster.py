@@ -1,15 +1,8 @@
 """
-pes/cluster.py
---------------
 Patient clustering for personalised RL training.
 
 Groups patients by aphasia subtype and severity to enable
 patient-specific policy training (addressing RQ4).
-
-References
-----------
-Gorshkov et al. (2025). Brain Sciences, 15(9), 1007.
-Fridriksson & Hillis (2021). Journal of Stroke, 23(2), 183–201.
 """
 
 from __future__ import annotations

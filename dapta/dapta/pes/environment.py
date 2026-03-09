@@ -1,6 +1,4 @@
 """
-pes/environment.py
-------------------
 Gymnasium-compatible MDP environment for DAPTA.
 
 Implements the therapy sequencing MDP:
@@ -15,11 +13,6 @@ where:
 
 This environment is compatible with Stable-Baselines3 and standard
 Gymnasium-based RL agents.
-
-References
-----------
-Yu et al. (2021). RL in healthcare. ACM Computing Surveys, 55(1), 1–36.
-Sutton & Barto (2018). Reinforcement Learning: An Introduction (2nd ed.). MIT.
 """
 
 from __future__ import annotations
@@ -104,9 +97,9 @@ class TherapyEnv(gym.Env):
         self._step_count: int = 0
         self._episode_history: List[Dict] = []
 
-    # ------------------------------------------------------------------
+   
     # Gymnasium interface
-    # ------------------------------------------------------------------
+   
 
     def reset(
         self,

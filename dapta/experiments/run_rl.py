@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
 """
-experiments/run_rl.py
----------------------
 Phase 2b: RL Agent Training.
 
 What this script does:

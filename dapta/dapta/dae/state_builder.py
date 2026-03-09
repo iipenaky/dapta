@@ -1,6 +1,4 @@
 """
-dae/state_builder.py
----------------------
 Builds the normalised patient state vector used by the RL agent.
 
 State vector s = [ciu_rate, mc_score, mlu_morphemes, ttr, syntactic_complexity,
@@ -8,11 +6,6 @@ State vector s = [ciu_rate, mc_score, mlu_morphemes, ttr, syntactic_complexity,
 
 Dimensions: 6 discourse metrics + 6 subtype one-hot + 2 static = 14-dim total
 (static features appended here; MDP uses full 14-dim state)
-
-References
-----------
-Fromm et al. (2020). Seminars in Speech and Language, 41(1), 10–19.
-Fridriksson & Hillis (2021). Journal of Stroke, 23(2), 183–201.
 """
 
 from __future__ import annotations
@@ -28,9 +21,9 @@ from dapta.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-# ---------------------------------------------------------------------------
+
 # Constants
-# ---------------------------------------------------------------------------
+
 
 # Discourse metric names (first 6 dims of state vector)
 DISCOURSE_METRIC_NAMES = [
@@ -61,9 +54,9 @@ N_STATIC = 2                         # wab_aq, months_post_onset
 STATE_DIM = N_DISCOURSE + N_SUBTYPE + N_STATIC   # = 14
 
 
-# ---------------------------------------------------------------------------
+
 # Patient metadata
-# ---------------------------------------------------------------------------
+
 
 class PatientProfile:
     """
@@ -109,9 +102,9 @@ class PatientProfile:
         return vec
 
 
-# ---------------------------------------------------------------------------
+
 # State builder
-# ---------------------------------------------------------------------------
+
 
 class PatientStateBuilder:
     """
@@ -132,9 +125,9 @@ class PatientStateBuilder:
         self._static_scaler: Optional[MinMaxScaler] = None
         self._fitted = False
 
-    # ------------------------------------------------------------------
+   
     # Fitting
-    # ------------------------------------------------------------------
+   
 
     def fit(
         self,
@@ -180,9 +173,9 @@ class PatientStateBuilder:
 
         return self
 
-    # ------------------------------------------------------------------
+   
     # Building state vectors
-    # ------------------------------------------------------------------
+   
 
     def build(
         self,
@@ -238,9 +231,9 @@ class PatientStateBuilder:
             for m, s, p in zip(metrics_list, surprisals, profiles)
         ])
 
-    # ------------------------------------------------------------------
+   
     # State trajectory (for GRU history encoder in PRTA)
-    # ------------------------------------------------------------------
+   
 
     def build_trajectory(
         self,
@@ -260,9 +253,9 @@ class PatientStateBuilder:
             for m, s in zip(session_metrics, session_surprisals)
         ])
 
-    # ------------------------------------------------------------------
+   
     # Persistence
-    # ------------------------------------------------------------------
+   
 
     def _save_scaler(self) -> None:
         self.scaler_path.parent.mkdir(parents=True, exist_ok=True)

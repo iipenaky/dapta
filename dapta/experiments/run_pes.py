@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
 """
-experiments/run_pes.py
-----------------------
 Phase 2a: Patient Environment Simulator (PES) Training.
 
 What this script does:

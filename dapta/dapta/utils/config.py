@@ -1,6 +1,4 @@
 """
-utils/config.py
----------------
 Central configuration loader.
 Loads configs/default.yaml and allows dot-notation access.
 """
