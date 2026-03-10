@@ -266,6 +266,50 @@ def main(args) -> None:
     logger.info("Transition model trained.")
 
     # ------------------------------------------------------------------
+    # Transition model validation metrics
+    # ------------------------------------------------------------------
+    logger.info("\n[3b/5] Computing transition model validation metrics...")
+    split = int(len(states) * 0.9)
+    val_states  = states[split:]
+    val_actions = actions[split:]
+    val_next    = next_states[split:]
+    val_deltas  = val_next - val_states          # observed deltas
+
+    pred_nexts = np.array([
+        transition_model.predict_next_state(s, int(a))
+        for s, a in zip(val_states, val_actions)
+    ])
+    pred_deltas = pred_nexts - val_states        # predicted deltas
+
+    mae_per_dim = np.mean(np.abs(pred_deltas - val_deltas), axis=0)
+    mse_overall = float(np.mean((pred_deltas - val_deltas) ** 2))
+    dir_acc     = np.mean(np.sign(pred_deltas) == np.sign(val_deltas), axis=0)
+
+    METRIC_NAMES_VAL = ["CIU_rate", "MC_score", "MLU_m", "TTR", "SynComp", "Surprisal"]
+    logger.info(f"  Val MSE (overall): {mse_overall:.6f}")
+    for i, m in enumerate(METRIC_NAMES_VAL):
+        logger.info(
+            f"  {m:<14}  MAE={mae_per_dim[i]:.4f}  DirAcc={dir_acc[i]:.3f}"
+        )
+
+    import json as _json
+    Path("outputs/pes").mkdir(parents=True, exist_ok=True)
+    val_metrics = {
+        "val_mse": round(mse_overall, 6),
+        "mae_per_metric": {
+            m: round(float(mae_per_dim[i]), 4)
+            for i, m in enumerate(METRIC_NAMES_VAL)
+        },
+        "directional_accuracy": {
+            m: round(float(dir_acc[i]), 3)
+            for i, m in enumerate(METRIC_NAMES_VAL)
+        },
+    }
+    with open("outputs/pes/transition_model_validation.json", "w") as _f:
+        _json.dump(val_metrics, _f, indent=2)
+    logger.info("  Saved to outputs/pes/transition_model_validation.json")
+
+    # ------------------------------------------------------------------
     # Cluster patients
     # ------------------------------------------------------------------
     logger.info("\n[4/5] Clustering patients...")
@@ -280,6 +324,11 @@ def main(args) -> None:
 
     for cluster_id, group in cluster_groups.items():
         logger.info(f"  Cluster {cluster_id}: {len(group)} patients")
+        action_counts = np.bincount(
+            np.array(actions)[cluster_labels == cluster_id].astype(int),
+            minlength=12
+        )
+        logger.info(f"    Action distribution: {action_counts.tolist()}")
 
     # ------------------------------------------------------------------
     # Build environments
