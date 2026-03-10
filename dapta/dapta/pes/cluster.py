@@ -31,7 +31,7 @@ class PatientClusterer:
     random_seed : For reproducibility
     """
 
-    def __init__(self, n_clusters: int = 6, random_seed: int = 42) -> None:
+    def __init__(self, n_clusters: int = 8, random_seed: int = 42) -> None:
         self.n_clusters = n_clusters
         self.random_seed = random_seed
         self._kmeans: Optional[KMeans] = None
@@ -83,12 +83,21 @@ class PatientClusterer:
         return groups
 
     def _build_feature_matrix(self, profiles: List[PatientProfile]) -> np.ndarray:
-        """Build clustering feature matrix: [subtype_encoded, wab_aq_norm, months_norm]."""
+        """Build clustering feature matrix: [subtype_encoded, severity_band, months_norm]."""
         subtypes_enc = self._le.transform([
             p.aphasia_subtype if p.aphasia_subtype in self._le.classes_ else "Other"
             for p in profiles
         ])
-        wab_aq = np.array([p.wab_aq for p in profiles]) / 100.0
+
+        # Discretise WAB-AQ into 4 severity bands using standard clinical cutoffs
+        # (Kertesz, 1982): Severe <25, Moderate 25-50, Mild-moderate 50-75, Mild 75+
+        def _severity_band(wab_aq: float) -> float:
+            if wab_aq < 25:   return 0.0
+            elif wab_aq < 50: return 0.33
+            elif wab_aq < 75: return 0.67
+            else:             return 1.0
+
+        severity = np.array([_severity_band(p.wab_aq) for p in profiles])
         months = np.array([min(p.months_post_onset, 60) for p in profiles]) / 60.0
 
-        return np.column_stack([subtypes_enc, wab_aq, months]).astype(np.float32)
+        return np.column_stack([subtypes_enc, severity, months]).astype(np.float32)

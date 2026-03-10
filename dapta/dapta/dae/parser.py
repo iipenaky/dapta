@@ -211,9 +211,7 @@ class CHATParser:
             tasks=tasks,
         )
 
-    def _extract_metadata_pylangacq(
-        self, reader, filepath: Path
-    ) -> dict:
+    def _extract_metadata_pylangacq( self, reader, filepath: Path) -> dict:
         """Extract participant metadata from CHAT headers."""
         metadata: dict = {"filename": filepath.name}
         try:
@@ -299,11 +297,7 @@ class CHATParser:
         text = re.sub(r"[.!?]+$", "", text).strip()
         return text
 
-    def _segment_by_task(
-        self,
-        utterances: List[Utterance],
-        filepath: Path,
-    ) -> Dict[str, List[Utterance]]:
+    def _segment_by_task(self, utterances: List[Utterance], filepath: Path) -> Dict[str, List[Utterance]]:
         """
         Assign utterances to discourse task types using @G: markers.
 

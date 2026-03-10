@@ -48,12 +48,7 @@ class AphasiaTranscriptDataset(Dataset):
     Each sample is a single utterance encoded by RoBERTa tokenizer.
     """
 
-    def __init__(
-        self,
-        utterances: List[str],
-        tokenizer: "RobertaTokenizerFast",
-        max_length: int = 256,
-    ) -> None:
+    def __init__(self,utterances: List[str],tokenizer: "RobertaTokenizerFast",max_length: int = 256,) -> None:
         self.encodings = tokenizer(
             utterances,
             truncation=True,
@@ -89,12 +84,7 @@ class RoBERTaScorer:
 
     MODEL_NAME = "roberta-base"
 
-    def __init__(
-        self,
-        model_name: str = MODEL_NAME,
-        checkpoint_path: Optional[str | Path] = None,
-        device: Optional[str] = None,
-    ) -> None:
+    def __init__(self, model_name: str = MODEL_NAME, checkpoint_path: Optional[str | Path] = None, device: Optional[str] = None) -> None:
         if not _TORCH_AVAILABLE:
             raise ImportError(
                 "PyTorch and transformers are required for RoBERTaScorer. "
@@ -137,19 +127,7 @@ class RoBERTaScorer:
     # Fine-tuning
    
 
-    def fine_tune(
-        self,
-        train_utterances: List[str],
-        val_utterances: List[str],
-        output_dir: Optional[str | Path] = None,
-        num_epochs: int = 5,
-        batch_size: int = 16,
-        learning_rate: float = 2e-5,
-        mlm_probability: float = 0.15,
-        warmup_ratio: float = 0.1,
-        weight_decay: float = 0.01,
-        early_stopping_patience: int = 2,
-    ) -> "RoBERTaScorer":
+    def fine_tune(self,train_utterances: List[str],val_utterances: List[str],output_dir: Optional[str | Path] = None,num_epochs: int = 5,batch_size: int = 16,learning_rate: float = 2e-5,mlm_probability: float = 0.15,warmup_ratio: float = 0.1,weight_decay: float = 0.01,early_stopping_patience: int = 2) -> "RoBERTaScorer":
         """
         Fine-tune RoBERTa on AphasiaBank utterances via MLM.
 
@@ -232,11 +210,7 @@ class RoBERTaScorer:
     # Surprisal scoring
    
 
-    def compute_surprisal(
-        self,
-        utterances: List[str],
-        batch_size: int = 32,
-    ) -> List[float]:
+    def compute_surprisal(self,utterances: List[str],batch_size: int = 32) -> List[float]:
         """
         Compute per-utterance surprisal (negative log-likelihood) scores.
 

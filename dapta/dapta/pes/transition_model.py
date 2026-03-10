@@ -281,15 +281,14 @@ class TransitionModel:
    
 
     def _prior_predict(self, state: np.ndarray, action: int) -> np.ndarray:
-        """
-        Fallback transition using RCT-derived effect size priors.
-        Applied to the CIU rate dimension (index 0) only.
-        Noise added to reflect uncertainty.
-        """
         effect = PRIOR_EFFECT_SIZES.get(action, 0.03)
         delta = np.zeros(STATE_DIM, dtype=np.float32)
-        delta[0] = effect + np.random.normal(0, 0.01)  # CIU rate
-        delta[1] = effect * 0.6 + np.random.normal(0, 0.005)  # MC score
+        delta[0] = effect + np.random.normal(0, 0.01)        # CIU rate
+        delta[1] = effect * 0.6 + np.random.normal(0, 0.005) # MC score
+        delta[2] = effect * 0.4 + np.random.normal(0, 0.005) # MLU
+        delta[3] = effect * 0.2 + np.random.normal(0, 0.003) # TTR
+        delta[4] = effect * 0.3 + np.random.normal(0, 0.005) # SynComp
+        delta[5] = -effect * 0.3 + np.random.normal(0, 0.003) # Surprisal (lower = better)
         next_state = np.clip(state + delta, 0.0, 1.0)
         return next_state.astype(np.float32)
 

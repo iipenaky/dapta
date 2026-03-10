@@ -61,6 +61,13 @@ MAIN_CONCEPTS: Dict[str, List[str]] = {
         "put slices together",
         "cut sandwich",
     ],
+    "stroke_narrative": [
+    "had a stroke",
+    "went to hospital",
+    "lost speech language",
+    "received therapy treatment",
+    "recovery progress",
+    ],
 }
 
 
@@ -83,13 +90,7 @@ class DiscourseMetrics:
 
     def to_array(self) -> np.ndarray:
         """Return as numpy array in METRIC_ORDER."""
-        return np.array([
-            self.ciu_rate,
-            self.mc_score,
-            self.mlu_morphemes,
-            self.ttr,
-            self.syntactic_complexity,
-        ], dtype=np.float32)
+        return np.array([self.ciu_rate, self.mc_score, self.mlu_morphemes,self.ttr,self.syntactic_complexity,], dtype=np.float32)
 
     def to_dict(self) -> dict:
         return {
@@ -121,16 +122,12 @@ class DiscourseMetricExtractor:
     # CIU scoring: words that are intelligible, accurate, relevant, informative
     # Exclusion patterns following Nicholas & Brookshire (1993)
     _FILLER_PATTERN = re.compile(
-        r"\b(uh|um|er|ah|hmm|well|you know|i mean|like|so|and|the|a|an)\b",
+        r"\b(uh|um|er|ah|hmm|well)\b",
         re.IGNORECASE,
     )
     _NON_WORD = re.compile(r"[^a-zA-Z\s'-]")
 
-    def __init__(
-        self,
-        duration_minutes: Optional[float] = None,
-        task: str = "cookie_theft",
-    ) -> None:
+    def __init__( self, duration_minutes: Optional[float] = None, task: str = "cookie_theft") -> None:
         self.duration_minutes = duration_minutes
         self.task = task
         self._nlp = self._load_spacy()
@@ -222,7 +219,7 @@ class DiscourseMetricExtractor:
         """
         concept_list = MAIN_CONCEPTS.get(self.task, [])
         if not concept_list:
-            return 0.0  # Unknown task
+            return 0.5  # Unknown task
 
         full_text = " ".join(utterances).lower()
         total_score = 0

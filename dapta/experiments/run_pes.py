@@ -269,7 +269,7 @@ def main(args) -> None:
     # Cluster patients
     # ------------------------------------------------------------------
     logger.info("\n[4/5] Clustering patients...")
-    clusterer = PatientClusterer(n_clusters=6, random_seed=42)
+    clusterer = PatientClusterer(n_clusters=8, random_seed=42)
     cluster_labels = clusterer.fit_predict(profiles)
     cluster_groups = clusterer.get_cluster_groups(profiles, cluster_labels)
 
@@ -300,7 +300,7 @@ def main(args) -> None:
     for i, (sid, profile) in enumerate(zip(session_ids, profiles)):
         session_to_cluster[sid] = int(cluster_labels[i])
 
-    cluster_env_indices: Dict[int, List[int]] = {i: [] for i in range(6)}
+    cluster_env_indices: Dict[int, List[int]] = {i: [] for i in range(8)}
     for i, sid in enumerate(session_ids):
         c = session_to_cluster.get(sid, 0)
         cluster_env_indices[c].append(i)
@@ -326,7 +326,7 @@ def main(args) -> None:
         "n_transition_triples": len(states),
         "n_longitudinal_real": int((states == states).all(axis=1).sum()),
         "n_augmented_synthetic": args.n_augment,
-        "n_clusters": 6,
+        "n_clusters": 8,
         "cluster_sizes": {str(k): len(v) for k, v in cluster_env_indices.items()},
         "n_environments": len(envs),
         "train_split_size": len(splits["train"]),

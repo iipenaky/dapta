@@ -60,7 +60,7 @@ METRIC_LABELS = {
     "MLU_morphemes":      "MLU-m",
     "TTR":                "TTR",
     "SynComp":            "Syn. Complexity",
-    "Surprisal":          "Surprisal (↓)",
+    "Surprisal":          r"Surprisal ($\downarrow$)",
 }
 
 AGENTS_ORDER = ["DAPTA", "G_DDQN", "RBDE", "RTS", "PPO"]
@@ -157,7 +157,7 @@ def plot_cohens_d_heatmap(stats: dict, out_dir: Path) -> None:
     for i in range(n_m):
         for j in range(n_b):
             d = d_matrix[i, j]
-            mark = " ✓" if sig_matrix[i, j] else ""
+            mark = r" $\checkmark$" if sig_matrix[i, j] else ""
             ax.text(j, i, f"{d:+.2f}{mark}", ha="center", va="center",
                     fontsize=9, fontfamily="monospace",
                     color="white" if abs(d) > vmax * 0.6 else "black")
@@ -252,7 +252,10 @@ def plot_rq4(stats: dict, out_dir: Path) -> None:
     # CI on DAPTA
     lo, hi = rq4["ci_95"]
     d_mean = rq4["dapta_ciu_mean"]
-    ax.errorbar(0, d_mean, yerr=[[d_mean - lo], [hi - d_mean]],
+    # Ensure error bar lengths are non-negative
+    lower_err = max(0, d_mean - lo)
+    upper_err = max(0, hi - d_mean)
+    ax.errorbar(0, d_mean, yerr=[[lower_err], [upper_err]],
                 fmt="none", color="black", capsize=5, linewidth=1.5, zorder=4)
 
     ax.set_ylabel("Mean CIU rate improvement")
@@ -279,6 +282,109 @@ def plot_rq4(stats: dict, out_dir: Path) -> None:
     fig.savefig(path)
     plt.close(fig)
     print(f"  Saved: {path}")
+
+
+# ── Figure 7: RL training / learning curves ───────────────────────────────────
+
+def plot_rl_learning_curves(rl_dir: Path, out_dir: Path) -> None:
+    path = rl_dir / "training_logs.json"
+    if not path.exists():
+        print(f"  Skipping fig7 — RL training logs not found: {path}")
+        return
+
+    with open(path) as f:
+        logs = json.load(f)
+
+    # Plot reward and loss curves. Show individual cluster curves faded and the generalised model highlighted.
+    cluster_keys = sorted([k for k in logs.keys() if k.startswith("ddqn_cluster_")])
+    general_key = "ddqn_generalised"
+
+    fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+    # Mean reward
+    ax = axes[0]
+    for k in cluster_keys:
+        entry = logs[k]
+        ax.plot(entry["steps"], entry["mean_reward"], color="#BBBBBB", alpha=0.4, linewidth=1)
+
+    if general_key in logs:
+        entry = logs[general_key]
+        ax.plot(entry["steps"], entry["mean_reward"], color=COLOURS["G_DDQN"], linewidth=2.2, label="G-DDQN")
+
+    ax.set_ylabel("Mean reward")
+    ax.set_title("Figure 7a — DDQN training: mean reward over time")
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=9)
+
+    # Loss
+    ax = axes[1]
+    for k in cluster_keys:
+        entry = logs[k]
+        ax.plot(entry["steps"], entry.get("loss", []), color="#BBBBBB", alpha=0.4, linewidth=1)
+
+    if general_key in logs:
+        entry = logs[general_key]
+        ax.plot(entry["steps"], entry.get("loss", []), color=COLOURS["G_DDQN"], linewidth=2.2, label="G-DDQN")
+
+    ax.set_xlabel("Training steps")
+    ax.set_ylabel("Loss")
+    ax.set_title("Figure 7b — DDQN training: loss over time")
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=9)
+
+    plt.tight_layout()
+    path = out_dir / "fig7_rl_learning_curves.png"
+    fig.savefig(path)
+    plt.close(fig)
+    print(f"  Saved: {path}")
+
+
+# ── Figure 8: Improvement histograms per metric ─────────────────────────────
+
+def plot_improvement_histograms(eval_dir: Path, out_dir: Path) -> None:
+    stats = load_results(eval_dir)
+    agents = available_agents(stats)
+
+    metric_keys = list(METRIC_LABELS.keys())
+
+    improvements = {}
+    for agent in agents:
+        p = eval_dir / f"improvements_{agent}.npy"
+        if not p.exists():
+            print(f"  Skipping histograms — missing {p}")
+            return
+        improvements[agent] = np.load(p)
+
+    fig, axes = plt.subplots(2, 3, figsize=(14, 8), constrained_layout=True)
+    axes = axes.flatten()
+
+    for i, metric in enumerate(metric_keys):
+        ax = axes[i]
+        for agent in agents:
+            data = improvements[agent][:, i]
+            ax.hist(data, bins=20, alpha=0.5, density=True,
+                    label=agent.replace("_", "-"), color=COLOURS.get(agent, "#444444"))
+        ax.set_title(METRIC_LABELS[metric])
+        if i == 0:
+            ax.legend(fontsize=8)
+        ax.set_xlabel("Improvement")
+        ax.set_ylabel("Density")
+
+    fig.suptitle("Figure 8 — Distribution of per-patient improvements by metric")
+    path = out_dir / "fig8_improvement_histograms.png"
+    fig.savefig(path)
+    plt.close(fig)
+    print(f"  Saved: {path}")
+
+
+# ── Figure 9: Example patient trajectory (state/action) ─────────────────────
+
+def plot_example_trajectory(out_dir: Path) -> None:
+    path = out_dir / "fig9_example_trajectory.txt"
+    with open(path, "w") as f:
+        f.write("Example patient trajectory not generated.\n")
+        f.write("Run `experiments/show_patient_trajectory.py` to generate it.\n")
+    print(f"  Created placeholder: {path}")
 
 
 # ── Figure 5: Wilcoxon significance summary ───────────────────────────────────
@@ -413,6 +519,8 @@ def main():
     parser = argparse.ArgumentParser(description="Plot DAPTA thesis results")
     parser.add_argument("--eval_dir",    default="outputs/evaluation",
                         help="Directory containing evaluation_results.json")
+    parser.add_argument("--rl_dir",      default="outputs/rl",
+                        help="Directory containing RL training logs")
     parser.add_argument("--roberta_dir", default="outputs/dae/roberta_checkpoint",
                         help="RoBERTa checkpoint dir (contains trainer_state.json)")
     parser.add_argument("--out_dir",     default="outputs/figures",
@@ -420,6 +528,7 @@ def main():
     args = parser.parse_args()
 
     eval_dir    = Path(args.eval_dir)
+    rl_dir      = Path(args.rl_dir)
     roberta_dir = Path(args.roberta_dir)
     out_dir     = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -432,6 +541,9 @@ def main():
     plot_cohens_d_heatmap(stats, out_dir)
     plot_rq3(stats, out_dir)
     plot_rq4(stats, out_dir)
+    plot_rl_learning_curves(rl_dir, out_dir)
+    plot_improvement_histograms(eval_dir, out_dir)
+    plot_example_trajectory(out_dir)
     plot_wilcoxon(stats, out_dir)
     plot_roberta_loss(roberta_dir, out_dir)
 

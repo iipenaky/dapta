@@ -24,8 +24,8 @@ DEFAULT_WEIGHTS: Dict[str, float] = {
     "ciu_rate": 0.35,         # Most direct measure of communicative info
     "mc_score": 0.25,         # Narrative completeness
     "mlu_morphemes": 0.10,    # Utterance length
-    "ttr": 0.10,              # Lexical diversity
-    "syntactic_complexity": 0.05,
+    "ttr": 0.05,              # Lexical diversity
+    "syntactic_complexity": 0.10,
     "mean_surprisal": 0.15,   # Inverse: improvement = REDUCTION in surprisal
 }
 

@@ -313,7 +313,7 @@ def main(args) -> None:
         "config": {
             "total_steps": args.total_steps,
             "episode_horizon": 20,
-            "n_clusters": 6,
+            "n_clusters": 8,
             "n_environments": len(all_envs),
         }
     }
