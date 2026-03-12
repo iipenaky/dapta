@@ -85,7 +85,7 @@ dae:
 pes:
   # Patient clustering
   clustering:
-    n_clusters: 6                    # Matches 6 aphasia subtypes
+    n_clusters: 6                    
     method: "kmeans"
     features: ["aphasia_subtype_encoded", "wab_aq", "months_post_onset"]
 

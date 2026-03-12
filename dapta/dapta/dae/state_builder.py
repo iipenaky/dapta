@@ -70,13 +70,7 @@ class PatientProfile:
     months_post_onset: Months since stroke onset
     """
 
-    def __init__(
-        self,
-        participant_id: str,
-        aphasia_subtype: str = "Other",
-        wab_aq: float = 50.0,
-        months_post_onset: float = 12.0,
-    ) -> None:
+    def __init__(self, participant_id: str, aphasia_subtype: str = "Other", wab_aq: float = 50.0, months_post_onset: float = 12.0) -> None:
         self.participant_id = participant_id
         self.aphasia_subtype = self._normalise_subtype(aphasia_subtype)
         self.wab_aq = float(np.clip(wab_aq, 0.0, 100.0))
@@ -129,12 +123,7 @@ class PatientStateBuilder:
     # Fitting
    
 
-    def fit(
-        self,
-        all_metrics: List[DiscourseMetrics],
-        all_surprisals: List[float],
-        all_profiles: List[PatientProfile],
-    ) -> "PatientStateBuilder":
+    def fit(self, all_metrics: List[DiscourseMetrics], all_surprisals: List[float], all_profiles: List[PatientProfile]) -> "PatientStateBuilder":
         """
         Fit min-max scalers on the training set.
 
@@ -177,12 +166,7 @@ class PatientStateBuilder:
     # Building state vectors
    
 
-    def build(
-        self,
-        metrics: DiscourseMetrics,
-        surprisal: float,
-        profile: PatientProfile,
-    ) -> np.ndarray:
+    def build(self, metrics: DiscourseMetrics, surprisal: float, profile: PatientProfile) -> np.ndarray:
         """
         Build a normalised 14-dimensional state vector.
 
@@ -217,12 +201,7 @@ class PatientStateBuilder:
 
         return np.concatenate([norm_discourse, subtype_ohe, norm_static]).astype(np.float32)
 
-    def build_batch(
-        self,
-        metrics_list: List[DiscourseMetrics],
-        surprisals: List[float],
-        profiles: List[PatientProfile],
-    ) -> np.ndarray:
+    def build_batch(self, metrics_list: List[DiscourseMetrics], surprisals: List[float], profiles: List[PatientProfile]) -> np.ndarray:
         """
         Build a batch of state vectors. Returns shape (N, STATE_DIM).
         """
@@ -235,12 +214,7 @@ class PatientStateBuilder:
     # State trajectory (for GRU history encoder in PRTA)
    
 
-    def build_trajectory(
-        self,
-        session_metrics: List[DiscourseMetrics],
-        session_surprisals: List[float],
-        profile: PatientProfile,
-    ) -> np.ndarray:
+    def build_trajectory(self, session_metrics: List[DiscourseMetrics], session_surprisals: List[float], profile: PatientProfile) -> np.ndarray:
         """
         Build a sequence of state vectors for a patient across sessions.
 

@@ -324,11 +324,16 @@ def main(args) -> None:
 
     for cluster_id, group in cluster_groups.items():
         logger.info(f"  Cluster {cluster_id}: {len(group)} patients")
+<<<<<<< Updated upstream
         action_counts = np.bincount(
             np.array(actions)[cluster_labels == cluster_id].astype(int),
             minlength=12
         )
         logger.info(f"    Action distribution: {action_counts.tolist()}")
+=======
+        subtypes = [p.aphasia_subtype for p in group[:5]]
+        logger.info(f"    Sample subtypes: {subtypes}")
+>>>>>>> Stashed changes
 
     # ------------------------------------------------------------------
     # Build environments

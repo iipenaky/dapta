@@ -51,14 +51,7 @@ class GRUDuelingQNetwork(nn.Module):
     q_values   : (B, N_ACTIONS)
     """
 
-    def __init__(
-        self,
-        state_dim: int = STATE_DIM,
-        n_actions: int = N_ACTIONS,
-        gru_hidden: int = 128,
-        gru_layers: int = 2,
-        fc_hidden: int = 256,
-    ) -> None:
+    def __init__(self, state_dim: int = STATE_DIM, n_actions: int = N_ACTIONS, gru_hidden: int = 128, gru_layers: int = 2, fc_hidden: int = 256) -> None:
         super().__init__()
         self.state_dim = state_dim
         self.n_actions = n_actions
@@ -92,11 +85,7 @@ class GRUDuelingQNetwork(nn.Module):
             nn.Linear(fc_out, 64), nn.ReLU(), nn.Linear(64, n_actions)
         )
 
-    def forward(
-        self,
-        state: "torch.Tensor",
-        history: "torch.Tensor",
-    ) -> "torch.Tensor":
+    def forward(self, state: "torch.Tensor", history: "torch.Tensor") -> "torch.Tensor":
         """
         Parameters
         ----------
@@ -138,13 +127,7 @@ class PrioritisedReplayBuffer:
     Schaul et al. (2016). Prioritized Experience Replay. ICLR.
     """
 
-    def __init__(
-        self,
-        capacity: int = 10_000,
-        alpha: float = 0.6,
-        beta_start: float = 0.4,
-        beta_end: float = 1.0,
-    ) -> None:
+    def __init__(self, capacity: int = 10_000, alpha: float = 0.6, beta_start: float = 0.4, beta_end: float = 1.0) -> None:
         self.capacity = capacity
         self.alpha = alpha
         self.beta = beta_start
@@ -152,23 +135,12 @@ class PrioritisedReplayBuffer:
         self._buffer: deque = deque(maxlen=capacity)
         self._priorities: deque = deque(maxlen=capacity)
 
-    def push(
-        self,
-        state: np.ndarray,
-        history: np.ndarray,
-        action: int,
-        reward: float,
-        next_state: np.ndarray,
-        next_history: np.ndarray,
-        done: bool,
-    ) -> None:
+    def push(self, state: np.ndarray, history: np.ndarray, action: int, reward: float, next_state: np.ndarray, next_history: np.ndarray,done: bool) -> None:
         max_priority = max(self._priorities, default=1.0)
         self._buffer.append((state, history, action, reward, next_state, next_history, done))
         self._priorities.append(max_priority)
 
-    def sample(
-        self, batch_size: int
-    ) -> Tuple[List, np.ndarray, np.ndarray]:
+    def sample(self, batch_size: int) -> Tuple[List, np.ndarray, np.ndarray]:
         """
         Returns
         -------
@@ -187,9 +159,7 @@ class PrioritisedReplayBuffer:
 
         return batch, indices, weights.astype(np.float32)
 
-    def update_priorities(
-        self, indices: np.ndarray, td_errors: np.ndarray
-    ) -> None:
+    def update_priorities(self, indices: np.ndarray, td_errors: np.ndarray) -> None:
         for idx, td in zip(indices, td_errors):
             self._priorities[idx] = float(abs(td)) + 1e-5
 
@@ -227,25 +197,7 @@ class DDQNAgent:
     checkpoint_path    : Where to save model
     """
 
-    def __init__(
-        self,
-        state_dim: int = STATE_DIM,
-        n_actions: int = N_ACTIONS,
-        gru_hidden: int = 128,
-        gru_layers: int = 2,
-        learning_rate: float = 1e-4,
-        gamma: float = 0.95,
-        tau: float = 0.005,
-        target_update_freq: int = 100,
-        buffer_size: int = 10_000,
-        batch_size: int = 64,
-        eps_start: float = 1.0,
-        eps_end: float = 0.05,
-        eps_fraction: float = 0.3,
-        history_len: int = 10,
-        device: Optional[str] = None,
-        checkpoint_path: Optional[str | Path] = None,
-    ) -> None:
+    def __init__(self, state_dim: int = STATE_DIM, n_actions: int = N_ACTIONS, gru_hidden: int = 128, gru_layers: int = 2, learning_rate: float = 1e-4, gamma: float = 0.95, tau: float = 0.005, target_update_freq: int = 100, buffer_size: int = 10_000, batch_size: int = 64, eps_start: float = 1.0, eps_end: float = 0.05, eps_fraction: float = 0.3, history_len: int = 10, device: Optional[str] = None, checkpoint_path: Optional[str | Path] = None) -> None:
         if not _TORCH:
             raise ImportError("PyTorch is required for DDQNAgent.")
 
@@ -279,12 +231,7 @@ class DDQNAgent:
 
     # Action selection
 
-    def select_action(
-        self,
-        state: np.ndarray,
-        history: np.ndarray,
-        greedy: bool = False,
-    ) -> int:
+    def select_action(self, state: np.ndarray, history: np.ndarray, greedy: bool = False) -> int:
         """
         ε-greedy action selection.
 
@@ -390,11 +337,7 @@ class DDQNAgent:
                 self.tau * param.data + (1.0 - self.tau) * target_param.data
             )
 
-    def build_history_tensor(
-        self,
-        state_history: List[np.ndarray],
-        action_history: List[int],
-    ) -> np.ndarray:
+    def build_history_tensor(self, state_history: List[np.ndarray],action_history: List[int]) -> np.ndarray:
         """
         Build history tensor from lists of past states and actions.
         Pads to history_len if necessary.

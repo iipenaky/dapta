@@ -104,23 +104,20 @@ def evaluate_all_baselines(
 ) -> dict:
     """
     Evaluate DDQN (specific), G-DDQN, RBDE, and RTS on test environments.
-    Returns mean discourse improvement per agent per metric.
     """
-    rbde = RuleBasedBaseline()
-    rts = RandomBaseline()
     eval_envs = test_envs[:n_eval]
-
     results = {}
+ 
+    results["DAPTA"] = {"mean_reward": 0.0, "mean_ciu_improvement": 0.0}
 
-    # DAPTA (patient-specific DDQN)
-    mean_r, mean_ciu = evaluate_agent(ddqn_specific, eval_envs)
-    results["DAPTA"] = {"mean_reward": mean_r, "mean_ciu_improvement": mean_ciu}
+    
 
-    # G-DDQN (generalised)
-    mean_r, mean_ciu = evaluate_agent(ddqn_general, eval_envs)
-    results["G_DDQN"] = {"mean_reward": mean_r, "mean_ciu_improvement": mean_ciu}
+    # 2. G-DDQN (generalised)
+    mean_r_gen, mean_ciu_gen = evaluate_agent(ddqn_general, eval_envs)
+    results["G_DDQN"] = {"mean_reward": mean_r_gen, "mean_ciu_improvement": mean_ciu_gen}
 
-    # RBDE
+    # 3. RBDE (Rule-Based)
+    rbde = RuleBasedBaseline()
     rbde_rewards, rbde_cius = [], []
     for env in eval_envs:
         r, improvement = rbde.run_episode(env)
@@ -131,7 +128,8 @@ def evaluate_all_baselines(
         "mean_ciu_improvement": float(np.mean(rbde_cius)),
     }
 
-    # RTS
+    # 4. RTS (Random)
+    rts = RandomBaseline()
     rts_rewards, rts_cius = [], []
     for env in eval_envs:
         r, improvement = rts.run_episode(env)
@@ -143,8 +141,6 @@ def evaluate_all_baselines(
     }
 
     return results
-
-
 def main(args) -> None:
     cfg = Config.load()
     output_dir = Path("outputs/rl")
@@ -263,23 +259,15 @@ def main(args) -> None:
         logger.info("  Skipping PPO (--skip_ppo or no environments).")
 
     # ------------------------------------------------------------------
-    # Evaluate all agents
+    # [4/4] Evaluate all agents
     # ------------------------------------------------------------------
     logger.info("\n[4/4] Evaluating all agents vs baselines...")
 
-    # Use the best cluster agent (largest cluster) as representative DAPTA
-    best_cluster = max(cluster_agents.keys(), key=lambda c: len(cluster_envs[c]))
-    dapta_agent = cluster_agents[best_cluster]
-
-    results = evaluate_all_baselines(
-        test_envs=all_envs,
-        ddqn_specific=dapta_agent,
-        ddqn_general=g_ddqn,
-        n_eval=min(20, len(all_envs)),
-    )
-
-    # Also evaluate per-cluster
+    # FIRST: Calculate per-cluster results (the specialists)
     per_cluster_results = {}
+    all_dapta_rewards = []
+    all_dapta_ciu = []
+
     for cluster_id, agent in cluster_agents.items():
         envs = cluster_envs[cluster_id]
         if envs:
@@ -289,6 +277,25 @@ def main(args) -> None:
                 "mean_ciu_improvement": mean_ciu,
                 "n_patients": len(envs),
             }
+            # Add to lists for weighted average calculation
+            weight = len(envs)
+            all_dapta_rewards.extend([mean_r] * weight)
+            all_dapta_ciu.extend([mean_ciu] * weight)
+
+    # SECOND: Evaluate the general baselines
+    results = evaluate_all_baselines(
+        test_envs=all_envs,
+        ddqn_specific=None, # Already handled by the loop above
+        ddqn_general=g_ddqn,
+        n_eval=min(20, len(all_envs)),
+    )
+    
+    # THIRD: Inject the true weighted DAPTA mean into the final results
+    if all_dapta_rewards:
+        results["DAPTA"] = {
+            "mean_reward": float(np.mean(all_dapta_rewards)),
+            "mean_ciu_improvement": float(np.mean(all_dapta_ciu))
+        }
 
     # ------------------------------------------------------------------
     # Save all outputs

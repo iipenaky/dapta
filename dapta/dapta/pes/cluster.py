@@ -6,7 +6,7 @@ patient-specific policy training (addressing RQ4).
 """
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 from sklearn.cluster import KMeans
