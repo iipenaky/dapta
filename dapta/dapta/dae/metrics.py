@@ -1,360 +1,658 @@
 """
-Automated computation of five validated discourse metrics from
-AphasiaBank transcripts.
+Computation of discourse metrics from AphasiaBank transcripts.
 
 Metrics
--
-1. CIU Rate  — Correct Information Units per minute 
-2. MC Score  — Main Concept completeness [0, 1] 
+1. CIU Rate  — Correct Information Units per minute
+2. MC Score  — Main Concept completeness [0, 1]
+               Returns 0.0 (not 0.5) for tasks with no concept list.
 3. MLU-m     — Mean Length of Utterance in morphemes
-4. TTR        — Type-Token Ratio
-5. SynComp   — Syntactic complexity
+4. MATTR     — Moving-Average Type-Token Ratio (window=50, content words)
+5. SynComp   — Syntactic complexity (proportion of utterances with subordinate clause)
+6. WPM       — Words per minute  (counted from CHAT-code-stripped raw, NOT clean_utterance output)
+7. maze_rate — Repair/revision proportion (must be computed from raw CHAT)
+
+INSTALL:
+    pip install stanza spacy
+    python -c "import stanza; stanza.download('en')"
+    python -m spacy download en_core_web_sm
 """
 
-from __future__ import annotations
 import re
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional
-from dataclasses import dataclass
 
 import numpy as np
-
-try:
-    import spacy
-    _nlp: Optional[spacy.Language] = None  
-    _SPACY_AVAILABLE = True
-except ImportError:
-    _SPACY_AVAILABLE = False
 
 from dapta.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# Main concept checklists
-MAIN_CONCEPTS: Dict[str, List[str]] = {
-    "cookie_theft": [
-        "woman washing dishes",
-        "water overflowing",
-        "boy stealing cookies",
-        "girl asking for cookies",
-        "boy falling off stool",
-        "stool tipping over",
-        "woman unaware of flood",
-        "window open curtains",
-    ],
-    "cinderella": [
-        "cinderella poor mistreated",
-        "stepmother stepsisters cruel",
-        "fairy godmother appears",
-        "pumpkin becomes carriage",
-        "cinderella goes to ball",
-        "prince dances with cinderella",
-        "cinderella leaves at midnight",
-        "glass slipper left behind",
-        "prince searches kingdom",
-        "slipper fits cinderella",
-        "they marry happily ever after",
-    ],
-    "sandwich": [
-        "get bread",
-        "get peanut butter",
-        "spread peanut butter",
-        "put slices together",
-        "cut sandwich",
-    ],
+# ---------------------------------------------------------------------------
+# Lazy-loaded NLP singletons
+# ---------------------------------------------------------------------------
+
+_stanza_nlp = None
+_spacy_nlp  = None
+
+
+def get_stanza():
+    global _stanza_nlp
+    if _stanza_nlp is None:
+        try:
+            import stanza
+            _stanza_nlp = stanza.Pipeline(
+                "en",
+                processors="tokenize,mwt,pos,lemma,depparse",
+                verbose=False,
+                download_method=None,
+            )
+            logger.info("Stanza pipeline loaded (cached).")
+        except Exception as e:
+            logger.warning(f"Stanza unavailable: {e}")
+            _stanza_nlp = False
+    return _stanza_nlp if _stanza_nlp else None
+
+
+def get_spacy():
+    global _spacy_nlp
+    if _spacy_nlp is None:
+        try:
+            import spacy
+            _spacy_nlp = spacy.load("en_core_web_sm")
+            logger.info("spaCy pipeline loaded (cached).")
+        except Exception as e:
+            logger.warning(f"spaCy unavailable: {e}")
+            _spacy_nlp = False
+    return _spacy_nlp if _spacy_nlp else None
+
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+TASK_DURATION_FALLBACK = {
+    "cookie_theft":     4.0,
+    "cinderella":       7.0,
+    "sandwich":         3.0,
+    "stroke_narrative": 5.0,
+    "conversation":    10.0,
 }
 
+MAIN_CONCEPTS = {
+    "cookie_theft": [
+        [["woman", "lady", "she", "mother", "mom"],
+         ["washing", "drying", "cleaning", "dishes", "sink"]],
+        [["water", "flood", "flooding", "overflow", "overflowing", "spilling"]],
+        [["boy", "he", "kid", "child"],
+         ["stealing", "taking", "reaching", "grabbing", "cookie", "cookies", "jar"]],
+        [["girl", "she", "sister"],
+         ["asking", "wants", "wanting", "cookie", "cookies"]],
+        [["boy", "he", "kid"],
+         ["falling", "fell", "tipping", "tipped", "stool", "chair"]],
+        [["stool", "chair"],
+         ["tipping", "tipped", "wobbling", "falling", "fell"]],
+        [["woman", "lady", "she", "mother"],
+         ["unaware", "ignoring", "oblivious", "noticing", "notice"]],
+        [["window", "curtains", "outside"]],
+    ],
+    "cinderella": [
+        [["cinderella", "she", "girl"],
+         ["poor", "mistreated", "servants", "maid", "work", "working"]],
+        [["stepmother", "sisters", "stepsisters"],
+         ["cruel", "mean", "wicked", "unkind", "bossy"]],
+        [["fairy", "godmother"],
+         ["appears", "appeared", "came", "magic", "helped"]],
+        [["pumpkin"],
+         ["carriage", "coach", "became", "turned"]],
+        [["cinderella", "she"],
+         ["ball", "party", "dance", "went", "going"]],
+        [["prince"],
+         ["danced", "dancing", "dance", "met", "cinderella"]],
+        [["midnight", "twelve"],
+         ["left", "ran", "running", "fled", "escape"]],
+        [["slipper", "shoe", "glass"],
+         ["left", "lost", "dropped", "behind"]],
+        [["prince"],
+         ["searching", "search", "looking", "found", "kingdom"]],
+        [["slipper", "shoe", "glass"],
+         ["fit", "fits", "fitted", "cinderella"]],
+        [["married", "marry", "wedding", "lived", "happily"]],
+    ],
+    "sandwich": [
+        [["bread", "loaf", "slice", "slices"]],
+        [["peanut", "butter", "jelly", "jam"]],
+        [["spread", "spreading", "put", "apply"]],
+        [["together", "slices", "bread", "sandwich"]],
+        [["cut", "cutting", "slice", "half"]],
+    ],
+    "stroke_narrative": [
+        [["stroke", "attack", "brain"]],
+        [["hospital", "ambulance", "emergency", "doctor"]],
+        [["speech", "talk", "talking", "speak", "language", "words", "communicate"]],
+        [["therapy", "therapist", "treatment", "rehab", "rehabilitation", "practice"]],
+        [["better", "improved", "improving", "recovery", "progress", "recovering"]],
+    ],
+    # conversation intentionally absent — no scoreable concept list.
+}
+
+COMPLEX_DEPS = {"advcl", "relcl", "ccomp", "xcomp", "acl"}
+
+CONTRACTION_MORPHEMES = [
+    (re.compile(r"\b\w+n't\b",  re.IGNORECASE), 1),
+    (re.compile(r"\b\w+'ve\b",  re.IGNORECASE), 1),
+    (re.compile(r"\b\w+'ll\b",  re.IGNORECASE), 1),
+    (re.compile(r"\b\w+'d\b",   re.IGNORECASE), 1),
+    (re.compile(r"\b\w+'re\b",  re.IGNORECASE), 1),
+    (re.compile(r"\b\w+'m\b",   re.IGNORECASE), 1),
+]
+
+_TS_PATTERN = re.compile(r"\x15(\d+)_(\d+)\x15")
+
+# CHAT repair markers — must be counted BEFORE clean_utterance() strips them
+_REPAIR_PATTERN = re.compile(
+    r"\[/\]"        # repetition
+    r"|\[//\]"      # revision
+    r"|\+/\."       # abandoned utterance
+)
+
+# CHAT codes to strip for WPM counting (timestamps, non-verbal codes, CHAT
+# bracket annotations) — but we do NOT strip orthographic words, contractions,
+# or filled pauses, so the count matches CLAN's word counter.
+_WPM_STRIP = re.compile(
+    r"\x15\d+_\d+\x15"         # timestamps
+    r"|\[[-/]{1,2}\]"           # [/] [//] [-]
+    r"|\[\+[^\]]*\]"            # [+ ...] switch codes
+    r"|\[[-=][^\]]*\]"          # [- ...] [= ...] comments
+    r"|&=[a-zA-Z_]+"            # &=laughs &=coughs etc.
+    r"|&\+[a-zA-Z]+"            # &+un partial words (NOT counted by CLAN)
+    r"|\+[<>!.,?]"              # overlap/continuation markers
+    r"|[<>]"                    # overlap angle brackets
+    r"|\x14\d+\x14"             # CHAT segment markers
+    r"|\[%[^\]]*\]"             # [% comment] tiers
+    r"|\[=\?[^\]]*\]"           # uncertain transcriptions keep the word, strip brackets below
+    r"|\[[^\]]*\]"              # remaining bracket annotations
+    r"|[.!?,;:]+\s*$"           # trailing punctuation
+    r"|www|xxx|yyy",            # unintelligible placeholders
+    re.VERBOSE,
+)
 
 
-# Dataclass for results
+# ---------------------------------------------------------------------------
+# Dataclass
+# ---------------------------------------------------------------------------
+
 @dataclass
 class DiscourseMetrics:
-    """
-    Computed discourse metrics for one patient transcript/task.
-    All numeric values are raw (un-normalised).
-    """
-    ciu_rate: float          # CIUs per minute (≥0)
-    mc_score: float          # Main concept completeness [0, 1]
-    mlu_morphemes: float     # Mean length of utterance in morphemes
-    ttr: float               # Type-token ratio [0, 1]
-    syntactic_complexity: float  # Subordinate clause ratio [0, 1]
-    n_utterances: int        # Total utterance count
-    n_words: int             # Total word count
-    task: str = "unknown"
+    ciu_rate:             float
+    mc_score:             float
+    mlu_morphemes:        float
+    mattr:                float
+    syntactic_complexity: float
+    n_utterances:         int
+    n_words:              int
+    wpm:                  float = 0.0
+    maze_rate:            float = 0.0   # proportion of utterances with repairs
+    task:                 str   = "unknown"
 
     def to_array(self) -> np.ndarray:
-        """Return as numpy array in METRIC_ORDER."""
+        """
+        Feature array for the RL state vector.
+        Matches METRIC_NAMES in state_builder: ciu_rate, mc_score,
+        mlu_morphemes, mattr, syntactic_complexity.
+        WPM lives in the static/signal block; ttr removed.
+        """
         return np.array([
             self.ciu_rate,
             self.mc_score,
             self.mlu_morphemes,
-            self.ttr,
+            self.mattr,
             self.syntactic_complexity,
         ], dtype=np.float32)
 
     def to_dict(self) -> dict:
         return {
-            "ciu_rate": self.ciu_rate,
-            "mc_score": self.mc_score,
-            "mlu_morphemes": self.mlu_morphemes,
-            "ttr": self.ttr,
+            "ciu_rate":             self.ciu_rate,
+            "mc_score":             self.mc_score,
+            "mlu_morphemes":        self.mlu_morphemes,
+            "mattr":                self.mattr,
             "syntactic_complexity": self.syntactic_complexity,
-            "n_utterances": self.n_utterances,
-            "n_words": self.n_words,
-            "task": self.task,
+            "n_utterances":         self.n_utterances,
+            "n_words":              self.n_words,
+            "wpm":                  self.wpm,
+            "maze_rate":            self.maze_rate,
+            "task":                 self.task,
         }
 
 
+# ---------------------------------------------------------------------------
+# Main extractor
+# ---------------------------------------------------------------------------
 
-# Metric extractor
 class DiscourseMetricExtractor:
     """
-    Computes all five discourse metrics from a list of utterance strings.
+    Computes discourse metrics from cleaned utterance strings.
 
     Parameters
-    duration_minutes : Optional float
-        Duration of the speech sample in minutes. Required for CIU rate.
-        If None, CIU rate is computed per utterance (less accurate).
-    task : str
-        Discourse task type for MC scoring.
+    ----------
+    task             : Discourse task name.
+    duration_minutes : Actual recording duration in minutes. If 0 or None,
+                       duration is estimated from CHAT timestamps, then falls
+                       back to per-task constants.
     """
 
-    # CIU scoring: words that are intelligible, accurate, relevant, informative
-    # Exclusion patterns following Nicholas & Brookshire (1993)
-    _FILLER_PATTERN = re.compile(
-        r"\b(uh|um|er|ah|hmm|well|you know|i mean|like|so|and|the|a|an)\b",
-        re.IGNORECASE,
-    )
-    _NON_WORD = re.compile(r"[^a-zA-Z\s'-]")
+    FILLER_PATTERN = re.compile(r"^\b(uh|um|er|ah|hmm|well)\b$", re.IGNORECASE)
+    NON_WORD       = re.compile(r"[^a-zA-Z\s'-]")
 
-    def __init__(
-        self,
-        duration_minutes: Optional[float] = None,
-        task: str = "cookie_theft",
-    ) -> None:
-        self.duration_minutes = duration_minutes
-        self.task = task
-        self._nlp = self._load_spacy()
+    def __init__(self, task: str, duration_minutes: float = 0.0):
+        self.task             = task
+        self.duration_minutes = duration_minutes or 0.0
 
+    # ------------------------------------------------------------------
     # Public API
-    
-    def compute(self, utterances: List[str]) -> DiscourseMetrics:
+    # ------------------------------------------------------------------
+
+    def compute(
+        self,
+        utterances:     List[str],
+        raw_utterances: Optional[List[str]] = None,
+    ) -> DiscourseMetrics:
         """
-        Compute all discourse metrics from a list of utterance strings.
+        Compute all discourse metrics.
 
         Parameters
-        utterances : List of cleaned utterance strings.
-
-        Returns
-        DiscourseMetrics
+        ----------
+        utterances     : Cleaned utterance strings (CHAT markup removed).
+        raw_utterances : Original CHAT tier strings — used for:
+                           • timestamp extraction (accurate CIU / WPM rates)
+                           • maze_rate (repair counts before cleaning)
+                           • WPM word counting (matches CLAN's counter)
+                         Optional but strongly recommended.
         """
-        if not utterances:
-            return self._empty_metrics()
-
-        # Filter empty
         utterances = [u.strip() for u in utterances if u.strip()]
         if not utterances:
             return self._empty_metrics()
 
-        ciu_rate = self._compute_ciu_rate(utterances)
-        mc_score = self._compute_mc_score(utterances)
-        mlu = self._compute_mlu(utterances)
-        ttr = self._compute_ttr(utterances)
-        syn_comp = self._compute_syntactic_complexity(utterances)
+        duration = self._resolve_duration(raw_utterances, utterances)
 
-        all_words = " ".join(utterances).split()
+        ciu_rate  = self._compute_ciu_rate(utterances, duration)
+        mc_score  = self._compute_mc_score(utterances)
+        mlu       = self._compute_mlu(utterances)
+        mattr     = self._compute_ttr(utterances)
+        syn_comp  = self._compute_syntactic_complexity(utterances)
+        wpm       = self._compute_wpm(utterances, raw_utterances, duration)
+        maze_rate = self._compute_maze_rate(raw_utterances, len(utterances))
+
+        n_words = len(re.findall(r"[a-zA-Z]+(?:'[a-zA-Z]+)?", " ".join(utterances).lower()))
 
         return DiscourseMetrics(
             ciu_rate=ciu_rate,
             mc_score=mc_score,
             mlu_morphemes=mlu,
-            ttr=ttr,
+            mattr=mattr,
             syntactic_complexity=syn_comp,
             n_utterances=len(utterances),
-            n_words=len(all_words),
+            n_words=n_words,
             task=self.task,
+            wpm=wpm,
+            maze_rate=maze_rate,
         )
 
-    # CIU Rate
+    # ------------------------------------------------------------------
+    # Duration resolution
+    # ------------------------------------------------------------------
 
-    def _compute_ciu_rate(self, utterances: List[str]) -> float:
-        """
-        Estimate CIU rate.
+    def _resolve_duration(
+        self,
+        raw_utterances: Optional[List[str]],
+        clean_utterances: List[str],
+    ) -> float:
+        if self.duration_minutes and self.duration_minutes > 0:
+            return self.duration_minutes
 
-        A CIU is a word that is:
-          - Intelligible (not unintelligible placeholder)
-          - Accurate (not a clear error)
-          - Relevant (not a filler/aside)
-          - Informative (contributes content)
+        if raw_utterances:
+            start_times = []
+            end_times   = []
+            for raw in raw_utterances:
+                for m in _TS_PATTERN.finditer(raw):
+                    start_times.append(int(m.group(1)))
+                    end_times.append(int(m.group(2)))
 
-        Approximated by removing fillers and non-content words.
-        For accurate CIU scoring, CLAN EVAL output should be used directly.
-        """
+            if start_times and end_times:
+                duration_ms = max(end_times) - min(start_times)
+                if duration_ms > 0:
+                    return duration_ms / 60_000.0
+
+        return TASK_DURATION_FALLBACK.get(self.task, 5.0)
+
+    # ------------------------------------------------------------------
+    # 1. CIU Rate
+    # ------------------------------------------------------------------
+
+    def _compute_ciu_rate(self, utterances: List[str], duration_minutes: float) -> float:
         ciu_count = 0
         for utt in utterances:
             words = utt.lower().split()
-            # Remove fillers
-            content_words = [
-                w for w in words
-                if not self._FILLER_PATTERN.fullmatch(w)
-                and len(w) > 1
-                and not self._NON_WORD.search(w)
-            ]
-            ciu_count += len(content_words)
+            for w in words:
+                if len(w) <= 1:
+                    continue
+                if self.FILLER_PATTERN.match(w):
+                    continue
+                if self.NON_WORD.search(w):
+                    continue
+                ciu_count += 1
+        return round(ciu_count / max(duration_minutes, 0.01), 2)
 
-        if self.duration_minutes and self.duration_minutes > 0:
-            return round(ciu_count / self.duration_minutes, 2)
-        else:
-            # Estimate: assume ~5 sec per utterance if no duration
-            est_minutes = len(utterances) * 5 / 60
-            return round(ciu_count / max(est_minutes, 0.01), 2)
+    # ------------------------------------------------------------------
+    # 2. WPM  — fixed to match CLAN's word counter
+    # ------------------------------------------------------------------
 
-    # Main Concept Score
+    def _compute_wpm(
+        self,
+        utterances:     List[str],
+        raw_utterances: Optional[List[str]],
+        duration_minutes: float,
+    ) -> float:
+        """
+        Words per minute aligned with CLAN.
+
+        CLAN counts all orthographic words (including filled pauses and
+        contractions) from the raw transcript tier, minus CHAT codes.
+        We replicate this by:
+          1. Using raw CHAT tier strings when available.
+          2. Stripping only structural CHAT codes (timestamps, bracket
+             annotations, non-verbal codes) via _WPM_STRIP.
+          3. Counting [a-zA-Z]+(?:'[a-zA-Z]+)? tokens — words + contractions.
+          4. Dividing by the already-resolved duration.
+
+        The previous implementation called clean_utterance() first, which
+        also removed filled pauses (uh, um) and other tokens CLAN keeps,
+        causing a systematic -49 WPM bias vs CLAN.
+        """
+        source = raw_utterances if raw_utterances else utterances
+
+        total_words = 0
+        for u in source:
+            stripped = _WPM_STRIP.sub(" ", u)
+            # Also remove stray CHAT tier-start markers e.g. "*PAR:" if present
+            stripped = re.sub(r"^\*[A-Z]{2,3}:\s*", "", stripped)
+            total_words += len(re.findall(r"[a-zA-Z]+(?:'[a-zA-Z]+)?", stripped))
+
+        return round(total_words / max(duration_minutes, 0.01), 2)
+
+    # ------------------------------------------------------------------
+    # 3. MC Score
+    # ------------------------------------------------------------------
 
     def _compute_mc_score(self, utterances: List[str]) -> float:
         """
-        Score main concept completeness against the published MC checklist.
-
-        Each MC unit scores 0 (absent), 1 (partial/keyword present),
-        or 2 (complete — full concept expressed).
-        Final score = sum / (2 * n_concepts), normalised to [0, 1].
-
-        Scoring is keyword-based: partial = ≥1 keyword hit, complete = ≥2.
+        Score each main concept as 0 (absent), 1 (partial), or 2 (complete).
+        Returns 0.0 for tasks with no concept list (e.g. conversation).
         """
         concept_list = MAIN_CONCEPTS.get(self.task, [])
         if not concept_list:
-            return 0.0  # Unknown task
+            return 0.0
 
         full_text = " ".join(utterances).lower()
-        total_score = 0
+        total     = 0
         max_score = 2 * len(concept_list)
 
         for concept in concept_list:
-            keywords = concept.split()
-            hits = sum(1 for kw in keywords if kw in full_text)
-            if hits == 0:
-                score = 0
-            elif hits < len(keywords):
-                score = 1   # Partial
-            else:
-                score = 2   # Complete
-            total_score += score
+            total += self._score_concept(concept, full_text)
 
-        return round(total_score / max_score, 4) if max_score > 0 else 0.0
-
-    # MLU in morphemes
-
-    def _compute_mlu(self, utterances: List[str]) -> float:
-        """
-        Approximate MLU in morphemes.
-
-        Morpheme count per word is estimated by:
-          - Base form = 1 morpheme
-          - Each inflectional suffix (ed, s, ing, er, est, ly) = +1 morpheme
-
-        For precise CLAN-level morpheme counts, EVAL output should be used.
-        """
-        if not self._nlp:
-            # Fallback: word-level MLU
-            word_counts = [len(u.split()) for u in utterances if u.strip()]
-            return round(np.mean(word_counts), 2) if word_counts else 0.0
-
-        morpheme_counts = []
-        for utt in utterances:
-            if not utt.strip():
-                continue
-            doc = self._nlp(utt)
-            count = 0
-            for token in doc:
-                if token.is_punct or token.is_space:
-                    continue
-                count += 1  # Base morpheme
-                # Inflectional morphemes via morphological analysis
-                morph = token.morph
-                if "Tense=Past" in str(morph):
-                    count += 1  # -ed
-                if "Number=Plur" in str(morph):
-                    count += 1  # -s
-                if "Aspect=Prog" in str(morph):
-                    count += 1  # -ing
-            morpheme_counts.append(count)
-
-        return round(np.mean(morpheme_counts), 2) if morpheme_counts else 0.0
-
-    # Type-Token Ratio
-
-    def _compute_ttr(self, utterances: List[str]) -> float:
-        """
-        Compute TTR as unique lemma types / total tokens.
-        Uses spaCy lemmatisation if available; else raw words.
-        """
-        full_text = " ".join(utterances).lower()
-
-        if self._nlp:
-            doc = self._nlp(full_text)
-            tokens = [
-                t.lemma_ for t in doc
-                if not t.is_punct and not t.is_space and not t.is_stop
-            ]
-        else:
-            tokens = re.findall(r"\b[a-zA-Z]+\b", full_text)
-
-        if not tokens:
-            return 0.0
-
-        types = set(tokens)
-        return round(len(types) / len(tokens), 4)
-
-    # Syntactic complexity
-
-    def _compute_syntactic_complexity(self, utterances: List[str]) -> float:
-        """
-        Syntactic complexity = proportion of complex utterances.
-        A complex utterance contains ≥1 subordinate clause (advcl, relcl, ccomp, xcomp).
-        """
-        if not self._nlp:
-            # Fallback: count subordinating conjunctions as proxy
-            sub_conj = {"because", "although", "when", "while", "since",
-                        "after", "before", "if", "that", "which", "who"}
-            complex_count = sum(
-                1 for u in utterances
-                if any(w in u.lower().split() for w in sub_conj)
-            )
-            return round(complex_count / len(utterances), 4) if utterances else 0.0
-
-        complex_deps = {"advcl", "relcl", "ccomp", "xcomp", "acl"}
-        complex_count = 0
-        for utt in utterances:
-            if not utt.strip():
-                continue
-            doc = self._nlp(utt)
-            deps = {token.dep_ for token in doc}
-            if deps & complex_deps:
-                complex_count += 1
-
-        return round(complex_count / len(utterances), 4) if utterances else 0.0
-
-    # Helpers
+        return round(total / max_score, 4) if max_score > 0 else 0.0
 
     @staticmethod
-    def _load_spacy() -> Optional["spacy.Language"]:
-        if not _SPACY_AVAILABLE:
-            logger.warning(
-                "spaCy not installed. Some metrics will use fallback computation. "
-                "Install with: pip install spacy && python -m spacy download en_core_web_sm"
-            )
-            return None
-        try:
-            return spacy.load("en_core_web_sm")
-        except OSError:
-            logger.warning(
-                "spaCy model 'en_core_web_sm' not found. "
-                "Run: python -m spacy download en_core_web_sm"
-            )
-            return None
+    def _score_concept(concept: list, full_text: str) -> int:
+        groups_hit = 0
+        any_hit    = False
+        for group in concept:
+            if isinstance(group, str):
+                group = [group]
+            if any(kw in full_text for kw in group):
+                groups_hit += 1
+                any_hit = True
+        if groups_hit == len(concept):
+            return 2
+        elif any_hit:
+            return 1
+        return 0
+
+    # ------------------------------------------------------------------
+    # 4. MLU in morphemes
+    # ------------------------------------------------------------------
+
+    def _compute_mlu(self, utterances: List[str]) -> float:
+        contraction_extras = []
+        for utt in utterances:
+            extra = sum(len(pat.findall(utt)) for pat, _ in CONTRACTION_MORPHEMES)
+            contraction_extras.append(extra)
+
+        nlp = get_stanza()
+        if nlp:
+            counts = []
+            for utt, extra in zip(utterances, contraction_extras):
+                if not utt.strip():
+                    continue
+                doc   = nlp(utt)
+                count = extra
+                for sent in doc.sentences:
+                    for word in sent.words:
+                        if word.upos == "PUNCT":
+                            continue
+                        count += 1
+                        feats = word.feats or ""
+                        if "Tense=Past"   in feats: count += 1
+                        if "Number=Plur"  in feats: count += 1
+                        if "Aspect=Prog"  in feats: count += 1
+                        if (
+                            "Tense=Pres"   in feats
+                            and "Number=Sing" in feats
+                            and "Person=3"    in feats
+                        ):
+                            count += 1
+                if count > 1:
+                    counts.append(count)
+            return round(float(np.mean(counts)), 2) if counts else 0.0
+
+        spacy_nlp = get_spacy()
+        if spacy_nlp:
+            counts = []
+            for utt, extra in zip(utterances, contraction_extras):
+                if not utt.strip():
+                    continue
+                doc   = spacy_nlp(utt)
+                count = extra
+                for token in doc:
+                    if token.is_punct or token.is_space:
+                        continue
+                    count += 1
+                    morph = str(token.morph)
+                    if "Tense=Past"  in morph: count += 1
+                    if "Number=Plur" in morph: count += 1
+                    if "Aspect=Prog" in morph: count += 1
+                if count > 1:
+                    counts.append(count)
+            return round(float(np.mean(counts)), 2) if counts else 0.0
+
+        logger.warning("MLU: no NLP available, falling back to word count.")
+        word_counts = [
+            len(utt.split()) for utt in utterances
+            if utt.strip() and len(utt.split()) > 1
+        ]
+        return round(float(np.mean(word_counts)), 2) if word_counts else 0.0
+
+    # ------------------------------------------------------------------
+    # 5. MATTR
+    # ------------------------------------------------------------------
+
+    MATTR_WINDOW      = 50
+    MATTR_MIN_WINDOWS = 2
+    CONTENT_POS_STANZA = {"NOUN", "VERB", "ADJ", "ADV"}
+    CONTENT_POS_SPACY  = {"NOUN", "VERB", "ADJ", "ADV"}
+
+    def _compute_ttr(self, utterances: List[str]) -> float:
+        full_text = " ".join(utterances).lower()
+
+        nlp = get_stanza()
+        if nlp:
+            doc    = nlp(full_text)
+            lemmas = [
+                word.lemma.lower()
+                for sent in doc.sentences
+                for word in sent.words
+                if word.upos in self.CONTENT_POS_STANZA
+            ]
+            return self._mattr(lemmas)
+
+        spacy_nlp = get_spacy()
+        if spacy_nlp:
+            doc    = spacy_nlp(full_text)
+            lemmas = [
+                t.lemma_.lower()
+                for t in doc
+                if t.pos_ in self.CONTENT_POS_SPACY
+                and not t.is_punct and not t.is_space
+            ]
+            return self._mattr(lemmas)
+
+        logger.warning("TTR: no NLP available, falling back to raw MATTR.")
+        words = [
+            w for w in full_text.split()
+            if len(w) > 1 and not self.NON_WORD.search(w)
+        ]
+        return self._mattr(words)
+
+    def _mattr(self, tokens: List[str]) -> float:
+        n = len(tokens)
+        if n == 0:
+            return 0.0
+        window = min(self.MATTR_WINDOW, max(1, n // self.MATTR_MIN_WINDOWS))
+        if window >= n:
+            return round(len(set(tokens)) / n, 4)
+        window_scores = [
+            len(set(tokens[i : i + window])) / window
+            for i in range(n - window + 1)
+        ]
+        return round(float(np.mean(window_scores)), 4)
+
+    # ------------------------------------------------------------------
+    # 6. Syntactic complexity
+    # ------------------------------------------------------------------
+
+    def _compute_syntactic_complexity(self, utterances: List[str]) -> float:
+        if not utterances:
+            return 0.0
+
+        nlp = get_stanza()
+        if nlp:
+            complex_count = 0
+            for utt in utterances:
+                if not utt.strip():
+                    continue
+                doc  = nlp(utt)
+                deps = {word.deprel for sent in doc.sentences for word in sent.words}
+                if deps & COMPLEX_DEPS:
+                    complex_count += 1
+            return round(complex_count / len(utterances), 4)
+
+        spacy_nlp = get_spacy()
+        if spacy_nlp:
+            complex_count = 0
+            for utt in utterances:
+                if not utt.strip():
+                    continue
+                doc  = spacy_nlp(utt)
+                deps = {token.dep_ for token in doc}
+                if deps & COMPLEX_DEPS:
+                    complex_count += 1
+            return round(complex_count / len(utterances), 4)
+
+        logger.warning("SynComp: no NLP available, returning 0.0.")
+        return 0.0
+
+    # ------------------------------------------------------------------
+    # 7. Maze rate
+    # ------------------------------------------------------------------
+
+    def _compute_maze_rate(
+        self,
+        raw_utterances: Optional[List[str]],
+        n_clean:        int,
+    ) -> float:
+        """
+        Proportion of utterances containing at least one repair marker.
+        Must be called with original (pre-cleaning) CHAT strings.
+        Returns 0.0 if raw_utterances is not provided.
+        """
+        if not raw_utterances:
+            return 0.0
+
+        n_with_repair = sum(
+            1 for raw in raw_utterances
+            if _REPAIR_PATTERN.search(raw)
+        )
+        return round(n_with_repair / max(n_clean, 1), 4)
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
 
     def _empty_metrics(self) -> DiscourseMetrics:
         return DiscourseMetrics(
             ciu_rate=0.0, mc_score=0.0, mlu_morphemes=0.0,
-            ttr=0.0, syntactic_complexity=0.0,
+            mattr=0.0, syntactic_complexity=0.0,
             n_utterances=0, n_words=0, task=self.task,
+            wpm=0.0, maze_rate=0.0,
         )
+
+    def _get_clean_production(self, utterances: List[str]) -> List[str]:
+        """Removes mazed words so we only count 'final' speech."""
+        clean_utts = []
+        for utt in utterances:
+            temp = re.sub(r'\w+\s+\[/\]', '', utt)
+            temp = re.sub(r'\w+\s+\[//\]', '', temp)
+            temp = re.sub(r'\[.*?\]', '', temp)
+            temp = re.sub(r'\+\S+', '', temp)
+            clean_utts.append(temp.strip())
+        return [u for u in clean_utts if u]
+
+
+# ---------------------------------------------------------------------------
+# Utterance-level signal helpers  (called by parser, not extractor)
+# ---------------------------------------------------------------------------
+
+def compute_utt_length_std(utterances: List[str]) -> float:
+    """
+    Std of per-utterance word counts.
+    High variance = alternating 1-word / 10-word pattern = word-finding failures.
+    Returns 0.0 for fewer than 2 utterances.
+    """
+    if len(utterances) < 2:
+        return 0.0
+    lengths = [len(u.split()) for u in utterances if u.strip()]
+    return round(float(np.std(lengths)), 4) if lengths else 0.0
+
+
+def compute_mean_pause_ms(raw_utterances: List[str]) -> float:
+    """
+    Mean inter-utterance pause in milliseconds from CHAT timestamps.
+    Returns 0.0 if fewer than 2 timestamps are found.
+    """
+    if not raw_utterances:
+        return 0.0
+
+    timestamps = []
+    for raw in raw_utterances:
+        m = _TS_PATTERN.search(raw)
+        if m:
+            timestamps.append((int(m.group(1)), int(m.group(2))))
+
+    if len(timestamps) < 2:
+        return 0.0
+
+    gaps = [
+        timestamps[i + 1][0] - timestamps[i][1]
+        for i in range(len(timestamps) - 1)
+        if timestamps[i + 1][0] > timestamps[i][1]
+    ]
+    return round(float(np.mean(gaps)), 2) if gaps else 0.0

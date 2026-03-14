@@ -9,7 +9,7 @@ Trains:
   5. Random Therapy Sequencing (RTS) baseline
 """
 
-from __future__ import annotations
+
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 

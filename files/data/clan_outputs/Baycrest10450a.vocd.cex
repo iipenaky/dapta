@@ -1,0 +1,177 @@
+vocd +t*PAR +f
+Fri Mar 13 22:37:51 2026
+vocd (11-Mar-2026) is conducting analyses on:
+  ONLY dependent tiers matching: %MOR;
+****************************************
+From file <Baycrest10450a.cha>
+well im good but be not very good 
+im good all around here but up here 
+yeah so 
+yeah 
+and something special I might 
+but most time I do yeah 
+well there be 
+well were here to yesterday right here 
+there be the four of we right 
+and FirstnameB and I and the other two 
+and were down here because 
+were little way up a bit from here up there 
+and sit down right 
+oh thats yeah 
+and their do down here 
+and they have a good time 
+and then late on someone else there its 
+and there and stuff 
+and then we go way down there 
+something to eat down there 
+yeah in the morning until late 
+yeah 
+yes there be 
+there be FirstnameB and I and FirstnameA and two kid be FirstnameD and two kid 
+and FirstnameM and two kid 
+and what the name 
+forget now 
+anyway 
+and they all come together 
+and then he go there 
+and they in the morning just before that there 
+and FirstnameA come in 
+so and anyway 
+he be have a good time with this 
+but oh it come right in there 
+and her problem there be all this stuff 
+he go 
+oh he go out right 
+and I leave it in here 
+uhoh its come down in there oh 
+and he go back there again and here 
+and its all stuff in there 
+but now its okay now 
+okay 
+he up here 
+and he go here 
+and he up that because get down 
+and this be bad on all this stuff in there 
+and this be up there but he cant get down 
+so he come down here 
+what all the day 
+what this be about 
+well im not sure that 
+in here there that person 
+and this one she do stuff in the air but in other in there together all the time 
+and this be good stuff 
+yeah okay 
+now she do stuff here and stuff in there but im not sure stuff be 
+so shes big one and the other two 
+but now they find this one here 
+and their gonna come in and stuff 
+but she work away 
+and then okay you will from the other one the two 
+and so this one right 
+and they didnt and cant do that right 
+and well I want out too 
+no I cant do that 
+nope forget it 
+but let do it anyway 
+so all the little one 
+and stuff 
+its that little thing 
+and they see they put all the down there to there and stuff 
+but Im not sure 
+it just have some 
+and it all this 
+and so you have a good time sort of 
+but all this be all gone so 
+and see by herself be of this and that there 
+aw too bad 
+but this special here 
+well stuff there be very good 
+and their do other stuff as well 
+and there good stuff 
+okay but I have to clean it on 
+and come down here and all this stuff 
+and have a good time 
+and there she be good stuff 
+but one of there 
+oh I have a go fast 
+but they leave it 
+come home 
+and stuff this one but not the other one 
+something stuff 
+and do this big 
+and what this here 
+this be a good one 
+that right on right there 
+and 
+so and stuff 
+anyway that good thank you 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.7437    0.066     37.768
+  36      100    0.7211    0.070     33.562
+  37      100    0.7281    0.056     36.072
+  38      100    0.7253    0.058     36.377
+  39      100    0.7105    0.070     34.005
+  40      100    0.7105    0.065     34.875
+  41      100    0.6959    0.065     32.637
+  42      100    0.7055    0.061     35.487
+  43      100    0.7035    0.061     35.885
+  44      100    0.6923    0.057     34.262
+  45      100    0.6869    0.053     33.904
+  46      100    0.6928    0.053     35.941
+  47      100    0.6757    0.058     33.094
+  48      100    0.6740    0.055     33.435
+  49      100    0.6767    0.054     34.709
+  50      100    0.6684    0.053     33.682
+
+D: average = 34.731; std dev. = 1.364
+D_optimum     <34.67; min least sq val = 0.001> 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.7454    0.068     38.198
+  36      100    0.7244    0.063     34.283
+  37      100    0.7305    0.062     36.641
+  38      100    0.7200    0.059     35.177
+  39      100    0.7213    0.065     36.398
+  40      100    0.7107    0.060     34.929
+  41      100    0.6985    0.062     33.182
+  42      100    0.6974    0.056     33.749
+  43      100    0.7042    0.061     36.041
+  44      100    0.7050    0.060     37.066
+  45      100    0.6880    0.053     34.135
+  46      100    0.6822    0.059     33.677
+  47      100    0.6879    0.058     35.625
+  48      100    0.6708    0.058     32.811
+  49      100    0.6590    0.051     31.198
+  50      100    0.6700    0.053     34.008
+
+D: average = 34.820; std dev. = 1.737
+D_optimum     <34.73; min least sq val = 0.001> 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.7343    0.073     35.510
+  36      100    0.7394    0.061     37.773
+  37      100    0.7289    0.064     36.260
+  38      100    0.7253    0.059     36.377
+  39      100    0.7179    0.067     35.636
+  40      100    0.7055    0.065     33.802
+  41      100    0.7073    0.059     35.042
+  42      100    0.6907    0.058     32.393
+  43      100    0.6816    0.059     31.376
+  44      100    0.6895    0.057     33.694
+  45      100    0.6887    0.056     34.275
+  46      100    0.6843    0.059     34.125
+  47      100    0.6687    0.060     31.723
+  48      100    0.6806    0.057     34.812
+  49      100    0.6712    0.059     33.574
+  50      100    0.6782    0.054     35.733
+
+D: average = 34.507; std dev. = 1.689
+D_optimum     <34.42; min least sq val = 0.001> 
+
+VOCD RESULTS SUMMARY
+====================
+   Types,Tokens,TTR:  <124,571,0.217163>
+  D_optimum  values:  <34.67, 34.73, 34.42>
+  D_optimum average:  34.61
+

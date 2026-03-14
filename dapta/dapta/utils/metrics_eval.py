@@ -14,7 +14,7 @@ Virtanen et al. (2020). SciPy 1.0. Nature Methods.
 Upton et al. (2024). iTalkBetter (d = 0.42 benchmark).
 """
 
-from __future__ import annotations
+
 import numpy as np
 from typing import Dict, List, Tuple, Optional
 from scipy import stats

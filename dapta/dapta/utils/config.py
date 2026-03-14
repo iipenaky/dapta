@@ -3,7 +3,7 @@ Central configuration loader.
 Loads configs/default.yaml and allows dot-notation access.
 """
 
-from __future__ import annotations
+
 import os
 import yaml
 from pathlib import Path

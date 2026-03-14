@@ -1,0 +1,5 @@
+metric,n_files,mean_clan,mean_python,mean_pct_diff,max_pct_diff,pearson_r
+ciu_rate,1,51.8818,51.88,0.0,0.0,nan
+mlu_morphemes,1,15.1343,8.81,41.79,41.79,nan
+ttr,1,0.257,0.236,8.17,8.17,nan
+syntactic_complexity,1,0.204,0.2139,4.85,4.85,nan

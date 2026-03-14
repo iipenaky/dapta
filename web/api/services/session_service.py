@@ -4,7 +4,7 @@ services/session_service.py
 All database operations for therapy sessions.
 """
 
-from __future__ import annotations
+
 from datetime import datetime, timezone
 from typing import Optional
 

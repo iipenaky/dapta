@@ -14,7 +14,7 @@ Statistical analysis:
   - 95% Bootstrap confidence intervals
 """
 
-from __future__ import annotations
+
 import argparse
 import json
 from pathlib import Path
@@ -109,7 +109,7 @@ def load_ddqn_agents(
             continue
         agent = DDQNAgent(state_dim=state_dim, n_actions=n_actions, device=device)
         agent.load(agent_path)
-        agent.epsilon = 0.0  # greedy at evaluation
+        agent.eps = 0.0  # greedy at evaluation
         cluster_agents[cluster_id] = agent
         logger.info(f"  Loaded DDQN cluster {cluster_id} from {agent_path}")
 

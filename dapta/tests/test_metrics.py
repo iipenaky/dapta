@@ -131,9 +131,9 @@ class TestDiscourseMetricExtractor:
 
 class TestDiscourseMetrics:
 
-    def test_empty_metrics_all_zero(self):
+    def testempty_metrics_all_zero(self):
         extractor = DiscourseMetricExtractor()
-        m = extractor._empty_metrics()
+        m = extractor.empty_metrics()
         assert m.ciu_rate == 0.0
         assert m.mc_score == 0.0
         assert m.n_utterances == 0

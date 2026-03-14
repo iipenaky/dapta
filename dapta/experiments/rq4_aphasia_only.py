@@ -19,7 +19,7 @@ Usage:
     python rq4_aphasia_only.py
 
     # Or from any directory:
-    python rq4_aphasia_only.py --data_dir outputs/evaluation
+    python rq4_aphasia_only.py --data_dir outputs/evaluation --dae_dir outputs/dae
 
     # Change contamination threshold:
     python rq4_aphasia_only.py --threshold 0.20
@@ -31,8 +31,6 @@ from pathlib import Path
 
 import numpy as np
 from scipy import stats
-from scipy.spatial.distance import cdist
-from scipy.optimize import linear_sum_assignment
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -84,49 +82,44 @@ def bonferroni(pvals, alpha=0.05):
     return [min(p * k, 1.0) for p in pvals], [min(p * k, 1.0) <= alpha for p in pvals]
 
 
-# ── Recover cluster membership from output files ──────────────────────────────
+# ── Load cluster labels directly from saved assignments ───────────────────────
 
-def recover_cluster_labels(cp, dapta, gddqn):
+def load_cluster_labels(data_dir: Path, dae_dir: Path) -> np.ndarray:
     """
-    Recover which row in the improvements arrays belongs to which cluster.
+    Load per-patient cluster labels for the test set directly from
+    cluster_assignments.json and splits.json, avoiding any reconstruction
+    heuristic.
 
-    Strategy: build a 12-dim signature (6 DAPTA + 6 G-DDQN metrics) for each
-    patient and each cluster centroid, then use the Hungarian algorithm to find
-    the optimal size-constrained assignment. This recovers exact membership
-    when the improvements data is consistent with cluster_performance.json.
+    Returns
+    -------
+    np.ndarray of int, shape (n_test_patients,)
     """
-    n_clusters   = len(cp)
-    cluster_sizes = [cp[str(c)]["n"] for c in range(n_clusters)]
+    with open(data_dir.parent / "pes" / "cluster_assignments.json") as f:
+        cluster_info = json.load(f)
 
-    # Build cluster centroids (12-dim)
-    centroids = np.array([
-        [cp[str(c)]["per_metric"][m]["dapta_mean"] for m in METRICS] +
-        [cp[str(c)]["per_metric"][m]["gddqn_mean"] for m in METRICS]
-        for c in range(n_clusters)
-    ])
+    dae_data = np.load(dae_dir / "state_vectors.npz", allow_pickle=True)
+    all_session_ids = list(dae_data["session_ids"])
 
-    patient_vecs = np.hstack([dapta, gddqn])   # (133, 12)
+    with open(dae_dir / "splits.json") as f:
+        splits = json.load(f)
 
-    # Replicate each centroid by its cluster size to form "slots"
-    slot_centroids = np.vstack([
-        np.tile(centroids[c], (cluster_sizes[c], 1))
-        for c in range(n_clusters)
-    ])
-    slot_labels = np.hstack([
-        np.full(cluster_sizes[c], c)
-        for c in range(n_clusters)
-    ])
+    test_ids    = splits["test"]
+    assignments = cluster_info["assignments"]
 
-    cost_matrix = cdist(patient_vecs, slot_centroids, metric="euclidean")
-    _, col_ind  = linear_sum_assignment(cost_matrix)
-    labels      = slot_labels[col_ind].astype(int)
+    # Only include test IDs that exist in the state vectors
+    valid_sids = set(all_session_ids)
+    cluster_labels = np.array([
+        assignments.get(sid, 0)
+        for sid in test_ids
+        if sid in valid_sids
+    ], dtype=int)
 
-    return labels
+    return cluster_labels
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-def main(data_dir: Path, threshold: float):
+def main(data_dir: Path, dae_dir: Path, threshold: float):
 
     # 1. Load files ─────────────────────────────────────────────────────────
     with open(data_dir / "cluster_performance.json") as f:
@@ -155,16 +148,22 @@ def main(data_dir: Path, threshold: float):
         else:
             aphasia_ids.append(c)
 
-    # 3. Recover per-patient cluster membership ─────────────────────────────
-    cluster_labels = recover_cluster_labels(cp, dapta, gddqn)
+    # 3. Load per-patient cluster membership directly from saved assignments ─
+    cluster_labels = load_cluster_labels(data_dir, dae_dir)
 
-    aphasia_mask   = np.isin(cluster_labels, aphasia_ids)
-    n_aphasia      = aphasia_mask.sum()
-    n_excluded     = (~aphasia_mask).sum()
+    if len(cluster_labels) != n_total:
+        print(
+            f"[WARNING] cluster_labels length ({len(cluster_labels)}) does not match "
+            f"improvements array length ({n_total}). Check --dae_dir path."
+        )
 
-    dapta_ap = dapta[aphasia_mask]
-    gddqn_ap = gddqn[aphasia_mask]
-    rbde_ap  = rbde[aphasia_mask]
+    aphasia_mask  = np.isin(cluster_labels, aphasia_ids)
+    n_aphasia     = aphasia_mask.sum()
+    n_excluded    = (~aphasia_mask).sum()
+
+    dapta_ap  = dapta[aphasia_mask]
+    gddqn_ap  = gddqn[aphasia_mask]
+    rbde_ap   = rbde[aphasia_mask]
     labels_ap = cluster_labels[aphasia_mask]
 
     # 4. Print results ───────────────────────────────────────────────────────
@@ -205,13 +204,13 @@ def main(data_dir: Path, threshold: float):
     print(SEP)
 
     for c in aphasia_ids:
-        mask   = labels_ap == c
+        mask  = labels_ap == c
         if mask.sum() == 0:
             continue
-        d_arr  = dapta_ap[mask, 0]
-        g_arr  = gddqn_ap[mask, 0]
-        d_val  = cohens_d(d_arr, g_arr)
-        dom    = cp[str(c)].get("dominant_subtype", f"C{c}")
+        d_arr = dapta_ap[mask, 0]
+        g_arr = gddqn_ap[mask, 0]
+        d_val = cohens_d(d_arr, g_arr)
+        dom   = cp[str(c)].get("dominant_subtype", f"C{c}")
         verdict = (
             "STRONG ✓"   if d_val >= 0.8  else
             "MODERATE ✓" if d_val >= BENCHMARK_D else
@@ -305,9 +304,11 @@ def main(data_dir: Path, threshold: float):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir",  default=".",
+    parser.add_argument("--data_dir", default=".",
                         help="Folder containing cluster_performance.json and improvements_*.npy")
+    parser.add_argument("--dae_dir",  default="../dae",
+                        help="Folder containing state_vectors.npz and splits.json")
     parser.add_argument("--threshold", type=float, default=0.30,
                         help="Clusters with >threshold non-aphasic proportion are excluded (default 0.30)")
     args = parser.parse_args()
-    main(Path(args.data_dir), args.threshold)
+    main(Path(args.data_dir), Path(args.dae_dir), args.threshold)

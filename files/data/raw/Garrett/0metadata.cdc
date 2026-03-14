@@ -1,0 +1,8 @@
+@UTF8
+Title:	AphasiaBank English Protocol Garrett Corpus
+Creator:	Garrett, Kathryn
+Language:	eng
+Description:	 aphasic people engaged in AphasiaBank protocol
+Date:		2013
+Country:	United States
+DOI:	10.21415/BPSP-YV25

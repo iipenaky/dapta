@@ -15,6 +15,7 @@ gymnasium>=0.29.0
 spacy>=3.7.0
 # After install: python -m spacy download en_core_web_sm
 pylangacq>=0.19.0
+stanza
 
 # Data & ML utilities
 numpy>=1.26.0

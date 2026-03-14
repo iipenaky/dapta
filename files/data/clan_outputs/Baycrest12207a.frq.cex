@@ -1,0 +1,50 @@
+freq +t*PAR +f
+Fri Mar 13 22:37:33 2026
+freq (11-Mar-2026) is conducting analyses on:
+  ONLY speaker main tiers matching: *PAR;
+****************************************
+From file <Baycrest12207a.cha>
+Speaker: *PAR:
+  5 I
+  1 Toronto
+  7 a
+  3 ah
+ 11 and
+  9 ay
+  2 bye
+  1 byebye
+  2 cooking
+  5 god
+  3 good
+  1 gosh
+  1 is
+  5 it
+  4 it's
+  1 like
+  3 maybe
+  7 my
+ 12 oh
+  4 oh_my_gosh
+  4 oof
+  3 oy
+  2 says
+  1 six
+  1 so
+ 11 that's
+  5 then
+  9 this
+  1 tractor
+  3 two
+  1 uhhuh
+  4 very
+  1 wheels
+  1 x@n
+  4 yeah
+------------------------------
+   35  Total number of different item types used
+  138  Total number of items (tokens)
+0.254  Type/Token ratio
+    This TTR number was not calculated on the basis of %mor line forms.
+    If you want a TTR based on lemmas, run FREQ on the %mor line
+    with option: +sm;*,o%
+

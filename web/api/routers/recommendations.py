@@ -4,7 +4,7 @@ routers/recommendations.py
 Recommendation and exercise submission endpoints.
 """
 
-from __future__ import annotations
+
 import tempfile
 from pathlib import Path
 

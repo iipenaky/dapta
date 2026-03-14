@@ -24,7 +24,7 @@ Usage:
   python experiments/run_rl.py --total_steps 10000  # faster for testing
 """
 
-from __future__ import annotations
+
 import argparse
 import json
 from pathlib import Path

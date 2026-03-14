@@ -1,0 +1,187 @@
+vocd +t*PAR +f
+Fri Mar 13 22:37:53 2026
+vocd (11-Mar-2026) is conducting analyses on:
+  ONLY dependent tiers matching: %MOR;
+****************************************
+From file <Baycrest11254a.cha>
+Cinderella be 
+Cinderella wash here there 
+and here no good there 
+and there wash dish 
+and then here 
+oh I know 
+say 
+and Cinderella say 
+im come 
+im come 
+and yeah no good yeah 
+Cinderella say 
+aye okay 
+and then off you go 
+yeah x 
+here that good 
+they be good there 
+we 
+that good 
+ah yeah 
+the Cinderella be 
+cat no good 
+and there I say 
+okay 
+go out 
+here 
+go out and see it 
+and ball 
+oh she say 
+oh happy 
+yeah 
+and here yeah 
+and this one she say that they no good 
+oh here be 
+that good 
+say 
+that good 
+yeah 
+no oh ah there 
+yes Cinderella 
+Cinderella yeah 
+so there picture 
+or no 
+painting 
+no 
+yeah 
+Cinderella so sad 
+yeah here I 
+yeah I see a pretty dress 
+bird and this one 
+ah beautiful 
+oh its beautiful 
+he say 
+Cinderella no 
+there 
+no I will not go 
+say there 
+Cinderella so sad 
+voice 
+yeah 
+here the girl there 
+okay 
+go down here there 
+okay 
+boy I here and that yeah use it there 
+its x 
+you Cinderella or the Snow White of the yeah 
+hey five ten or 
+Cinderella 
+now I get you 
+you dont 
+there 
+there 
+there 
+guard here 
+oh yeah 
+and soldier yeah 
+it there or 
+yeah 
+there and there 
+oh good 
+wow yeah French there 
+there yeah good 
+I getta go 
+I getta go 
+and then oh yeah here slipper 
+yeah oh boy 
+slipper 
+here go 
+oh I 
+you have the slipper 
+yeah I can see the 
+I say 
+oh good 
+this here 
+ah this be beautiful 
+yeah 
+so this one here awful 
+and the slipper no fit 
+aye yes 
+yeah and be good to see 
+and say 
+oh good 
+yeah beautiful 
+and heres a prince 
+and yeah 
+and there 
+and there hey 
+oh its good yeah 
+there and there 
+end show 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.6551    0.067     21.781
+  36      100    0.6539    0.063     22.236
+  37      100    0.6511    0.054     22.476
+  38      100    0.6329    0.055     20.731
+  39      100    0.6356    0.060     21.624
+  40      100    0.6328    0.058     21.804
+  41      100    0.6110    0.063     19.671
+  42      100    0.6140    0.061     20.516
+  43      100    0.6128    0.062     20.851
+  44      100    0.6195    0.063     22.196
+  45      100    0.5960    0.060     19.783
+  46      100    0.5891    0.060     19.429
+  47      100    0.5947    0.062     20.504
+  48      100    0.5883    0.056     20.180
+  49      100    0.5816    0.054     19.811
+  50      100    0.5828    0.052     20.353
+
+D: average = 20.872; std dev. = 0.978
+D_optimum     <20.84; min least sq val = 0.001> 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.6586    0.068     22.230
+  36      100    0.6592    0.069     22.947
+  37      100    0.6446    0.072     21.628
+  38      100    0.6345    0.067     20.925
+  39      100    0.6323    0.071     21.203
+  40      100    0.6220    0.061     20.470
+  41      100    0.6088    0.058     19.420
+  42      100    0.6176    0.067     20.949
+  43      100    0.6153    0.062     21.165
+  44      100    0.5961    0.055     19.359
+  45      100    0.5989    0.060     20.119
+  46      100    0.5970    0.054     20.336
+  47      100    0.5977    0.055     20.863
+  48      100    0.5863    0.059     19.936
+  49      100    0.5847    0.054     20.168
+  50      100    0.5748    0.047     19.426
+
+D: average = 20.697; std dev. = 0.978
+D_optimum     <20.66; min least sq val = 0.001> 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.6526    0.057     21.450
+  36      100    0.6414    0.064     20.649
+  37      100    0.6449    0.063     21.663
+  38      100    0.6424    0.070     21.922
+  39      100    0.6308    0.061     21.012
+  40      100    0.6222    0.062     20.500
+  41      100    0.6266    0.056     21.554
+  42      100    0.6252    0.054     21.906
+  43      100    0.6093    0.062     20.430
+  44      100    0.6073    0.062     20.659
+  45      100    0.6093    0.051     21.384
+  46      100    0.6059    0.056     21.421
+  47      100    0.5921    0.048     20.201
+  48      100    0.5979    0.052     21.339
+  49      100    0.5908    0.057     20.900
+  50      100    0.5834    0.050     20.425
+
+D: average = 21.088; std dev. = 0.544
+D_optimum     <21.08; min least sq val = 0.000> 
+
+VOCD RESULTS SUMMARY
+====================
+   Types,Tokens,TTR:  <81,310,0.261290>
+  D_optimum  values:  <20.84, 20.66, 21.08>
+  D_optimum average:  20.86
+

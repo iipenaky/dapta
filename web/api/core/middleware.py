@@ -4,7 +4,7 @@ core/middleware.py
 Custom Starlette middleware for DAPTA API.
 """
 
-from __future__ import annotations
+
 import logging
 import traceback
 

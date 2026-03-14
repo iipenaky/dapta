@@ -1,0 +1,12 @@
+mlu +t*PAR +f
+Fri Mar 13 22:36:02 2026
+mlu (11-Mar-2026) is conducting analyses on:
+  ONLY dependent tiers matching: %MOR;
+****************************************
+From file <Baycrest9772a.cha>
+MLU for Speaker: *PAR:
+  MLU (xxx, yyy and www are EXCLUDED from the utterance and morpheme counts):
+	Number of: utterances = 136, morphemes = 548
+	Ratio of morphemes over utterances = 4.029
+	Standard deviation = 4.519
+

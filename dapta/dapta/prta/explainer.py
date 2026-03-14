@@ -6,7 +6,7 @@ generates a plain-English clinical explanation of WHY that exercise
 was chosen — grounded in the patient's discourse metric profile.
 """
 
-from __future__ import annotations
+
 from typing import Dict, List, Optional, Tuple
 import numpy as np
 

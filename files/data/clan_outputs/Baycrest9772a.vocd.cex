@@ -1,0 +1,213 @@
+vocd +t*PAR +f
+Fri Mar 13 22:37:55 2026
+vocd (11-Mar-2026) is conducting analyses on:
+  ONLY dependent tiers matching: %MOR;
+****************************************
+From file <Baycrest9772a.cha>
+okay 
+boy be play ball 
+and he kick it 
+and it run through the window of this house 
+and the master of the house be sit there 
+and then pop his ball into his house 
+and he pick up the ball 
+and he go to the window to see what happen 
+alright 
+the boy get offer a umbrella which he refuse because its nice and sunny outside 
+and what do you know 
+he walk to school 
+and he start get wet 
+he come home 
+and he get the umbrella 
+well the cat be up in the tree 
+and the man climb up to get the cat 
+only the dog find the ladder and knock it over and be bark at the man 
+a girl be bark at the cat 
+and the firemen be come to the rescue 
+so Cinderella have some stepsister and a stepmother 
+and they be cruel to her 
+and she manage to make out with the prince 
+and she be at the dance 
+and she lose her shoe 
+and at the end the prince come 
+well the messenger come with the shoe look for the right princess and find her 
+oh be I suppose to 
+what 
+oh im sorry 
+be I tell this story or im tell the Cinderella story 
+so the fairy godmother come and ask Cinderella what she want 
+she want to go to the ball 
+so the fairy godmother make her the appurtenance that will suit her at the ball 
+and she go to the ball 
+and she have a good time with the prince 
+the bus be come 
+the tour bus be come 
+tour bus be come into the town 
+the tour bus be come into the town to pick up the person 
+tour bus be come into the town to pick up the person from the hotel 
+the tour bus be come to pick up the person from the hotel to go swim 
+forget something 
+the dog chase the cat up the tree 
+the bird be catch by the worm 
+would you like to star in a movie 
+book like to read child 
+ice cream taste good in the summer 
+beautiful flower smell the lovely woman 
+count to ten as fast as you can 
+the man see the boy that the dog chase 
+tell I the name of the person next door 
+how many be in a dozen 
+tiger be claw by the lion 
+bad weather be cause by long airplane delay 
+episode 
+theory 
+elbow 
+hand 
+hotel 
+potato 
+woe 
+character 
+church 
+wheat 
+effort 
+folly 
+fire 
+tribute 
+gravity 
+fact 
+valor 
+irony 
+idea 
+ax 
+funnel 
+tractor 
+crisis 
+length 
+battle 
+clue 
+concept 
+spider 
+village 
+deed 
+gravy 
+gravy 
+plea 
+dogma 
+monkey 
+manor 
+realm 
+slope 
+alcohol 
+member 
+satire 
+picture 
+window 
+treason 
+drum 
+think 
+mercy 
+radio 
+cart 
+pupil 
+miracle 
+onion 
+hospital 
+audience 
+purpose 
+quality 
+school 
+attitude 
+system 
+elephant 
+wrath 
+letter 
+pg 
+tobacco 
+principal 
+session 
+plain 
+student 
+night 
+moment 
+summer 
+marriage 
+feather 
+thing 
+bonus 
+packed 
+mother 
+opinion 
+coffee 
+pill 
+analogy 
+now you want I to say they all 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.8223    0.058     66.583
+  36      100    0.8097    0.067     62.024
+  37      100    0.8008    0.056     59.562
+  38      100    0.8039    0.063     62.638
+  39      100    0.8026    0.056     63.616
+  40      100    0.7987    0.065     63.404
+  41      100    0.7944    0.066     62.918
+  42      100    0.7838    0.057     59.677
+  43      100    0.7849    0.057     61.571
+  44      100    0.7857    0.054     63.366
+  45      100    0.7729    0.055     59.180
+  46      100    0.7872    0.051     66.964
+  47      100    0.7838    0.063     66.791
+  48      100    0.7744    0.056     63.786
+  49      100    0.7739    0.051     64.888
+  50      100    0.7634    0.051     61.579
+
+D: average = 63.034; std dev. = 2.377
+D_optimum     <63.00; min least sq val = 0.000> 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.8126    0.066     61.649
+  36      100    0.8233    0.062     69.067
+  37      100    0.8059    0.063     61.924
+  38      100    0.8042    0.060     62.763
+  39      100    0.7974    0.066     61.216
+  40      100    0.7995    0.059     63.761
+  41      100    0.7924    0.070     62.021
+  42      100    0.7962    0.055     65.317
+  43      100    0.7923    0.066     64.992
+  44      100    0.7850    0.057     63.056
+  45      100    0.7720    0.058     58.814
+  46      100    0.7852    0.058     66.025
+  47      100    0.7781    0.062     64.111
+  48      100    0.7771    0.054     65.014
+  49      100    0.7733    0.055     64.611
+  50      100    0.7866    0.057     72.486
+
+D: average = 64.177; std dev. = 3.125
+D_optimum     <64.16; min least sq val = 0.001> 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.8123    0.061     61.512
+  36      100    0.8150    0.055     64.627
+  37      100    0.8022    0.060     60.171
+  38      100    0.8163    0.064     68.928
+  39      100    0.8003    0.075     62.520
+  40      100    0.7950    0.062     61.661
+  41      100    0.8017    0.060     66.448
+  42      100    0.8014    0.055     67.925
+  43      100    0.7970    0.062     67.264
+  44      100    0.7791    0.057     60.448
+  45      100    0.7876    0.057     65.690
+  46      100    0.7846    0.060     65.716
+  47      100    0.7819    0.066     65.881
+  48      100    0.7773    0.049     65.109
+  49      100    0.7739    0.061     64.888
+  50      100    0.7804    0.059     69.333
+
+D: average = 64.883; std dev. = 2.797
+D_optimum     <64.90; min least sq val = 0.001> 
+
+VOCD RESULTS SUMMARY
+====================
+   Types,Tokens,TTR:  <239,499,0.478958>
+  D_optimum  values:  <63.00, 64.16, 64.90>
+  D_optimum average:  64.02
+

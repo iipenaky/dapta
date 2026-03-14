@@ -15,7 +15,7 @@ Ng et al. (1999). Policy invariance under reward transformations.
     ICML Proceedings.
 """
 
-from __future__ import annotations
+
 import numpy as np
 from typing import Dict, Optional
 

@@ -23,7 +23,7 @@ Usage:
   python experiments/run_pes.py
 """
 
-from __future__ import annotations
+
 import argparse
 import json
 from pathlib import Path
@@ -233,9 +233,19 @@ def main(args) -> None:
         state_vectors, session_ids, longitudinal
     )
 
-    # Augment with RCT priors
-    states, actions, next_states = augment_with_priors(
-        states, actions, next_states,
+    # Hold out real longitudinal data for validation BEFORE augmentation
+    n_real = len(states)
+    real_split = int(n_real * 0.9)
+    val_states_real  = states[real_split:]
+    val_actions_real = actions[real_split:]
+    val_next_real    = next_states[real_split:]
+    train_states     = states[:real_split]
+    train_actions    = actions[:real_split]
+    train_next       = next_states[:real_split]
+
+    # Augment only the training portion with RCT priors
+    train_states, train_actions, train_next = augment_with_priors(
+        train_states, train_actions, train_next,
         all_initial_states=state_vectors,
         n_augment=args.n_augment,
     )
@@ -253,9 +263,9 @@ def main(args) -> None:
     )
 
     transition_model.fit(
-        states=states,
-        actions=actions,
-        next_states=next_states,
+        states=train_states,
+        actions=train_actions,
+        next_states=train_next,
         val_split=0.1,
         learning_rate=1e-3,
         batch_size=32,
@@ -266,13 +276,12 @@ def main(args) -> None:
     logger.info("Transition model trained.")
 
     # ------------------------------------------------------------------
-    # Transition model validation metrics
+    # Transition model validation metrics (on held-out real longitudinal data)
     # ------------------------------------------------------------------
     logger.info("\n[3b/5] Computing transition model validation metrics...")
-    split = int(len(states) * 0.9)
-    val_states  = states[split:]
-    val_actions = actions[split:]
-    val_next    = next_states[split:]
+    val_states  = val_states_real
+    val_actions = val_actions_real
+    val_next    = val_next_real
     val_deltas  = val_next - val_states          # observed deltas
 
     pred_nexts = np.array([
@@ -324,16 +333,8 @@ def main(args) -> None:
 
     for cluster_id, group in cluster_groups.items():
         logger.info(f"  Cluster {cluster_id}: {len(group)} patients")
-<<<<<<< Updated upstream
-        action_counts = np.bincount(
-            np.array(actions)[cluster_labels == cluster_id].astype(int),
-            minlength=12
-        )
-        logger.info(f"    Action distribution: {action_counts.tolist()}")
-=======
         subtypes = [p.aphasia_subtype for p in group[:5]]
         logger.info(f"    Sample subtypes: {subtypes}")
->>>>>>> Stashed changes
 
     # ------------------------------------------------------------------
     # Build environments
@@ -377,8 +378,8 @@ def main(args) -> None:
 
     # Save report
     report = {
-        "n_transition_triples": len(states),
-        "n_longitudinal_real": int((states == states).all(axis=1).sum()),
+        "n_transition_triples": len(train_states),
+        "n_longitudinal_real": real_split,
         "n_augmented_synthetic": args.n_augment,
         "n_clusters": 6,
         "cluster_sizes": {str(k): len(v) for k, v in cluster_env_indices.items()},
@@ -392,7 +393,7 @@ def main(args) -> None:
 
     logger.info("\n" + "=" * 60)
     logger.info("Phase 2a Complete.")
-    logger.info(f"  Transition triples : {len(states)}")
+    logger.info(f"  Transition triples : {len(train_states)}")
     logger.info(f"  Patient clusters   : 6")
     logger.info(f"  Environments built : {len(envs)}")
     logger.info(f"  Outputs saved to   : {output_dir}/")

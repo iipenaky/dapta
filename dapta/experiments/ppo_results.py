@@ -30,7 +30,7 @@ Assumes your outputs are structured as:
         evaluation_results.json
 """
 
-from __future__ import annotations
+
 import argparse
 import json
 from pathlib import Path

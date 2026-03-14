@@ -1,0 +1,137 @@
+vocd +t*PAR +f
+Fri Mar 13 22:37:53 2026
+vocd (11-Mar-2026) is conducting analyses on:
+  ONLY dependent tiers matching: %MOR;
+****************************************
+From file <Baycrest12207a.cha>
+its 
+maybe six 
+that it yeah 
+that it 
+ohmygosh 
+ay ay ay oof 
+ah ah ah 
+oy oy oy oof 
+oh my gosh 
+oh 
+oof 
+maybe two 
+two 
+bye 
+bye 
+that a 
+that a 
+that two 
+and byebye 
+oh my god its a x 
+oh my god 
+maybe 
+oh 
+this ohmygosh 
+this oh my god 
+like I say 
+oh my god 
+oh my 
+this this this and this and this 
+I say 
+ohmygosh 
+and then very good 
+ay ay ay 
+that 
+that 
+I 
+I 
+and then 
+oh my god 
+uhhuh oh yeah 
+Toronto 
+oh ohmygosh oof 
+oh its a 
+this 
+this be a wheel 
+a tractor 
+yeah that it 
+yeah 
+and then 
+and then 
+and 
+ay ay ay 
+and 
+so cooking 
+very good 
+I 
+a very 
+and then that it 
+that very good 
+cooking and its 
+that it 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.5857    0.055     14.491
+  36      100    0.5700    0.051     13.600
+  37      100    0.5703    0.055     14.000
+  38      100    0.5563    0.045     13.253
+  39      100    0.5464    0.046     12.835
+  40      100    0.5427    0.050     12.885
+  41      100    0.5341    0.053     12.555
+  42      100    0.5226    0.047     12.015
+  43      100    0.5270    0.045     12.622
+  44      100    0.5191    0.039     12.327
+  45      100    0.5053    0.041     11.615
+  46      100    0.4998    0.042     11.485
+  47      100    0.4919    0.042     11.192
+  48      100    0.4944    0.041     11.601
+  49      100    0.4857    0.036     11.239
+  50      100    0.4844    0.040     11.377
+
+D: average = 12.443; std dev. = 0.990
+D_optimum     <12.42; min least sq val = 0.003> 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.5806    0.052     14.063
+  36      100    0.5717    0.058     13.733
+  37      100    0.5581    0.056     13.040
+  38      100    0.5611    0.050     13.625
+  39      100    0.5521    0.047     13.267
+  40      100    0.5367    0.050     12.438
+  41      100    0.5288    0.047     12.164
+  42      100    0.5340    0.052     12.854
+  43      100    0.5179    0.051     11.962
+  44      100    0.5148    0.041     12.015
+  45      100    0.5184    0.044     12.559
+  46      100    0.5148    0.043     12.561
+  47      100    0.5038    0.040     12.023
+  48      100    0.4929    0.039     11.499
+  49      100    0.4845    0.032     11.156
+  50      100    0.4778    0.042     10.929
+
+D: average = 12.493; std dev. = 0.880
+D_optimum     <12.48; min least sq val = 0.002> 
+
+tokens  samples    ttr     st.dev      D
+  35      100    0.5703    0.052     13.245
+  36      100    0.5625    0.055     13.018
+  37      100    0.5597    0.057     13.165
+  38      100    0.5579    0.052     13.376
+  39      100    0.5472    0.043     12.893
+  40      100    0.5437    0.047     12.961
+  41      100    0.5412    0.046     13.089
+  42      100    0.5257    0.038     12.237
+  43      100    0.5116    0.042     11.524
+  44      100    0.5209    0.044     12.460
+  45      100    0.5027    0.043     11.431
+  46      100    0.5074    0.039     12.020
+  47      100    0.4964    0.041     11.497
+  48      100    0.4871    0.039     11.101
+  49      100    0.4886    0.037     11.435
+  50      100    0.4828    0.041     11.267
+
+D: average = 12.295; std dev. = 0.794
+D_optimum     <12.28; min least sq val = 0.002> 
+
+VOCD RESULTS SUMMARY
+====================
+   Types,Tokens,TTR:  <35,138,0.253623>
+  D_optimum  values:  <12.42, 12.48, 12.28>
+  D_optimum average:  12.39
+

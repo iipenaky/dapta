@@ -20,7 +20,7 @@ Requirements:
   pip install gradio plotly openai-whisper
 """
 
-from __future__ import annotations
+
 import argparse
 import json
 import tempfile

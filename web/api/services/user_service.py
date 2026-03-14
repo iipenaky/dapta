@@ -4,7 +4,7 @@ services/user_service.py
 All database operations for User. No business logic lives in routers.
 """
 
-from __future__ import annotations
+
 from typing import Optional
 
 from sqlalchemy import select

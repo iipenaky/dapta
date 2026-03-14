@@ -5,7 +5,7 @@ DAPTA API — FastAPI application entry point.
 All configuration via core/config.py — never hardcode values here.
 """
 
-from __future__ import annotations
+
 import logging
 from contextlib import asynccontextmanager
 

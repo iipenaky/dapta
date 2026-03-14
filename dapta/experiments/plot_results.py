@@ -16,7 +16,7 @@ Usage:
   python experiments/plot_results.py --eval_dir outputs/evaluation --out_dir outputs/figures
 """
 
-from __future__ import annotations
+
 import argparse
 import json
 from pathlib import Path

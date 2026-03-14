@@ -11,7 +11,7 @@ Architecture references:
   - GRU for POMDP: Yu et al. (2021). ACM Computing Surveys.
 """
 
-from __future__ import annotations
+
 import random
 from collections import deque
 from pathlib import Path

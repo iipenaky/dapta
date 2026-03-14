@@ -4,7 +4,7 @@ routers/auth.py
 Authentication endpoints: signup, login, refresh, me, update profile.
 """
 
-from __future__ import annotations
+
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession

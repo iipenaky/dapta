@@ -10,7 +10,7 @@ This classification is used for analysis of which exercise types the
 RL agent selects for different patient profiles.
 """
 
-from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import List
 
