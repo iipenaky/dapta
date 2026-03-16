@@ -129,7 +129,6 @@ class TherapyEnv(gym.Env):
         reward = compute_reward(
             state_before=state_before,
             state_after=next_state,
-            session_ciu_history=self._ciu_history,
             clip=self.reward_clip,
         )
 

@@ -1,28 +1,20 @@
 """
-Run this from your outputs/evaluation/ folder (or pass --data_dir).
+RQ4 reanalysis — aphasia-only patients.
 
-It reads your existing output files:
-  - cluster_performance.json  
-  - improvements_DAPTA.npy
-  - improvements_G_DDQN.npy
-  - improvements_RBDE.npy
-  - improvements_RTS.npy
+Reads:
+  outputs/evaluation/improvements_DAPTA.npy
+  outputs/evaluation/improvements_G_DDQN.npy
+  outputs/evaluation/improvements_RBDE.npy
+  outputs/evaluation/improvements_RTS.npy
+  outputs/dae/patient_profiles.json
+  outputs/dae/splits.json
 
-It AUTOMATICALLY detects which clusters contain controls by reading
-subtype_counts, filters those clusters out, then re-runs the RQ4
-statistical analysis on aphasia-only patients.
-
-No cluster IDs are hardcoded. The threshold (default 30%) is configurable.
+Filters at the PATIENT level (not cluster level) using each patient's
+aphasia_subtype field, then re-runs RQ4 on aphasia-only patients.
 
 Usage:
-    cd outputs/evaluation
-    python rq4_aphasia_only.py
-
-    # Or from any directory:
-    python rq4_aphasia_only.py --data_dir outputs/evaluation --dae_dir outputs/dae
-
-    # Change contamination threshold:
-    python rq4_aphasia_only.py --threshold 0.20
+    python experiments/rq4_aphasia_only.py
+    python experiments/rq4_aphasia_only.py --data_dir outputs/evaluation --dae_dir outputs/dae
 """
 
 import argparse
@@ -34,33 +26,33 @@ from scipy import stats
 import warnings
 warnings.filterwarnings("ignore")
 
-# ── Labels that identify non-aphasic participants ─────────────────────────────
 NON_APHASIA = {
     "control", "Control", "CONTROL",
     "NotAphasicByWAB", "NotAphasicByWab", "notaphasicbywab",
     "not_aphasic", "healthy",
 }
 
-METRICS      = ["CIU_rate", "MC_score", "MLU_morphemes", "TTR", "SynComp", "Surprisal"]
-METRIC_LABEL = ["CIU Rate", "MC Score", "MLU-m",         "TTR", "SynComp", "Surprisal"]
-BENCHMARK_D  = 0.42   # iTalkBetter clinical benchmark
+METRICS      = ["ciu_rate", "mc_score", "mlu_morphemes", "mattr", "syntactic_complexity"]
+METRIC_LABEL = ["CIU Rate", "MC Score", "MLU-m",         "MATTR", "SynComp"]
+BENCHMARK_D  = 0.42
 
 
-# ── Stats helpers ─────────────────────────────────────────────────────────────
+# ---------------------------------------------------------------------------
+# Stats helpers
+# ---------------------------------------------------------------------------
 
 def cohens_d(a, b):
-    """Independent-samples Cohen's d: positive means a > b."""
     na, nb = len(a), len(b)
     if na < 2 or nb < 2:
         return 0.0
     pooled = np.sqrt(
-        ((na - 1) * np.var(a, ddof=1) + (nb - 1) * np.var(b, ddof=1)) / (na + nb - 2)
+        ((na - 1) * np.var(a, ddof=1) + (nb - 1) * np.var(b, ddof=1))
+        / (na + nb - 2)
     )
     return float((np.mean(a) - np.mean(b)) / pooled) if pooled > 0 else 0.0
 
 
 def wilcoxon_gt(a, b):
-    """Wilcoxon signed-rank, H1: a > b. Returns p-value."""
     diff = a - b
     if np.all(diff == 0) or len(diff) < 2:
         return 1.0
@@ -82,49 +74,13 @@ def bonferroni(pvals, alpha=0.05):
     return [min(p * k, 1.0) for p in pvals], [min(p * k, 1.0) <= alpha for p in pvals]
 
 
-# ── Load cluster labels directly from saved assignments ───────────────────────
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 
-def load_cluster_labels(data_dir: Path, dae_dir: Path) -> np.ndarray:
-    """
-    Load per-patient cluster labels for the test set directly from
-    cluster_assignments.json and splits.json, avoiding any reconstruction
-    heuristic.
+def main(data_dir: Path, dae_dir: Path):
 
-    Returns
-    -------
-    np.ndarray of int, shape (n_test_patients,)
-    """
-    with open(data_dir.parent / "pes" / "cluster_assignments.json") as f:
-        cluster_info = json.load(f)
-
-    dae_data = np.load(dae_dir / "state_vectors.npz", allow_pickle=True)
-    all_session_ids = list(dae_data["session_ids"])
-
-    with open(dae_dir / "splits.json") as f:
-        splits = json.load(f)
-
-    test_ids    = splits["test"]
-    assignments = cluster_info["assignments"]
-
-    # Only include test IDs that exist in the state vectors
-    valid_sids = set(all_session_ids)
-    cluster_labels = np.array([
-        assignments.get(sid, 0)
-        for sid in test_ids
-        if sid in valid_sids
-    ], dtype=int)
-
-    return cluster_labels
-
-
-# ── Main ──────────────────────────────────────────────────────────────────────
-
-def main(data_dir: Path, dae_dir: Path, threshold: float):
-
-    # 1. Load files ─────────────────────────────────────────────────────────
-    with open(data_dir / "cluster_performance.json") as f:
-        cp = json.load(f)
-
+    # 1. Load improvement arrays
     dapta = np.load(data_dir / "improvements_DAPTA.npy")
     gddqn = np.load(data_dir / "improvements_G_DDQN.npy")
     rbde  = np.load(data_dir / "improvements_RBDE.npy")
@@ -132,122 +88,120 @@ def main(data_dir: Path, dae_dir: Path, threshold: float):
 
     n_total = len(dapta)
 
-    # 2. Auto-detect contaminated clusters ──────────────────────────────────
-    aphasia_ids  = []
-    excluded_ids = []
+    for name, arr in [("DAPTA", dapta), ("G_DDQN", gddqn), ("RBDE", rbde), ("RTS", rts)]:
+        if arr.ndim != 2 or arr.shape[1] != 5:
+            print(f"[ERROR] {name} array has shape {arr.shape}, expected (N, 5).")
+            print("        Re-run run_evaluation.py to regenerate improvement arrays.")
+            return
 
-    for c_str, info in sorted(cp.items(), key=lambda x: int(x[0])):
-        c     = int(c_str)
-        total = info["n"]
-        sc    = info.get("subtype_counts", {})
-        non_a = sum(v for k, v in sc.items() if k in NON_APHASIA)
-        pct   = non_a / total if total > 0 else 0
+    # 2. Load per-patient subtypes for the test set
+    dae_data        = np.load(dae_dir / "state_vectors.npz", allow_pickle=True)
+    all_session_ids = list(dae_data["session_ids"])
+    sid_to_idx      = {sid: i for i, sid in enumerate(all_session_ids)}
 
-        if pct >= threshold:
-            excluded_ids.append(c)
-        else:
-            aphasia_ids.append(c)
+    with open(dae_dir / "splits.json") as f:
+        test_ids = json.load(f)["test"]
 
-    # 3. Load per-patient cluster membership directly from saved assignments ─
-    cluster_labels = load_cluster_labels(data_dir, dae_dir)
+    with open(dae_dir / "patient_profiles.json") as f:
+        all_profiles = json.load(f)
 
-    if len(cluster_labels) != n_total:
+    test_indices  = [sid_to_idx[sid] for sid in test_ids if sid in sid_to_idx]
+    test_profiles = [all_profiles[i] for i in test_indices]
+
+    if len(test_profiles) != n_total:
         print(
-            f"[WARNING] cluster_labels length ({len(cluster_labels)}) does not match "
-            f"improvements array length ({n_total}). Check --dae_dir path."
+            f"[WARNING] test_profiles length ({len(test_profiles)}) != "
+            f"improvements array length ({n_total}). Truncating to shorter."
         )
+        min_n         = min(len(test_profiles), n_total)
+        test_profiles = test_profiles[:min_n]
+        dapta         = dapta[:min_n]
+        gddqn         = gddqn[:min_n]
+        rbde          = rbde[:min_n]
+        rts           = rts[:min_n]
+        n_total       = min_n
 
-    aphasia_mask  = np.isin(cluster_labels, aphasia_ids)
-    n_aphasia     = aphasia_mask.sum()
-    n_excluded    = (~aphasia_mask).sum()
+    # 3. Build aphasia mask directly from patient subtypes
+    subtypes     = [p.get("aphasia_subtype", "Other") for p in test_profiles]
+    aphasia_mask = np.array([s not in NON_APHASIA for s in subtypes])
+    n_aphasia    = int(aphasia_mask.sum())
+    n_excluded   = int((~aphasia_mask).sum())
 
-    dapta_ap  = dapta[aphasia_mask]
-    gddqn_ap  = gddqn[aphasia_mask]
-    rbde_ap   = rbde[aphasia_mask]
-    labels_ap = cluster_labels[aphasia_mask]
+    if n_aphasia == 0:
+        print("[ERROR] No aphasia patients found after filtering.")
+        print(f"        Unique subtypes in your data: {set(subtypes)}")
+        print(f"        NON_APHASIA set: {NON_APHASIA}")
+        return
 
-    # 4. Print results ───────────────────────────────────────────────────────
+    dapta_ap = dapta[aphasia_mask]
+    gddqn_ap = gddqn[aphasia_mask]
+    rbde_ap  = rbde[aphasia_mask]
+
+    # Print subtype breakdown
+    from collections import Counter
+    subtype_counts = Counter(subtypes)
+
     SEP  = "─" * 72
     SEP2 = "═" * 72
 
     print()
     print(SEP2)
     print("  DAPTA RQ4 REANALYSIS — APHASIA-ONLY PATIENTS")
-    print(f"  Contamination threshold : >{threshold*100:.0f}% non-aphasic → excluded")
+    print(f"  Patient-level filter: excluding {NON_APHASIA}")
     print(SEP2)
 
-    # ── Cluster audit ───────────────────────────────────────────────────────
+    # Section 1: Patient subtype audit
     print()
-    print("SECTION 1 — CLUSTER CONTAMINATION AUDIT  (auto-detected from subtype_counts)")
+    print("SECTION 1 — PATIENT SUBTYPE BREAKDOWN")
     print(SEP)
-    print(f"  {'C':<4} {'Dominant subtype':<22} {'n':>5} {'Controls':>10} {'Ctrl%':>7}  Status")
+    print(f"  {'Subtype':<28} {'n':>6}  {'Included?':>10}")
     print(SEP)
-
-    for c_str, info in sorted(cp.items(), key=lambda x: int(x[0])):
-        c      = int(c_str)
-        total  = info["n"]
-        sc     = info.get("subtype_counts", {})
-        non_a  = sum(v for k, v in sc.items() if k in NON_APHASIA)
-        pct    = non_a / total * 100 if total > 0 else 0
-        dom    = info.get("dominant_subtype", "?")
-        status = "✗ EXCLUDED" if c in excluded_ids else "✓ INCLUDED"
-        print(f"  C{c:<3} {dom:<22} {total:>5} {non_a:>10} {pct:>6.1f}%  {status}")
-
+    for subtype, count in sorted(subtype_counts.items(), key=lambda x: -x[1]):
+        status = "✗ excluded" if subtype in NON_APHASIA else "✓ included"
+        print(f"  {subtype:<28} {count:>6}  {status:>10}")
     print(SEP)
-    print(f"  Aphasia-only : {n_aphasia} patients   |   Excluded : {n_excluded} patients   |   Total : {n_total}")
+    print(
+        f"  Aphasia patients : {n_aphasia}   |   "
+        f"Excluded (non-aphasic) : {n_excluded}   |   "
+        f"Total : {n_total}"
+    )
 
-    # ── Per-cluster CIU ─────────────────────────────────────────────────────
+    # Section 2: Pooled CIU
     print()
-    print("SECTION 2 — PER-CLUSTER CIU RATE  (aphasia clusters only)")
-    print(SEP)
-    print(f"  {'C':<4} {'Dominant subtype':<22} {'n':>4}   {'DAPTA':>8} {'G-DDQN':>8} {'d':>8}   Verdict")
+    print("SECTION 2 — POOLED RESULTS  (DAPTA vs G-DDQN, aphasia patients only)")
     print(SEP)
 
-    for c in aphasia_ids:
-        mask  = labels_ap == c
-        if mask.sum() == 0:
-            continue
-        d_arr = dapta_ap[mask, 0]
-        g_arr = gddqn_ap[mask, 0]
-        d_val = cohens_d(d_arr, g_arr)
-        dom   = cp[str(c)].get("dominant_subtype", f"C{c}")
-        verdict = (
-            "STRONG ✓"   if d_val >= 0.8  else
-            "MODERATE ✓" if d_val >= BENCHMARK_D else
-            "WEAK"        if d_val >  0   else
-            "NEGATIVE"
-        )
-        print(f"  C{c:<3} {dom:<22} {mask.sum():>4}   {np.mean(d_arr):>8.4f} {np.mean(g_arr):>8.4f} {d_val:>8.3f}   {verdict}")
-
-    print(SEP)
-
-    # ── Pooled CIU ──────────────────────────────────────────────────────────
-    print()
-    print("SECTION 3 — POOLED RESULTS  (DAPTA vs G-DDQN, aphasia patients only)")
-    print(SEP)
-
-    ciu_d = dapta_ap[:, 0]
-    ciu_g = gddqn_ap[:, 0]
-    d_val = cohens_d(ciu_d, ciu_g)
-    p_val = wilcoxon_gt(ciu_d, ciu_g)
+    ciu_d        = dapta_ap[:, 0]
+    ciu_g        = gddqn_ap[:, 0]
+    d_val        = cohens_d(ciu_d, ciu_g)
+    p_val        = wilcoxon_gt(ciu_d, ciu_g)
     ci_lo, ci_hi = bootstrap_ci(ciu_d - ciu_g)
-    var_red = (np.var(ciu_g, ddof=1) - np.var(ciu_d, ddof=1)) / max(np.var(ciu_g, ddof=1), 1e-8) * 100
+    var_red      = (
+        (np.var(ciu_g, ddof=1) - np.var(ciu_d, ddof=1))
+        / max(np.var(ciu_g, ddof=1), 1e-8) * 100
+    )
 
     print(f"  n (aphasia-only)         : {n_aphasia}")
     print(f"  DAPTA  mean CIU          : {np.mean(ciu_d):.4f}")
     print(f"  G-DDQN mean CIU          : {np.mean(ciu_g):.4f}")
-    print(f"  Cohen's d                : {d_val:+.3f}  ({'large' if abs(d_val)>=0.8 else 'medium' if abs(d_val)>=0.5 else 'small' if abs(d_val)>=0.2 else 'negligible'})")
+    print(
+        f"  Cohen's d                : {d_val:+.3f}  "
+        f"({'large' if abs(d_val)>=0.8 else 'medium' if abs(d_val)>=0.5 else 'small' if abs(d_val)>=0.2 else 'negligible'})"
+    )
     print(f"  Wilcoxon p  (DAPTA>G)    : {p_val:.4f}  {'✓ significant' if p_val < 0.05 else '✗ not significant'}")
     print(f"  95% bootstrap CI (diff)  : [{ci_lo:.4f}, {ci_hi:.4f}]")
     print(f"  iTalkBetter benchmark    : d = {BENCHMARK_D}")
-    print(f"  Exceeds benchmark?       : {'YES ✓' if d_val >= BENCHMARK_D else 'NO  (approaching)' if d_val >= BENCHMARK_D * 0.75 else 'NO'}")
+    print(
+        f"  Exceeds benchmark?       : "
+        f"{'YES ✓' if d_val >= BENCHMARK_D else 'NO  (approaching)' if d_val >= BENCHMARK_D * 0.75 else 'NO'}"
+    )
     print(f"  Variance reduction       : {var_red:+.1f}%")
 
-    # ── All metrics ──────────────────────────────────────────────────────────
+    # Section 3: All metrics
     print()
-    print("SECTION 4 — ALL METRICS  (aphasia-only, Bonferroni-corrected p-values)")
+    print("SECTION 3 — ALL METRICS  (aphasia-only, Bonferroni-corrected)")
     print(SEP)
-    print(f"  {'Metric':<12} {'DAPTA':>8} {'G-DDQN':>8} {'RBDE':>8}   {'d':>8} {'p-corr':>8}  Benchmark?")
+    print(f"  {'Metric':<14} {'DAPTA':>8} {'G-DDQN':>8} {'RBDE':>8}   {'d':>8} {'p-corr':>8}  Benchmark?")
     print(SEP)
 
     raw_pvals = []
@@ -256,59 +210,112 @@ def main(data_dir: Path, dae_dir: Path, threshold: float):
         d_arr = dapta_ap[:, mi]
         g_arr = gddqn_ap[:, mi]
         r_arr = rbde_ap[:, mi]
-        d_val = cohens_d(d_arr, g_arr)
-        p_raw = wilcoxon_gt(d_arr, g_arr)
+        d_val_m = cohens_d(d_arr, g_arr)
+        p_raw   = wilcoxon_gt(d_arr, g_arr)
         raw_pvals.append(p_raw)
-        rows.append((label, np.mean(d_arr), np.mean(g_arr), np.mean(r_arr), d_val))
+        rows.append((label, np.mean(d_arr), np.mean(g_arr), np.mean(r_arr), d_val_m))
 
     p_corr, sig = bonferroni(raw_pvals)
 
-    for i, (label, d_mean, g_mean, r_mean, d_val) in enumerate(rows):
-        bench = "YES ✓" if d_val >= BENCHMARK_D else ("YES ✓ (neg)" if d_val <= -BENCHMARK_D else "no")
-        print(f"  {label:<12} {d_mean:>8.4f} {g_mean:>8.4f} {r_mean:>8.4f}   {d_val:>8.3f} {p_corr[i]:>8.4f}  {bench}")
+    for i, (label, d_mean, g_mean, r_mean, d_val_m) in enumerate(rows):
+        bench = (
+            "YES ✓"       if d_val_m >=  BENCHMARK_D else
+            "YES ✓ (neg)" if d_val_m <= -BENCHMARK_D else
+            "no"
+        )
+        print(
+            f"  {label:<14} {d_mean:>8.4f} {g_mean:>8.4f} {r_mean:>8.4f}   "
+            f"{d_val_m:>8.3f} {p_corr[i]:>8.4f}  {bench}"
+        )
 
     print(SEP)
     print("  Positive d = DAPTA > G-DDQN")
 
-    # ── Before vs After ──────────────────────────────────────────────────────
+    # Section 4: Original vs aphasia-only comparison
+    orig_d_val = cohens_d(dapta[:, 0], gddqn[:, 0])
+    orig_p     = wilcoxon_gt(dapta[:, 0], gddqn[:, 0])
+    new_d_val  = cohens_d(dapta_ap[:, 0], gddqn_ap[:, 0])
+    new_p      = wilcoxon_gt(dapta_ap[:, 0], gddqn_ap[:, 0])
+
     print()
-    print("SECTION 5 — ORIGINAL (n=133) vs APHASIA-ONLY  COMPARISON")
+    print(f"SECTION 4 — ORIGINAL (n={n_total}) vs APHASIA-ONLY (n={n_aphasia}) COMPARISON")
+    print(SEP)
+    print(f"  {'':28} {'Original (n='+str(n_total)+')':>18}  {'Aphasia-only (n='+str(n_aphasia)+')':>22}")
+    print(SEP)
+    print(f"  {'DAPTA mean CIU':<28} {float(np.mean(dapta[:,0])):>18.4f}  {float(np.mean(dapta_ap[:,0])):>22.4f}")
+    print(f"  {'G-DDQN mean CIU':<28} {float(np.mean(gddqn[:,0])):>18.4f}  {float(np.mean(gddqn_ap[:,0])):>22.4f}")
+    print(f"  {'Cohens d':<28} {orig_d_val:>18.3f}  {new_d_val:>22.3f}")
+    print(f"  {'Wilcoxon p':<28} {orig_p:>18.4f}  {new_p:>22.4f}")
     print(SEP)
 
-    orig_d_mean = float(np.mean(dapta[:, 0]))
-    orig_g_mean = float(np.mean(gddqn[:, 0]))
-    orig_d_val  = cohens_d(dapta[:, 0], gddqn[:, 0])
-    orig_p      = wilcoxon_gt(dapta[:, 0], gddqn[:, 0])
-
-    new_d_val   = cohens_d(dapta_ap[:, 0], gddqn_ap[:, 0])
-    new_p       = wilcoxon_gt(dapta_ap[:, 0], gddqn_ap[:, 0])
-
-    print(f"  {'':28} {'Original (n='+str(n_total)+')':>18}  {'Aphasia-only (n='+str(n_aphasia)+')':>20}")
-    print(SEP)
-    print(f"  {'DAPTA mean CIU':<28} {orig_d_mean:>18.4f}  {np.mean(dapta_ap[:,0]):>20.4f}")
-    print(f"  {'G-DDQN mean CIU':<28} {orig_g_mean:>18.4f}  {np.mean(gddqn_ap[:,0]):>20.4f}")
-    print(f"  {'Cohens d':<28} {orig_d_val:>18.3f}  {new_d_val:>20.3f}")
-    print(f"  {'Wilcoxon p':<28} {orig_p:>18.4f}  {new_p:>20.4f}")
-    print(f"  {'DAPTA wins?':<28} {'NO  (contaminated)':>18}  {'YES ✓' if new_d_val > 0 else 'NO':>20}")
-    print(SEP)
     print()
     print("  CONCLUSION:")
-    print(f"  The original null (d={orig_d_val:.3f}, p={orig_p:.3f}) was caused by {n_excluded}")
-    print(f"  non-aphasic patients in contaminated clusters swamping the signal.")
-    print(f"  On the {n_aphasia} true aphasia patients, DAPTA outperforms G-DDQN")
-    print(f"  on CIU rate (d={new_d_val:+.3f}, p={new_p:.4f}).")
+    print(
+        f"  Original result (n={n_total}): d={orig_d_val:.3f}, p={orig_p:.3f}  "
+        f"({'significant' if orig_p < 0.05 else 'not significant'})"
+    )
+    print(
+        f"  Aphasia-only (n={n_aphasia}): d={new_d_val:.3f}, p={new_p:.4f}  "
+        f"({'significant' if new_p < 0.05 else 'not significant'})"
+    )
+    print(f"  {n_excluded} non-aphasic patients excluded.")
+
+    if new_d_val > orig_d_val and new_p < 0.05:
+        print(
+            f"  Removing controls strengthened the personalisation signal. "
+            f"DAPTA outperforms G-DDQN on aphasia patients (d={new_d_val:+.3f})."
+        )
+    elif new_d_val > 0 and new_p < 0.05:
+        print(
+            f"  DAPTA outperforms G-DDQN on aphasia-only patients (d={new_d_val:+.3f}), "
+            f"consistent with the overall result."
+        )
+    elif new_d_val > 0:
+        print(
+            f"  DAPTA shows a positive trend on aphasia-only patients (d={new_d_val:+.3f}) "
+            f"but does not reach significance (p={new_p:.4f})."
+        )
+    else:
+        print(
+            f"  DAPTA does not outperform G-DDQN even on aphasia-only patients "
+            f"(d={new_d_val:+.3f}, p={new_p:.4f})."
+        )
+
     print()
     print(SEP2)
     print()
 
+    # Save results
+    results = {
+        "n_total":    n_total,
+        "n_aphasia":  n_aphasia,
+        "n_excluded": n_excluded,
+        "pooled": {
+            "dapta_ciu_mean":    round(float(np.mean(ciu_d)), 4),
+            "gddqn_ciu_mean":    round(float(np.mean(ciu_g)), 4),
+            "cohens_d":          round(new_d_val, 3),
+            "wilcoxon_p":        round(new_p, 4),
+            "ci_95":             [round(ci_lo, 4), round(ci_hi, 4)],
+            "significant":       bool(new_p < 0.05),
+            "exceeds_benchmark": bool(new_d_val >= BENCHMARK_D),
+        },
+        "original_vs_aphasia_only": {
+            "original_d":     round(orig_d_val, 3),
+            "original_p":     round(orig_p, 4),
+            "aphasia_only_d": round(new_d_val, 3),
+            "aphasia_only_p": round(new_p, 4),
+        },
+    }
+
+    out_path = data_dir / "rq4_aphasia_only_results.json"
+    with open(out_path, "w") as f:
+        json.dump(results, f, indent=2)
+    print(f"  Results saved to {out_path}")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", default=".",
-                        help="Folder containing cluster_performance.json and improvements_*.npy")
-    parser.add_argument("--dae_dir",  default="../dae",
-                        help="Folder containing state_vectors.npz and splits.json")
-    parser.add_argument("--threshold", type=float, default=0.30,
-                        help="Clusters with >threshold non-aphasic proportion are excluded (default 0.30)")
+    parser.add_argument("--data_dir", default="outputs/evaluation")
+    parser.add_argument("--dae_dir",  default="outputs/dae")
     args = parser.parse_args()
-    main(Path(args.data_dir), Path(args.dae_dir), args.threshold)
+    main(Path(args.data_dir), Path(args.dae_dir))

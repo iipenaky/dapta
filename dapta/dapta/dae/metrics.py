@@ -8,7 +8,6 @@ Metrics
 3. MLU-m     — Mean Length of Utterance in morphemes
 4. MATTR     — Moving-Average Type-Token Ratio (window=50, content words)
 5. SynComp   — Syntactic complexity (proportion of utterances with subordinate clause)
-6. WPM       — Words per minute  (counted from CHAT-code-stripped raw, NOT clean_utterance output)
 7. maze_rate — Repair/revision proportion (must be computed from raw CHAT)
 
 INSTALL:

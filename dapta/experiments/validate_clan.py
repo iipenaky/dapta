@@ -1,19 +1,9 @@
 """
-Validates automatically-computed discourse metrics against CLAN gold standard.
-
-Reads individual per-transcript CLAN output files:
-    Baycrest9336a.eval.xls
-    Baycrest9772a.eval.xls
-    ...
-
-Changes from original
----------------------
-1. Added `duration_source` column to matched_comparison.csv so you can
-   filter out fallback-duration transcripts from WPM/CIU correlations.
-2. Per-metric correlation thresholds: WPM ≥ 0.90 (direct count),
-   SynComp ≥ 0.65 (proxy construct), others ≥ 0.80.
-3. Per-task stratified correlation table in the JSON report.
-4. MATTR vs FREQ_TTR mismatch is flagged explicitly in the report.
+RQ1 Full Analysis: 
+  1. Automated metric accuracy vs CLAN gold standard
+  2. Metric correlation with WAB-AQ (functional ability)
+  3. Comparison of CLAN vs automated metric correlation with WAB-AQ
+     (does automation degrade the functional signal?)
 
 Usage:
   python experiments/validate_against_clan.py \
@@ -24,6 +14,8 @@ Outputs:
   outputs/validation/correlation_report.json
   outputs/validation/matched_comparison.csv
   outputs/validation/scatter_plots.png
+  outputs/validation/rq1_full_report.json
+  outputs/validation/wabaq_lookup.csv
 """
 
 import argparse
@@ -43,9 +35,6 @@ from dapta.utils.logger import get_logger
 logger = get_logger(__name__, log_file="logs/validate_against_clan.log")
 
 
-# ---------------------------------------------------------------------------
-# Metric map — (auto attribute, CLAN column, human label, threshold, note)
-# ---------------------------------------------------------------------------
 METRIC_MAP = [
     (
         "mlu_morphemes", "MLU_Morphemes",
@@ -58,26 +47,38 @@ METRIC_MAP = [
         0.80,
         "NOTE: MATTR and raw TTR are different measures. MATTR is length-robust; "
         "raw TTR is length-dependent. Lower r here does not mean the computation "
-        "is wrong — it means the constructs differ. Compare like-for-like by "
-        "computing raw TTR from the auto pipeline if needed.",
+        "is wrong — it means the constructs differ.",
     ),
     (
         "wpm", "Words_Min",
         "Words per minute",
-        0.90,   # higher threshold — WPM is a direct count, should be tight
+        0.90,
         None,
     ),
     (
         "syntactic_complexity", "Verbs_Utt",
         "Syntactic complexity vs verbs/utterance",
-        0.65,   # lower threshold — different constructs
+        0.65,
         "NOTE: auto metric = proportion of utterances with subordinate clause; "
         "CLAN Verbs_Utt = mean verbs per utterance. These are correlated but "
-        "not equivalent. Low r here is expected.",
+        "not equivalent.",
     ),
-    ("maze_rate", "clan_repair_rate",   # computed below, not a direct column match
-        "Maze rate vs CLAN (retracing+repetition)/Total_Utts",
-        0.75, None,)
+    (
+        "maze_rate", "clan_repair_rate",
+        "Maze rate vs CLAN repair rate",
+        0.75, None,
+    ),
+]
+
+# WAB-AQ comes from .cha headers, not .eval.xls
+WAB_AQ_COL = "wab_aq"
+
+WAB_METRICS = [
+    ("mlu_morphemes",        "MLU_Morphemes",   "auto_mlu"),
+    ("mattr",                "FREQ_TTR",        "auto_mattr"),
+    ("syntactic_complexity", "Verbs_Utt",       "auto_syn_comp"),
+    ("maze_rate",            "clan_repair_rate", "auto_maze_rate"),
+    ("wpm",                  "Words_Min",       "auto_wpm"),
 ]
 
 
@@ -85,6 +86,47 @@ def normalise_id(path) -> str:
     stem = Path(str(path)).stem
     stem = Path(stem).stem
     return stem.lower().strip()
+
+
+# ---------------------------------------------------------------------------
+# NEW: Extract WAB-AQ from .cha headers
+# ---------------------------------------------------------------------------
+def extract_wabaq_from_cha(cha_dir: str, session_ids: set) -> pd.DataFrame:
+    """
+    Pull WAB-AQ from .cha @ID headers for the validation patients.
+    Returns a DataFrame with columns: _session_id, wab_aq
+    """
+    cha_dir = Path(cha_dir)
+    parser  = CHATParser(participant_tier="PAR")
+    rows    = []
+
+    for cha in sorted(cha_dir.rglob("*.cha")):
+        sid = cha.stem.lower()
+        if sid not in session_ids:
+            continue
+        try:
+            transcript = parser.parse_file(cha)
+            wab_aq = transcript.metadata.get("wab_aq", None)
+            if wab_aq is not None:
+                try:
+                    wab_aq = float(wab_aq)
+                except (ValueError, TypeError):
+                    wab_aq = None
+
+            rows.append({
+                "_session_id": sid,
+                "wab_aq":      wab_aq,
+            })
+            status = f"{wab_aq:.1f}" if wab_aq is not None else "not found"
+            logger.info(f"  {cha.name}: WAB-AQ = {status}")
+
+        except Exception as e:
+            logger.warning(f"  Failed to parse {cha.name}: {e}")
+
+    df = pd.DataFrame(rows)
+    n_found = df["wab_aq"].notna().sum()
+    logger.info(f"WAB-AQ extracted for {n_found} / {len(df)} matched transcripts")
+    return df
 
 
 # ---------------------------------------------------------------------------
@@ -142,9 +184,7 @@ def load_all_clan_evals(clan_dir: str) -> pd.DataFrame:
                  sorted(clan_dir.rglob("*.eval.xlsx"))
 
     if not eval_files:
-        raise FileNotFoundError(
-            f"No *.eval.xls files found in {clan_dir}."
-        )
+        raise FileNotFoundError(f"No *.eval.xls files found in {clan_dir}.")
 
     logger.info(f"Found {len(eval_files)} CLAN eval files in {clan_dir}")
 
@@ -161,12 +201,13 @@ def load_all_clan_evals(clan_dir: str) -> pd.DataFrame:
 
     df = pd.DataFrame(rows)
     logger.info(f"Successfully loaded CLAN scores for {len(df)} transcripts")
-      # Compute CLAN's own repair rate for cross-validation
+
     if {"retracing", "repetition", "Total_Utts"}.issubset(df.columns):
         df["clan_repair_rate"] = (
             (df["retracing"].fillna(0) + df["repetition"].fillna(0))
             / df["Total_Utts"].replace(0, np.nan)
         ).fillna(0.0)
+
     return df
 
 
@@ -194,7 +235,6 @@ def compute_auto_metrics(
             f"  .cha stems (sample): {[f.stem.lower() for f in all_cha[:5]]}"
         )
 
-    # Build duration lookup from CLAN data
     duration_lookup = {}
     if "Duration_(sec)" in clan_df.columns:
         for _, row in clan_df.iterrows():
@@ -222,18 +262,13 @@ def compute_auto_metrics(
             for task in TASK_PRIORITY:
                 if not transcript.has_task(task):
                     continue
-                raw_utts = [u.raw for u in transcript.tasks[task]if u.text.strip()]
+                raw_utts   = [u.raw  for u in transcript.tasks[task] if u.text.strip()]
                 clean_utts = [u.text for u in transcript.tasks[task] if u.text.strip()]
                 if not clean_utts:
                     continue
 
                 real_duration = duration_lookup.get(cha.stem.lower(), 0.0)
-
-                # Determine duration source for the report column
-                if real_duration > 0:
-                    dur_source = "clan"
-                else:
-                    dur_source = "fallback"
+                dur_source    = "clan" if real_duration > 0 else "fallback"
 
                 best = DiscourseMetricExtractor(
                     task=task,
@@ -249,7 +284,7 @@ def compute_auto_metrics(
             rows.append({
                 "_session_id":       cha.stem.lower(),
                 "task":              best_task,
-                "duration_source":   dur_source,   # NEW: "clan" or "fallback"
+                "duration_source":   dur_source,
                 "auto_mlu":          best.mlu_morphemes,
                 "auto_mattr":        best.mattr,
                 "auto_ciu_rate":     best.ciu_rate,
@@ -272,7 +307,6 @@ def compute_auto_metrics(
 # ---------------------------------------------------------------------------
 # Correlation helpers
 # ---------------------------------------------------------------------------
-
 def _correlate_pair(x: np.ndarray, y: np.ndarray, threshold: float) -> dict:
     if len(x) < 3:
         return None
@@ -295,18 +329,40 @@ def _correlate_pair(x: np.ndarray, y: np.ndarray, threshold: float) -> dict:
     }
 
 
+def _correlate_with_wabaq(values: np.ndarray, wab_aq: np.ndarray, label: str) -> dict:
+    if len(values) < 5:
+        return None
+
+    r, p = stats.pearsonr(values, wab_aq)
+
+    # Manual bootstrap CI for Pearson r
+    rng = np.random.default_rng(42)
+    boot_rs = []
+    n = len(values)
+    for _ in range(1000):
+        idx = rng.integers(0, n, size=n)
+        boot_r, _ = stats.pearsonr(values[idx], wab_aq[idx])
+        boot_rs.append(boot_r)
+    boot_rs = np.array(boot_rs)
+    ci_low  = float(np.percentile(boot_rs, 2.5))
+    ci_high = float(np.percentile(boot_rs, 97.5))
+
+    return {
+        "label":       label,
+        "n":           int(len(values)),
+        "r":           round(float(r), 3),
+        "p_value":     round(float(p), 4),
+        "ci_95_low":   round(ci_low,  3),
+        "ci_95_high":  round(ci_high, 3),
+        "significant": bool(p < 0.05),
+    }
 # ---------------------------------------------------------------------------
-# Match and correlate
+# Step 1: Auto vs CLAN accuracy
 # ---------------------------------------------------------------------------
 def run_validation(clan_df: pd.DataFrame, auto_df: pd.DataFrame):
-    merged  = pd.merge(clan_df, auto_df, on="_session_id", how="inner")
-    n_match = len(merged)
-
-    unmatched = sorted(
-        set(clan_df["_session_id"]) - set(auto_df["_session_id"])
-    )
-
-    # How many transcripts used fallback duration?
+    merged     = pd.merge(clan_df, auto_df, on="_session_id", how="inner")
+    n_match    = len(merged)
+    unmatched  = sorted(set(clan_df["_session_id"]) - set(auto_df["_session_id"]))
     n_fallback = int((merged.get("duration_source", pd.Series()) == "fallback").sum())
 
     logger.info(
@@ -319,18 +375,18 @@ def run_validation(clan_df: pd.DataFrame, auto_df: pd.DataFrame):
         "mattr":                "auto_mattr",
         "wpm":                  "auto_wpm",
         "syntactic_complexity": "auto_syn_comp",
-        "maze_rate":            "auto_maze_rate"
+        "maze_rate":            "auto_maze_rate",
     }
 
     results = {
-        "n_clan_files":       len(clan_df),
-        "n_auto_scored":      len(auto_df),
-        "n_matched":          n_match,
-        "n_fallback_duration": n_fallback,
-        "unmatched_ids":      unmatched,
-        "metrics":            {},
-        "metrics_clan_duration_only": {},  # excludes fallback-duration rows
-        "per_task":           {},
+        "n_clan_files":               len(clan_df),
+        "n_auto_scored":              len(auto_df),
+        "n_matched":                  n_match,
+        "n_fallback_duration":        n_fallback,
+        "unmatched_ids":              unmatched,
+        "metrics":                    {},
+        "metrics_clan_duration_only": {},
+        "per_task":                   {},
     }
 
     for auto_attr, clan_col, label, threshold, note in METRIC_MAP:
@@ -352,7 +408,6 @@ def run_validation(clan_df: pd.DataFrame, auto_df: pd.DataFrame):
             entry["note"] = note
         results["metrics"][auto_attr] = entry
 
-        # Correlation excluding fallback-duration transcripts
         if "duration_source" in merged.columns:
             clan_only = merged[merged["duration_source"] == "clan"]
             pair_c    = clan_only[[auto_col, clan_col]].dropna()
@@ -366,12 +421,9 @@ def run_validation(clan_df: pd.DataFrame, auto_df: pd.DataFrame):
 
         logger.info(
             f"  {label:<50}  r={entry['pearson_r']:.3f}  "
-            f"rho={entry['spearman_r']:.3f}  MAE={entry['mae']:.3f}  "
-            f"bias={entry['bias']:+.3f}  "
             f"{'OK' if entry['acceptable'] else 'needs work'} (threshold={threshold})"
         )
 
-    # Per-task stratified correlations  (NEW)
     if "task" in merged.columns:
         for task in merged["task"].dropna().unique():
             task_rows = merged[merged["task"] == task]
@@ -393,6 +445,88 @@ def run_validation(clan_df: pd.DataFrame, auto_df: pd.DataFrame):
 
 
 # ---------------------------------------------------------------------------
+# Step 2 & 3: WAB-AQ correlation analysis
+# ---------------------------------------------------------------------------
+def run_wabaq_analysis(merged: pd.DataFrame) -> dict:
+    if WAB_AQ_COL not in merged.columns:
+        logger.warning(
+            f"WAB-AQ column '{WAB_AQ_COL}' not found in merged data. "
+            f"Skipping WAB-AQ analysis."
+        )
+        return {}
+
+    wab_aq_raw   = merged[WAB_AQ_COL].values.astype(float)
+    valid_mask   = ~np.isnan(wab_aq_raw)
+    wab_aq       = wab_aq_raw[valid_mask]
+    merged_valid = merged[valid_mask].copy()
+
+    logger.info(
+        f"WAB-AQ available for {valid_mask.sum()} / {len(merged)} matched transcripts"
+    )
+
+    if valid_mask.sum() < 5:
+        logger.warning("Fewer than 5 patients with WAB-AQ — skipping WAB-AQ analysis.")
+        return {}
+
+    results = {
+        "n_with_wabaq": int(valid_mask.sum()),
+        "wab_aq_mean":  round(float(np.mean(wab_aq)), 2),
+        "wab_aq_std":   round(float(np.std(wab_aq)),  2),
+        "step2_metric_wabaq_correlations": {},
+        "step3_clan_vs_auto_wabaq":        {},
+    }
+
+    for metric_attr, clan_col, auto_col in WAB_METRICS:
+        # Step 2: automated metric vs WAB-AQ
+        if auto_col in merged_valid.columns:
+            auto_vals = merged_valid[auto_col].values.astype(float)
+            auto_mask = ~np.isnan(auto_vals)
+            if auto_mask.sum() >= 5:
+                entry = _correlate_with_wabaq(
+                    auto_vals[auto_mask],
+                    wab_aq[auto_mask],
+                    label=f"AUTO {metric_attr} vs WAB-AQ",
+                )
+                if entry:
+                    results["step2_metric_wabaq_correlations"][metric_attr] = entry
+
+        # Step 3: CLAN metric vs WAB-AQ compared to automated metric vs WAB-AQ
+        if clan_col in merged_valid.columns and auto_col in merged_valid.columns:
+            pair = merged_valid[[clan_col, auto_col]].copy()
+            pair[WAB_AQ_COL] = wab_aq
+            pair = pair.dropna()
+
+            if len(pair) >= 5:
+                clan_vals = pair[clan_col].values.astype(float)
+                auto_vals = pair[auto_col].values.astype(float)
+                wab_vals  = pair[WAB_AQ_COL].values.astype(float)
+
+                clan_entry = _correlate_with_wabaq(
+                    clan_vals, wab_vals,
+                    label=f"CLAN {clan_col} vs WAB-AQ",
+                )
+                auto_entry = _correlate_with_wabaq(
+                    auto_vals, wab_vals,
+                    label=f"AUTO {metric_attr} vs WAB-AQ",
+                )
+
+                if clan_entry and auto_entry:
+                    diff = round(auto_entry["r"] - clan_entry["r"], 3)
+                    results["step3_clan_vs_auto_wabaq"][metric_attr] = {
+                        "clan":       clan_entry,
+                        "auto":       auto_entry,
+                        "r_diff":     diff,
+                        "conclusion": (
+                            "automation preserves functional signal"
+                            if abs(diff) < 0.10
+                            else "automation degrades functional signal"
+                        ),
+                    }
+
+    return results
+
+
+# ---------------------------------------------------------------------------
 # Scatter plots
 # ---------------------------------------------------------------------------
 def make_scatter_plots(merged: pd.DataFrame, output_dir: Path) -> None:
@@ -407,24 +541,23 @@ def make_scatter_plots(merged: pd.DataFrame, output_dir: Path) -> None:
         "mattr":                "auto_mattr",
         "wpm":                  "auto_wpm",
         "syntactic_complexity": "auto_syn_comp",
-        "maze_rate":            "auto_maze_rate"
+        "maze_rate":            "auto_maze_rate",
     }
 
     plot_specs = [
         (AUTO_COL_MAP[a], clan_col, label, threshold)
         for a, clan_col, label, threshold, _ in METRIC_MAP
-        if AUTO_COL_MAP[a] in merged.columns and clan_col in merged.columns
+        if AUTO_COL_MAP.get(a) in merged.columns and clan_col in merged.columns
     ]
 
     if not plot_specs:
         return
 
-    n    = len(plot_specs)
+    n         = len(plot_specs)
     fig, axes = plt.subplots(1, n, figsize=(5 * n, 5))
     if n == 1:
         axes = [axes]
 
-    # Colour-code by duration source if available
     has_source = "duration_source" in merged.columns
     colors_map = {"clan": "#1D9E75", "fallback": "#D85A30"}
 
@@ -488,67 +621,110 @@ def make_scatter_plots(merged: pd.DataFrame, output_dir: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Print full RQ1 report
+# ---------------------------------------------------------------------------
+def print_rq1_report(validation_results: dict, wabaq_results: dict) -> None:
+    print("\n" + "=" * 76)
+    print("RQ1 FULL ANSWER")
+    print("=" * 76)
+
+    print("\nSTEP 1: Can the LLM compute metrics accurately? (vs CLAN gold standard)")
+    print(f"  {'Metric':<35} {'r':>7} {'ρ':>7} {'MAE':>8} {'Pass?':>6}")
+    print(f"  {'-'*35} {'-'*7} {'-'*7} {'-'*8} {'-'*6}")
+    for attr, r in validation_results.get("metrics", {}).items():
+        print(
+            f"  {attr:<35} {r['pearson_r']:>7.3f} {r['spearman_r']:>7.3f} "
+            f"{r['mae']:>8.3f} {'  ✓' if r['acceptable'] else '  ✗':>6}"
+        )
+
+    if not wabaq_results:
+        print("\n  WAB-AQ analysis not available (not found in .cha headers).")
+        print("=" * 76)
+        return
+
+    print(f"\nSTEP 2: Which metrics reflect functional ability? (correlation with WAB-AQ)")
+    print(f"  n = {wabaq_results['n_with_wabaq']} patients  |  "
+          f"WAB-AQ mean = {wabaq_results['wab_aq_mean']}  "
+          f"std = {wabaq_results['wab_aq_std']}")
+    print(f"\n  {'Metric':<25} {'r':>7} {'p':>8} {'95% CI':>18} {'Sig?':>6}")
+    print(f"  {'-'*25} {'-'*7} {'-'*8} {'-'*18} {'-'*6}")
+    for metric, entry in wabaq_results.get("step2_metric_wabaq_correlations", {}).items():
+        ci  = f"[{entry['ci_95_low']:+.3f}, {entry['ci_95_high']:+.3f}]"
+        sig = "  *" if entry["significant"] else "   "
+        print(
+            f"  {metric:<25} {entry['r']:>+7.3f} {entry['p_value']:>8.4f} "
+            f"{ci:>18} {sig:>6}"
+        )
+    print("  * = p < 0.05")
+
+    print(f"\nSTEP 3: Does automation degrade the functional signal?")
+    print(f"  {'Metric':<25} {'CLAN r':>8} {'Auto r':>8} {'Diff':>8} {'Conclusion'}")
+    print(f"  {'-'*25} {'-'*8} {'-'*8} {'-'*8} {'-'*35}")
+    for metric, entry in wabaq_results.get("step3_clan_vs_auto_wabaq", {}).items():
+        print(
+            f"  {metric:<25} "
+            f"{entry['clan']['r']:>+8.3f} "
+            f"{entry['auto']['r']:>+8.3f} "
+            f"{entry['r_diff']:>+8.3f}  "
+            f"{entry['conclusion']}"
+        )
+
+    print("\n" + "=" * 76)
+    print("  Full results : outputs/validation/rq1_full_report.json")
+    print("=" * 76)
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 def main(args) -> None:
     output_dir = Path("outputs/validation")
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Load CLAN eval files
     clan_df          = load_all_clan_evals(args.clan_dir)
     clan_session_ids = set(clan_df["_session_id"].tolist())
 
+    # Compute auto metrics
     auto_df = compute_auto_metrics(args.cha_dir, clan_session_ids, clan_df)
 
-    results, merged = run_validation(clan_df, auto_df)
+    # Step 1: merge and validate
+    validation_results, merged = run_validation(clan_df, auto_df)
 
-    merged.to_csv(str(output_dir / "matched_comparison.csv"), index=False)
-    with open(output_dir / "correlation_report.json", "w") as f:
-        json.dump(results, f, indent=2)
+    # Extract WAB-AQ from .cha headers and join into merged
+    logger.info("Extracting WAB-AQ from .cha headers...")
+    wabaq_df = extract_wabaq_from_cha(args.cha_dir, clan_session_ids)
+    wabaq_df.to_csv(str(output_dir / "wabaq_lookup.csv"), index=False)
 
-    # Summary table
-    print("\n" + "=" * 76)
-    print("VALIDATION SUMMARY")
-    print("=" * 76)
-    print(f"  CLAN eval files found    : {results['n_clan_files']}")
-    print(f"  Transcripts auto-scored  : {results['n_auto_scored']}")
-    print(f"  Matched for comparison   : {results['n_matched']}")
-    print(f"  Fallback duration used   : {results['n_fallback_duration']} "
-          f"(WPM/CIU rates may be less accurate for these)")
-    if results["unmatched_ids"]:
-        print(f"  Unmatched CLAN IDs       : {results['unmatched_ids']}")
-    print()
-    print(
-        f"  {'Metric':<35} {'r':>7} {'ρ':>7} "
-        f"{'MAE':>8} {'Bias':>8} {'Thresh':>7} {'Pass?':>6}"
+    n_before = len(merged)
+    merged = pd.merge(merged, wabaq_df, on="_session_id", how="left")
+    logger.info(
+        f"WAB-AQ joined: {merged['wab_aq'].notna().sum()} / {n_before} patients have a value"
     )
-    print(f"  {'-'*35} {'-'*7} {'-'*7} {'-'*8} {'-'*8} {'-'*7} {'-'*6}")
-    for attr, r in results["metrics"].items():
-        print(
-            f"  {attr:<35} {r['pearson_r']:>7.3f} {r['spearman_r']:>7.3f} "
-            f"{r['mae']:>8.3f} {r['bias']:>+8.3f} "
-            f"{r['threshold']:>7.2f} "
-            f"{'  ✓' if r['acceptable'] else '  ✗':>6}"
-        )
 
-    if results.get("per_task"):
-        print()
-        print("  Per-task MLU correlation (Pearson r):")
-        for task, task_metrics in results["per_task"].items():
-            if "mlu_morphemes" in task_metrics:
-                tm = task_metrics["mlu_morphemes"]
-                print(f"    {task:<25} r={tm['pearson_r']:.3f}  n={tm['n_pairs']}")
+    # Steps 2 & 3: WAB-AQ correlation
+    wabaq_results = run_wabaq_analysis(merged)
 
-    print("=" * 76)
-    print("  Full results : outputs/validation/correlation_report.json")
-    print("  Row-level    : outputs/validation/matched_comparison.csv")
-    print()
+    # Save outputs
+    merged.to_csv(str(output_dir / "matched_comparison.csv"), index=False)
 
+    with open(output_dir / "correlation_report.json", "w") as f:
+        json.dump(validation_results, f, indent=2)
+
+    full_report = {
+        "step1_auto_vs_clan":         validation_results,
+        "step2_and_3_wabaq_analysis": wabaq_results,
+    }
+    with open(output_dir / "rq1_full_report.json", "w") as f:
+        json.dump(full_report, f, indent=2)
+
+    print_rq1_report(validation_results, wabaq_results)
     make_scatter_plots(merged, output_dir)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Validate automatic discourse metrics against CLAN .eval.xls files"
+        description="RQ1 Full Analysis: automated metrics vs CLAN and WAB-AQ"
     )
     parser.add_argument("--clan_dir", type=str, required=True)
     parser.add_argument("--cha_dir",  type=str, required=True)

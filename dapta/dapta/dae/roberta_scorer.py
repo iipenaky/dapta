@@ -78,8 +78,8 @@ class RoBERTaScorer:
         if self.tokenizer is None:
             self.load(from_checkpoint=False)
 
-        train_dataset = AphasiaTranscriptDataset(train_utterances, self.tokenizer)
-        val_dataset   = AphasiaTranscriptDataset(val_utterances,   self.tokenizer)
+        train_dataset = AphasiaTranscriptDataset(train_utterances, self.tokenizer, max_length = 128)
+        val_dataset   = AphasiaTranscriptDataset(val_utterances,   self.tokenizer, max_length = 128)
 
         data_collator = DataCollatorForLanguageModeling(
             tokenizer=self.tokenizer,

@@ -13,7 +13,6 @@ Discourse metrics — 4 per task × 5 tasks = 20 dims
   * sandwich mc_score is low-confidence (only 5 concepts)
   † conversation mc_score is always 0.0 (no concept list — not applicable)
   mattr removed — failed CLAN validation (r=0.755) and is a construct
-  mismatch with CLAN's raw TTR; WPM captures rate information instead.
 
 Task presence flags — 5 dims
   [20:25] 1.0 if the patient performed that task, 0.0 if absent.
@@ -32,7 +31,6 @@ Signal dims — 8 dims
   [35]    maze_rate         Repair/revision proportion (global)
   [36:41] utt_length_std    Per-task std of utterance word counts (5 dims)
   [41]    mean_pause_ms     Mean inter-utterance gap from CHAT timestamps (ms)
-  [42]    wpm               Words per minute (global, counted from raw CHAT tier)
 ─────────────────────────────────────────────────────────────────────────
 
 Scaler design
@@ -63,9 +61,9 @@ from dapta.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-# ---------------------------------------------------------------------------
+
 # Constants
-# ---------------------------------------------------------------------------
+
 
 TASKS = [
     "cookie_theft",
@@ -81,6 +79,7 @@ METRIC_NAMES = [
     "mc_score",
     "mlu_morphemes",
     "syntactic_complexity",
+    "mattr"
 ]
 
 APHASIA_SUBTYPES = ["Broca", "Wernicke", "Anomic", "Conduction", "Global", "Other"]
@@ -96,26 +95,26 @@ WAB_AQ_MEDIAN: Dict[str, float] = {
 }
 
 # Dimension bookkeeping
-N_METRICS_PER_TASK = len(METRIC_NAMES)            # 4
+N_METRICS_PER_TASK = len(METRIC_NAMES)            # 5
 N_TASKS            = len(TASKS)                    # 5
-N_DISCOURSE        = N_METRICS_PER_TASK * N_TASKS  # 20
+N_DISCOURSE        = N_METRICS_PER_TASK * N_TASKS  # 25
 N_FLAGS            = N_TASKS                       # 5
 N_SUBTYPE          = len(APHASIA_SUBTYPES)         # 6
 N_STATIC           = 4   # wab_aq, wab_aq_known, mean_surprisal, log_session_num
-N_SIGNAL           = 8   # maze_rate + 5×utt_length_std + mean_pause_ms + wpm
-STATE_DIM          = N_DISCOURSE + N_FLAGS + N_SUBTYPE + N_STATIC + N_SIGNAL  # 43
+N_SIGNAL           = 7   # maze_rate + 5×utt_length_std + mean_pause_ms 
+STATE_DIM          = N_DISCOURSE + N_FLAGS + N_SUBTYPE + N_STATIC + N_SIGNAL  # 47
 
 # Named slices
-SLICE_DISCOURSE = slice(0,  20)
-SLICE_FLAGS     = slice(20, 25)
-SLICE_SUBTYPE   = slice(25, 31)
-SLICE_STATIC    = slice(31, 35)
-SLICE_SIGNAL    = slice(35, 43)
+SLICE_DISCOURSE = slice(0,  25)
+SLICE_FLAGS     = slice(25, 30)
+SLICE_SUBTYPE   = slice(30, 36)
+SLICE_STATIC    = slice(36, 40)
+SLICE_SIGNAL    = slice(40, 47)
 
 
-# ---------------------------------------------------------------------------
+
 # PatientProfile
-# ---------------------------------------------------------------------------
+
 
 class PatientProfile:
     """
@@ -174,9 +173,9 @@ class PatientProfile:
         )
 
 
-# ---------------------------------------------------------------------------
+
 # SessionSignals
-# ---------------------------------------------------------------------------
+
 
 class SessionSignals:
     """
@@ -191,8 +190,6 @@ class SessionSignals:
                      counts for that task. Missing tasks default to 0.0.
     mean_pause_ms  : Mean inter-utterance pause in ms from CHAT timestamps.
                      Pass 0.0 if timestamps are unavailable.
-    wpm            : Words per minute (global across all tasks, computed
-                     from raw CHAT tier to match CLAN's Words_Min).
     """
 
     def __init__(
@@ -200,12 +197,11 @@ class SessionSignals:
         maze_rate:      float            = 0.0,
         utt_length_std: Dict[str, float] = None,
         mean_pause_ms:  float            = 0.0,
-        wpm:            float            = 0.0,
     ) -> None:
         self.maze_rate      = float(maze_rate)
         self.utt_length_std = utt_length_std or {}
         self.mean_pause_ms  = float(mean_pause_ms)
-        self.wpm            = float(wpm)
+
 
     def std_array(self) -> np.ndarray:
         """Return per-task utt_length_std as a 5-dim array (task order = TASKS)."""
@@ -217,9 +213,9 @@ class SessionSignals:
         return arr
 
 
-# ---------------------------------------------------------------------------
+
 # NaN-aware scaler helper
-# ---------------------------------------------------------------------------
+
 
 def _fit_nanaware_scaler(matrix: np.ndarray) -> MinMaxScaler:
     """
@@ -250,9 +246,9 @@ def _transform_nanaware(scaler: MinMaxScaler, row: np.ndarray) -> np.ndarray:
     return np.clip(out, 0.0, 1.0).astype(np.float32)
 
 
-# ---------------------------------------------------------------------------
+
 # Helpers
-# ---------------------------------------------------------------------------
+
 
 def _metrics_to_array(m: DiscourseMetrics) -> np.ndarray:
     """Return [ciu_rate, mc_score, mlu_morphemes, syntactic_complexity]."""
@@ -261,12 +257,13 @@ def _metrics_to_array(m: DiscourseMetrics) -> np.ndarray:
         m.mc_score,
         m.mlu_morphemes,
         m.syntactic_complexity,
+        m.mattr
     ], dtype=np.float32)
 
 
-# ---------------------------------------------------------------------------
+
 # PatientStateBuilder
-# ---------------------------------------------------------------------------
+
 
 class PatientStateBuilder:
     """
@@ -276,7 +273,7 @@ class PatientStateBuilder:
       - task_metrics  : dict of task name -> DiscourseMetrics
       - surprisal     : global mean RoBERTa surprisal
       - profile       : PatientProfile (subtype, WAB-AQ, session number)
-      - signals       : SessionSignals (maze_rate, utt_length_std, pause, wpm)
+      - signals       : SessionSignals (maze_rate, utt_length_std, pause)
 
     Normalisation
     -------------
@@ -475,7 +472,6 @@ class PatientStateBuilder:
           [4]    maze_rate
           [5:10] utt_length_std per task (5 values)
           [10]   mean_pause_ms
-          [11]   wpm
         """
         return np.array([
             profile.wab_aq,
@@ -485,7 +481,6 @@ class PatientStateBuilder:
             signals.maze_rate,
             *signals.std_array(),   # 5 values
             signals.mean_pause_ms,
-            signals.wpm,
         ], dtype=np.float32)
 
     # ------------------------------------------------------------------
@@ -553,7 +548,6 @@ class PatientStateBuilder:
         for task in TASKS:
             names.append(f"utt_length_std__{task}")
         names.append("mean_pause_ms")
-        names.append("wpm")
         assert len(names) == STATE_DIM, (
             f"dim_names length {len(names)} != STATE_DIM {STATE_DIM}"
         )

@@ -155,14 +155,10 @@ def build_session_signals(
                      (already computed from raw CHAT in ext.compute())
     - utt_length_std: per-task std of utterance word counts
     - mean_pause_ms : from raw CHAT timestamps across all utterances
-    - wpm          : from the first available task's DiscourseMetrics
-                     (already computed from raw CHAT in ext.compute())
     """
-    # maze_rate and wpm: use global values averaged across tasks
+    # maze_rate use global values averaged across tasks
     maze_rates = [m.maze_rate for m in task_metrics.values()]
-    wpms       = [m.wpm       for m in task_metrics.values()]
     maze_rate  = float(np.mean(maze_rates)) if maze_rates else 0.0
-    wpm        = float(np.mean(wpms))       if wpms       else 0.0
 
     # per-task utterance length std
     utt_length_std: Dict[str, float] = {}
@@ -178,7 +174,6 @@ def build_session_signals(
         maze_rate=maze_rate,
         utt_length_std=utt_length_std,
         mean_pause_ms=mean_pause_ms,
-        wpm=wpm,
     )
 
 
@@ -239,7 +234,7 @@ def main(args) -> None:
                 if not clean_utts:
                     continue
                 ext = DiscourseMetricExtractor(task=task)
-                # Pass raw_utterances so WPM, maze_rate, and duration are
+        
                 # computed from the original CHAT tier (not cleaned text).
                 task_dict[task] = ext.compute(clean_utts, raw_utterances=raw_utts)
 
@@ -428,11 +423,6 @@ def main(args) -> None:
         ])),
         "mean_mlu": float(np.mean([
             m.mlu_morphemes
-            for task_dict in all_task_metrics
-            for m in task_dict.values()
-        ])),
-        "mean_wpm": float(np.mean([
-            m.wpm
             for task_dict in all_task_metrics
             for m in task_dict.values()
         ])),

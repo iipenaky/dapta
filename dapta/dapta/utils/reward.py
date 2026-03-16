@@ -1,95 +1,127 @@
 """
 Discourse-level reward function for DAPTA.
 
-The reward is a weighted sum of improvements across six discourse metrics:
-    R = w1*ΔCIU + w2*ΔMC + w3*ΔMLU + w4*ΔTTR + w5*ΔSynComp − w6*ΔSurprisal
+Computes reward from the 47-dimensional patient state vector.
+Averages discourse metric improvements across all tasks the patient
+performed, using task presence flags (dims 25-29) to identify
+valid tasks.
 
-Weights are set a priori based on the clinical validity of each metric
-as an index of functional communication (Stark et al., 2021).
+Reward formula:
+    R = w1*mean(ΔCIU) + w2*mean(ΔMC) + w3*mean(ΔMLU)
+      + w4*mean(ΔSynComp) + w5*mean(ΔMATTR) − w6*ΔSurprisal
+
+Weights are set a priori based on clinical validity (Stark et al., 2021).
+MATTR retained as length-robust lexical diversity measure despite lower
+CLAN correlation (r=0.683), reflecting construct difference not error.
 
 References
 ----------
 Stark et al. (2021). Standardising assessment of spoken discourse in aphasia.
-    AJSLP, 30(1S), 491–502.
-Ng et al. (1999). Policy invariance under reward transformations.
-    ICML Proceedings.
+    AJSLP, 30(1S), 491-502.
+Ng et al. (1999). Policy invariance under reward transformations. ICML.
 """
 
-
 import numpy as np
-from typing import Dict, Optional
+from typing import Optional
 
-# Default metric weights (must sum to 1.0)
-DEFAULT_WEIGHTS: Dict[str, float] = {
-    "ciu_rate": 0.35,         # Most direct measure of communicative info
-    "mc_score": 0.25,         # Narrative completeness
-    "mlu_morphemes": 0.10,    # Utterance length
-    "ttr": 0.10,              # Lexical diversity
-    "syntactic_complexity": 0.05,
-    "mean_surprisal": 0.15,   # Inverse: improvement = REDUCTION in surprisal
-}
+from dapta.dae.state_builder import (
+    N_METRICS_PER_TASK,
+    N_TASKS,
+    SLICE_FLAGS,
+    SLICE_STATIC,
+)
 
-# Metric ordering must match state vector ordering in state_builder.py
-METRIC_ORDER = [
-    "ciu_rate",
-    "mc_score",
-    "mlu_morphemes",
-    "ttr",
-    "syntactic_complexity",
-    "mean_surprisal",
-]
+# Metric indices within each task block
+# Layout per task: [ciu_rate, mc_score, mlu_morphemes, syncomp, mattr]
+_CIU_IDX   = 0
+_MC_IDX    = 1
+_MLU_IDX   = 2
+_SYN_IDX   = 3
+_MATTR_IDX = 4
 
-# Negative improvement penalty (applied if any primary metric worsens)
+# Surprisal dim within static block (offset 2 from static block start)
+_SURPRISAL_OFFSET = 2
+
+# Reward weights — must sum to 1.0
+_W_CIU    = 0.35   # Most direct measure of communicative informativeness [34, 42]
+_W_MC     = 0.25   # Narrative completeness [38, 42]
+_W_MLU    = 0.10   # Utterance structural complexity [42]
+_W_SYN    = 0.10   # Syntactic complexity [42]
+_W_MATTR  = 0.05   # Lexical diversity (length-robust TTR) [42]
+_W_SURP   = 0.15   # LLM surprisal — inverse metric [13, 52]
+
+assert abs(_W_CIU + _W_MC + _W_MLU + _W_SYN + _W_MATTR + _W_SURP - 1.0) < 1e-4
+
+# Regression penalty applied if CIU or MC decreases
 REGRESSION_PENALTY = -0.2
 
 
 def compute_reward(
     state_before: np.ndarray,
-    state_after: np.ndarray,
-    weights: Optional[Dict[str, float]] = None,
-    clip: tuple[float, float] = (-1.0, 1.0),
+    state_after:  np.ndarray,
+    clip:         tuple = (-1.0, 1.0),
 ) -> float:
     """
-    Compute the discourse-level reward from state transition.
+    Compute discourse-level reward from a 47-dim state transition.
+
+    Averages improvement across all tasks the patient performed,
+    identified by task presence flags (SLICE_FLAGS).
 
     Parameters
     ----------
-    state_before : np.ndarray, shape (6,)
-        Normalised discourse state vector before therapy exercise.
-    state_after  : np.ndarray, shape (6,)
-        Normalised discourse state vector after therapy exercise.
-    weights      : Optional dict of metric -> weight. Uses DEFAULT_WEIGHTS if None.
-    clip         : (min, max) to clip final reward.
+    state_before : np.ndarray shape (47,)
+    state_after  : np.ndarray shape (47,)
+    clip         : (min, max) reward clipping
 
     Returns
     -------
-    float : Scalar reward in [clip[0], clip[1]]
+    float
     """
-    if weights is None:
-        weights = DEFAULT_WEIGHTS
+    ciu_deltas   = []
+    mc_deltas    = []
+    mlu_deltas   = []
+    syn_deltas   = []
+    mattr_deltas = []
 
-    _validate_weights(weights)
-    assert len(state_before) == len(METRIC_ORDER), (
-        f"State vector length {len(state_before)} != expected {len(METRIC_ORDER)}"
+    flags_start = SLICE_FLAGS.start
+
+    for t in range(N_TASKS):
+        # Check task presence flag
+        if state_after[flags_start + t] < 0.5:
+            continue
+
+        base = t * N_METRICS_PER_TASK
+        ciu_deltas.append(  float(state_after[base + _CIU_IDX]   - state_before[base + _CIU_IDX]))
+        mc_deltas.append(   float(state_after[base + _MC_IDX]    - state_before[base + _MC_IDX]))
+        mlu_deltas.append(  float(state_after[base + _MLU_IDX]   - state_before[base + _MLU_IDX]))
+        syn_deltas.append(  float(state_after[base + _SYN_IDX]   - state_before[base + _SYN_IDX]))
+        mattr_deltas.append(float(state_after[base + _MATTR_IDX] - state_before[base + _MATTR_IDX]))
+
+    if not ciu_deltas:
+        return 0.0
+
+    # Average across present tasks
+    d_ciu   = float(np.mean(ciu_deltas))
+    d_mc    = float(np.mean(mc_deltas))
+    d_mlu   = float(np.mean(mlu_deltas))
+    d_syn   = float(np.mean(syn_deltas))
+    d_mattr = float(np.mean(mattr_deltas))
+
+    # Surprisal from static block
+    surp_dim = SLICE_STATIC.start + _SURPRISAL_OFFSET
+    d_surp   = float(state_after[surp_dim] - state_before[surp_dim])
+
+    reward = (
+        _W_CIU   * d_ciu
+      + _W_MC    * d_mc
+      + _W_MLU   * d_mlu
+      + _W_SYN   * d_syn
+      + _W_MATTR * d_mattr
+      - _W_SURP  * d_surp   # surprisal inverted
     )
 
-    delta = state_after - state_before  # shape (6,)
-    reward = 0.0
-
-    for i, metric in enumerate(METRIC_ORDER):
-        w = weights[metric]
-        d = float(delta[i])
-
-        if metric == "mean_surprisal":
-            # Lower surprisal = better = positive reward
-            reward += w * (-d)
-        else:
-            reward += w * d
-
-    # Regression penalty: punish if CIU rate or MC score decreases
-    ciu_idx = METRIC_ORDER.index("ciu_rate")
-    mc_idx = METRIC_ORDER.index("mc_score")
-    if delta[ciu_idx] < 0 or delta[mc_idx] < 0:
+    # Regression penalty
+    if d_ciu < 0 or d_mc < 0:
         reward += REGRESSION_PENALTY
 
     return float(np.clip(reward, clip[0], clip[1]))
@@ -97,52 +129,22 @@ def compute_reward(
 
 def compute_batch_rewards(
     states_before: np.ndarray,
-    states_after: np.ndarray,
-    weights: Optional[Dict[str, float]] = None,
-    clip: tuple[float, float] = (-1.0, 1.0),
+    states_after:  np.ndarray,
+    clip:          tuple = (-1.0, 1.0),
 ) -> np.ndarray:
     """
-    Vectorised reward computation for a batch of transitions.
+    Vectorised reward for a batch of transitions.
 
     Parameters
     ----------
-    states_before : np.ndarray, shape (B, 6)
-    states_after  : np.ndarray, shape (B, 6)
+    states_before : (B, 47)
+    states_after  : (B, 47)
 
     Returns
     -------
-    np.ndarray, shape (B,)
+    np.ndarray shape (B,)
     """
-    if weights is None:
-        weights = DEFAULT_WEIGHTS
-
-    weight_vec = np.array([
-        -weights[m] if m == "mean_surprisal" else weights[m]
-        for m in METRIC_ORDER
+    return np.array([
+        compute_reward(sb, sa, clip)
+        for sb, sa in zip(states_before, states_after)
     ], dtype=np.float32)
-
-    delta = states_after - states_before        # (B, 6)
-    rewards = (delta * weight_vec).sum(axis=1)  # (B,)
-
-    # Regression penalty
-    ciu_idx = METRIC_ORDER.index("ciu_rate")
-    mc_idx = METRIC_ORDER.index("mc_score")
-    penalty_mask = (delta[:, ciu_idx] < 0) | (delta[:, mc_idx] < 0)
-    rewards[penalty_mask] += REGRESSION_PENALTY
-
-    return np.clip(rewards, clip[0], clip[1]).astype(np.float32)
-
-
-
-# Internal helpers
-
-def _validate_weights(weights: Dict[str, float]) -> None:
-    total = sum(weights.values())
-    if not np.isclose(total, 1.0, atol=1e-4):
-        raise ValueError(
-            f"Metric weights must sum to 1.0, got {total:.4f}. "
-            f"Adjust weights in configs/default.yaml."
-        )
-    for metric in METRIC_ORDER:
-        if metric not in weights:
-            raise KeyError(f"Weight missing for metric '{metric}'.")
