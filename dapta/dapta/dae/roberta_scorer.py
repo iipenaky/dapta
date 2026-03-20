@@ -1,7 +1,3 @@
-"""
-RoBERTa fine-tuning on AphasiaBank transcripts and per-utterance surprisal scoring.
-"""
-
 import math
 from pathlib import Path
 from typing import Optional
@@ -33,15 +29,6 @@ class AphasiaTranscriptDataset(Dataset):
 
 
 class RoBERTaScorer:
-    """
-    Manages RoBERTa fine-tuning on AphasiaBank and computes surprisal scores.
-
-    Parameters
-    ----------
-        model_name      : HuggingFace model ID. Default is distilroberta-base
-        checkpoint_path : Where to save/load the fine-tuned model.
-        device          : "cuda", "cpu", or None (auto-detect).
-    """
 
     def __init__(self,model_name, checkpoint_path, device):
         self.model_name = model_name

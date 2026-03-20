@@ -48,11 +48,6 @@ from dapta.utils.logger import get_logger
 
 logger = get_logger(__name__, log_file="logs/run_dae.log")
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 def extract_metadata_from_transcript(transcript: PatientTranscript) -> dict:
     """
     Pull WAB-AQ and aphasia subtype from CHAT @ID header.

@@ -1,18 +1,3 @@
-"""
-Phase 3: Held-out test set evaluation.
-
-Runs all trained agents on the held-out test set (patients never seen
-during RL training) and computes the final thesis results.
-
-  RQ2: Does RL outperform rule-based sequencing?
-  RQ3: Do discourse-level gains transfer to naturalised speech?
-  RQ4: Does patient-specific adaptation outperform G-DDQN?
-
-Usage:
-  python experiments/run_evaluation.py
-  python experiments/run_evaluation.py --skip_ppo
-"""
-
 import argparse
 import json
 from pathlib import Path
@@ -32,13 +17,8 @@ from dapta.dae.state_builder import STATE_DIM
 logger = get_logger(__name__, log_file="logs/evaluation.log")
 
 METRIC_NAMES       = ["ciu_rate", "mc_score", "mlu_morphemes", "mattr", "syntactic_complexity"]
-CLINICAL_THRESHOLD = 0.40   # iTalkBetter benchmark (Upton et al., 2024)
-SURPRISAL_DIM      = 38     # dim 38 in the 47-dim state vector
-
-
-# ---------------------------------------------------------------------------
-# Stats helpers
-# ---------------------------------------------------------------------------
+CLINICAL_THRESHOLD = 0.40  
+SURPRISAL_DIM      = 38     
 
 def cohens_d_paired(before: np.ndarray, after: np.ndarray) -> float:
     diff = after - before
@@ -79,11 +59,6 @@ def effect_size_label(d: float) -> str:
     if d < 0.5: return "small"
     if d < 0.8: return "medium"
     return "large"
-
-
-# ---------------------------------------------------------------------------
-# Episode runners — all return (5,) discourse improvement + surprisal delta
-# ---------------------------------------------------------------------------
 
 def run_ddqn_episode(
     agent: DDQNAgent,
@@ -195,14 +170,7 @@ def evaluate_all_agents(
     rts:                 RandomBaseline,
     ppo_agent=None,
 ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
-    """
-    Run every agent on every test environment.
 
-    Returns
-    -------
-    disc_improvements : agent -> (N, 5) discourse improvement array
-    surp_improvements : agent -> (N,)   surprisal improvement array
-    """
     agent_names = ["DAPTA", "G_DDQN", "RBDE", "RTS"]
     if ppo_agent is not None:
         agent_names.append("PPO")

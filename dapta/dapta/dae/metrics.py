@@ -1,21 +1,3 @@
-"""
-Computation of discourse metrics from AphasiaBank transcripts.
-
-Metrics
-1. CIU Rate  — Correct Information Units per minute
-2. MC Score  — Main Concept completeness [0, 1]
-               Returns 0.0 (not 0.5) for tasks with no concept list.
-3. MLU-m     — Mean Length of Utterance in morphemes
-4. MATTR     — Moving-Average Type-Token Ratio (window=50, content words)
-5. SynComp   — Syntactic complexity (proportion of utterances with subordinate clause)
-7. maze_rate — Repair/revision proportion (must be computed from raw CHAT)
-
-INSTALL:
-    pip install stanza spacy
-    python -c "import stanza; stanza.download('en')"
-    python -m spacy download en_core_web_sm
-"""
-
 import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
@@ -25,10 +7,6 @@ import numpy as np
 from dapta.utils.logger import get_logger
 
 logger = get_logger(__name__)
-
-# ---------------------------------------------------------------------------
-# Lazy-loaded NLP singletons
-# ---------------------------------------------------------------------------
 
 _stanza_nlp = None
 _spacy_nlp  = None
@@ -64,10 +42,6 @@ def get_spacy():
             _spacy_nlp = False
     return _spacy_nlp if _spacy_nlp else None
 
-
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
 
 TASK_DURATION_FALLBACK = {
     "cookie_theft":     4.0,
@@ -131,7 +105,7 @@ MAIN_CONCEPTS = {
         [["therapy", "therapist", "treatment", "rehab", "rehabilitation", "practice"]],
         [["better", "improved", "improving", "recovery", "progress", "recovering"]],
     ],
-    # conversation intentionally absent — no scoreable concept list.
+    
 }
 
 COMPLEX_DEPS = {"advcl", "relcl", "ccomp", "xcomp", "acl"}
@@ -147,38 +121,29 @@ CONTRACTION_MORPHEMES = [
 
 _TS_PATTERN = re.compile(r"\x15(\d+)_(\d+)\x15")
 
-# CHAT repair markers — must be counted BEFORE clean_utterance() strips them
 _REPAIR_PATTERN = re.compile(
-    r"\[/\]"        # repetition
-    r"|\[//\]"      # revision
-    r"|\+/\."       # abandoned utterance
+    r"\[/\]"       
+    r"|\[//\]"      
+    r"|\+/\."       
 )
 
-# CHAT codes to strip for WPM counting (timestamps, non-verbal codes, CHAT
-# bracket annotations) — but we do NOT strip orthographic words, contractions,
-# or filled pauses, so the count matches CLAN's word counter.
 _WPM_STRIP = re.compile(
-    r"\x15\d+_\d+\x15"         # timestamps
-    r"|\[[-/]{1,2}\]"           # [/] [//] [-]
-    r"|\[\+[^\]]*\]"            # [+ ...] switch codes
-    r"|\[[-=][^\]]*\]"          # [- ...] [= ...] comments
-    r"|&=[a-zA-Z_]+"            # &=laughs &=coughs etc.
-    r"|&\+[a-zA-Z]+"            # &+un partial words (NOT counted by CLAN)
-    r"|\+[<>!.,?]"              # overlap/continuation markers
-    r"|[<>]"                    # overlap angle brackets
-    r"|\x14\d+\x14"             # CHAT segment markers
-    r"|\[%[^\]]*\]"             # [% comment] tiers
-    r"|\[=\?[^\]]*\]"           # uncertain transcriptions keep the word, strip brackets below
-    r"|\[[^\]]*\]"              # remaining bracket annotations
-    r"|[.!?,;:]+\s*$"           # trailing punctuation
-    r"|www|xxx|yyy",            # unintelligible placeholders
+    r"\x15\d+_\d+\x15"         
+    r"|\[[-/]{1,2}\]"         
+    r"|\[\+[^\]]*\]"            
+    r"|\[[-=][^\]]*\]"          
+    r"|&=[a-zA-Z_]+"           
+    r"|&\+[a-zA-Z]+"         
+    r"|\+[<>!.,?]"              
+    r"|[<>]"                   
+    r"|\x14\d+\x14"            
+    r"|\[%[^\]]*\]"            
+    r"|\[=\?[^\]]*\]"           
+    r"|\[[^\]]*\]"              
+    r"|[.!?,;:]+\s*$"          
+    r"|www|xxx|yyy",            
     re.VERBOSE,
 )
-
-
-# ---------------------------------------------------------------------------
-# Dataclass
-# ---------------------------------------------------------------------------
 
 @dataclass
 class DiscourseMetrics:
@@ -190,16 +155,10 @@ class DiscourseMetrics:
     n_utterances:         int
     n_words:              int
     wpm:                  float = 0.0
-    maze_rate:            float = 0.0   # proportion of utterances with repairs
+    maze_rate:            float = 0.0   
     task:                 str   = "unknown"
 
     def to_array(self) -> np.ndarray:
-        """
-        Feature array for the RL state vector.
-        Matches METRIC_NAMES in state_builder: ciu_rate, mc_score,
-        mlu_morphemes, mattr, syntactic_complexity.
-        WPM lives in the static/signal block; ttr removed.
-        """
         return np.array([
             self.ciu_rate,
             self.mc_score,
@@ -223,21 +182,7 @@ class DiscourseMetrics:
         }
 
 
-# ---------------------------------------------------------------------------
-# Main extractor
-# ---------------------------------------------------------------------------
-
 class DiscourseMetricExtractor:
-    """
-    Computes discourse metrics from cleaned utterance strings.
-
-    Parameters
-    ----------
-    task             : Discourse task name.
-    duration_minutes : Actual recording duration in minutes. If 0 or None,
-                       duration is estimated from CHAT timestamps, then falls
-                       back to per-task constants.
-    """
 
     FILLER_PATTERN = re.compile(r"^\b(uh|um|er|ah|hmm|well)\b$", re.IGNORECASE)
     NON_WORD       = re.compile(r"[^a-zA-Z\s'-]")
@@ -246,27 +191,12 @@ class DiscourseMetricExtractor:
         self.task             = task
         self.duration_minutes = duration_minutes or 0.0
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
 
     def compute(
         self,
         utterances:     List[str],
         raw_utterances: Optional[List[str]] = None,
     ) -> DiscourseMetrics:
-        """
-        Compute all discourse metrics.
-
-        Parameters
-        ----------
-        utterances     : Cleaned utterance strings (CHAT markup removed).
-        raw_utterances : Original CHAT tier strings — used for:
-                           • timestamp extraction (accurate CIU / WPM rates)
-                           • maze_rate (repair counts before cleaning)
-                           • WPM word counting (matches CLAN's counter)
-                         Optional but strongly recommended.
-        """
         utterances = [u.strip() for u in utterances if u.strip()]
         if not utterances:
             return self._empty_metrics()
@@ -296,10 +226,6 @@ class DiscourseMetricExtractor:
             maze_rate=maze_rate,
         )
 
-    # ------------------------------------------------------------------
-    # Duration resolution
-    # ------------------------------------------------------------------
-
     def _resolve_duration(
         self,
         raw_utterances: Optional[List[str]],
@@ -323,10 +249,6 @@ class DiscourseMetricExtractor:
 
         return TASK_DURATION_FALLBACK.get(self.task, 5.0)
 
-    # ------------------------------------------------------------------
-    # 1. CIU Rate
-    # ------------------------------------------------------------------
-
     def _compute_ciu_rate(self, utterances: List[str], duration_minutes: float) -> float:
         ciu_count = 0
         for utt in utterances:
@@ -341,9 +263,6 @@ class DiscourseMetricExtractor:
                 ciu_count += 1
         return round(ciu_count / max(duration_minutes, 0.01), 2)
 
-    # ------------------------------------------------------------------
-    # 2. WPM  — fixed to match CLAN's word counter
-    # ------------------------------------------------------------------
 
     def _compute_wpm(
         self,
@@ -351,42 +270,17 @@ class DiscourseMetricExtractor:
         raw_utterances: Optional[List[str]],
         duration_minutes: float,
     ) -> float:
-        """
-        Words per minute aligned with CLAN.
-
-        CLAN counts all orthographic words (including filled pauses and
-        contractions) from the raw transcript tier, minus CHAT codes.
-        We replicate this by:
-          1. Using raw CHAT tier strings when available.
-          2. Stripping only structural CHAT codes (timestamps, bracket
-             annotations, non-verbal codes) via _WPM_STRIP.
-          3. Counting [a-zA-Z]+(?:'[a-zA-Z]+)? tokens — words + contractions.
-          4. Dividing by the already-resolved duration.
-
-        The previous implementation called clean_utterance() first, which
-        also removed filled pauses (uh, um) and other tokens CLAN keeps,
-        causing a systematic -49 WPM bias vs CLAN.
-        """
         source = raw_utterances if raw_utterances else utterances
 
         total_words = 0
         for u in source:
             stripped = _WPM_STRIP.sub(" ", u)
-            # Also remove stray CHAT tier-start markers e.g. "*PAR:" if present
             stripped = re.sub(r"^\*[A-Z]{2,3}:\s*", "", stripped)
             total_words += len(re.findall(r"[a-zA-Z]+(?:'[a-zA-Z]+)?", stripped))
 
         return round(total_words / max(duration_minutes, 0.01), 2)
 
-    # ------------------------------------------------------------------
-    # 3. MC Score
-    # ------------------------------------------------------------------
-
     def _compute_mc_score(self, utterances: List[str]) -> float:
-        """
-        Score each main concept as 0 (absent), 1 (partial), or 2 (complete).
-        Returns 0.0 for tasks with no concept list (e.g. conversation).
-        """
         concept_list = MAIN_CONCEPTS.get(self.task, [])
         if not concept_list:
             return 0.0
@@ -415,10 +309,6 @@ class DiscourseMetricExtractor:
         elif any_hit:
             return 1
         return 0
-
-    # ------------------------------------------------------------------
-    # 4. MLU in morphemes
-    # ------------------------------------------------------------------
 
     def _compute_mlu(self, utterances: List[str]) -> float:
         contraction_extras = []
@@ -480,10 +370,6 @@ class DiscourseMetricExtractor:
         ]
         return round(float(np.mean(word_counts)), 2) if word_counts else 0.0
 
-    # ------------------------------------------------------------------
-    # 5. MATTR
-    # ------------------------------------------------------------------
-
     MATTR_WINDOW      = 50
     MATTR_MIN_WINDOWS = 2
     CONTENT_POS_STANZA = {"NOUN", "VERB", "ADJ", "ADV"}
@@ -534,10 +420,6 @@ class DiscourseMetricExtractor:
         ]
         return round(float(np.mean(window_scores)), 4)
 
-    # ------------------------------------------------------------------
-    # 6. Syntactic complexity
-    # ------------------------------------------------------------------
-
     def _compute_syntactic_complexity(self, utterances: List[str]) -> float:
         if not utterances:
             return 0.0
@@ -569,20 +451,12 @@ class DiscourseMetricExtractor:
         logger.warning("SynComp: no NLP available, returning 0.0.")
         return 0.0
 
-    # ------------------------------------------------------------------
-    # 7. Maze rate
-    # ------------------------------------------------------------------
-
     def _compute_maze_rate(
         self,
         raw_utterances: Optional[List[str]],
         n_clean:        int,
     ) -> float:
-        """
-        Proportion of utterances containing at least one repair marker.
-        Must be called with original (pre-cleaning) CHAT strings.
-        Returns 0.0 if raw_utterances is not provided.
-        """
+
         if not raw_utterances:
             return 0.0
 
@@ -591,10 +465,6 @@ class DiscourseMetricExtractor:
             if _REPAIR_PATTERN.search(raw)
         )
         return round(n_with_repair / max(n_clean, 1), 4)
-
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
 
     def _empty_metrics(self) -> DiscourseMetrics:
         return DiscourseMetrics(
@@ -605,7 +475,6 @@ class DiscourseMetricExtractor:
         )
 
     def _get_clean_production(self, utterances: List[str]) -> List[str]:
-        """Removes mazed words so we only count 'final' speech."""
         clean_utts = []
         for utt in utterances:
             temp = re.sub(r'\w+\s+\[/\]', '', utt)
@@ -615,17 +484,8 @@ class DiscourseMetricExtractor:
             clean_utts.append(temp.strip())
         return [u for u in clean_utts if u]
 
-
-# ---------------------------------------------------------------------------
-# Utterance-level signal helpers  (called by parser, not extractor)
-# ---------------------------------------------------------------------------
-
 def compute_utt_length_std(utterances: List[str]) -> float:
-    """
-    Std of per-utterance word counts.
-    High variance = alternating 1-word / 10-word pattern = word-finding failures.
-    Returns 0.0 for fewer than 2 utterances.
-    """
+
     if len(utterances) < 2:
         return 0.0
     lengths = [len(u.split()) for u in utterances if u.strip()]
@@ -633,10 +493,6 @@ def compute_utt_length_std(utterances: List[str]) -> float:
 
 
 def compute_mean_pause_ms(raw_utterances: List[str]) -> float:
-    """
-    Mean inter-utterance pause in milliseconds from CHAT timestamps.
-    Returns 0.0 if fewer than 2 timestamps are found.
-    """
     if not raw_utterances:
         return 0.0
 

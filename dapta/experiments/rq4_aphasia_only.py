@@ -1,22 +1,3 @@
-"""
-RQ4 reanalysis — aphasia-only patients.
-
-Reads:
-  outputs/evaluation/improvements_DAPTA.npy
-  outputs/evaluation/improvements_G_DDQN.npy
-  outputs/evaluation/improvements_RBDE.npy
-  outputs/evaluation/improvements_RTS.npy
-  outputs/dae/patient_profiles.json
-  outputs/dae/splits.json
-
-Filters at the PATIENT level (not cluster level) using each patient's
-aphasia_subtype field, then re-runs RQ4 on aphasia-only patients.
-
-Usage:
-    python experiments/rq4_aphasia_only.py
-    python experiments/rq4_aphasia_only.py --data_dir outputs/evaluation --dae_dir outputs/dae
-"""
-
 import argparse
 import json
 from pathlib import Path
@@ -35,11 +16,6 @@ NON_APHASIA = {
 METRICS      = ["ciu_rate", "mc_score", "mlu_morphemes", "mattr", "syntactic_complexity"]
 METRIC_LABEL = ["CIU Rate", "MC Score", "MLU-m",         "MATTR", "SynComp"]
 BENCHMARK_D  = 0.42
-
-
-# ---------------------------------------------------------------------------
-# Stats helpers
-# ---------------------------------------------------------------------------
 
 def cohens_d(a, b):
     na, nb = len(a), len(b)
@@ -74,13 +50,9 @@ def bonferroni(pvals, alpha=0.05):
     return [min(p * k, 1.0) for p in pvals], [min(p * k, 1.0) <= alpha for p in pvals]
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
 def main(data_dir: Path, dae_dir: Path):
 
-    # 1. Load improvement arrays
+
     dapta = np.load(data_dir / "improvements_DAPTA.npy")
     gddqn = np.load(data_dir / "improvements_G_DDQN.npy")
     rbde  = np.load(data_dir / "improvements_RBDE.npy")
@@ -94,7 +66,6 @@ def main(data_dir: Path, dae_dir: Path):
             print("        Re-run run_evaluation.py to regenerate improvement arrays.")
             return
 
-    # 2. Load per-patient subtypes for the test set
     dae_data        = np.load(dae_dir / "state_vectors.npz", allow_pickle=True)
     all_session_ids = list(dae_data["session_ids"])
     sid_to_idx      = {sid: i for i, sid in enumerate(all_session_ids)}
@@ -121,7 +92,6 @@ def main(data_dir: Path, dae_dir: Path):
         rts           = rts[:min_n]
         n_total       = min_n
 
-    # 3. Build aphasia mask directly from patient subtypes
     subtypes     = [p.get("aphasia_subtype", "Other") for p in test_profiles]
     aphasia_mask = np.array([s not in NON_APHASIA for s in subtypes])
     n_aphasia    = int(aphasia_mask.sum())
@@ -137,7 +107,6 @@ def main(data_dir: Path, dae_dir: Path):
     gddqn_ap = gddqn[aphasia_mask]
     rbde_ap  = rbde[aphasia_mask]
 
-    # Print subtype breakdown
     from collections import Counter
     subtype_counts = Counter(subtypes)
 
@@ -150,7 +119,6 @@ def main(data_dir: Path, dae_dir: Path):
     print(f"  Patient-level filter: excluding {NON_APHASIA}")
     print(SEP2)
 
-    # Section 1: Patient subtype audit
     print()
     print("SECTION 1 — PATIENT SUBTYPE BREAKDOWN")
     print(SEP)
@@ -166,7 +134,6 @@ def main(data_dir: Path, dae_dir: Path):
         f"Total : {n_total}"
     )
 
-    # Section 2: Pooled CIU
     print()
     print("SECTION 2 — POOLED RESULTS  (DAPTA vs G-DDQN, aphasia patients only)")
     print(SEP)
@@ -196,8 +163,6 @@ def main(data_dir: Path, dae_dir: Path):
         f"{'YES ✓' if d_val >= BENCHMARK_D else 'NO  (approaching)' if d_val >= BENCHMARK_D * 0.75 else 'NO'}"
     )
     print(f"  Variance reduction       : {var_red:+.1f}%")
-
-    # Section 3: All metrics
     print()
     print("SECTION 3 — ALL METRICS  (aphasia-only, Bonferroni-corrected)")
     print(SEP)
@@ -231,7 +196,6 @@ def main(data_dir: Path, dae_dir: Path):
     print(SEP)
     print("  Positive d = DAPTA > G-DDQN")
 
-    # Section 4: Original vs aphasia-only comparison
     orig_d_val = cohens_d(dapta[:, 0], gddqn[:, 0])
     orig_p     = wilcoxon_gt(dapta[:, 0], gddqn[:, 0])
     new_d_val  = cohens_d(dapta_ap[:, 0], gddqn_ap[:, 0])
@@ -285,7 +249,6 @@ def main(data_dir: Path, dae_dir: Path):
     print(SEP2)
     print()
 
-    # Save results
     results = {
         "n_total":    n_total,
         "n_aphasia":  n_aphasia,

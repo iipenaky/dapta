@@ -1,20 +1,3 @@
-"""
-Neural transition model for the Patient Environment Simulator.
-
-Learns T(s_{t+1} | s_t, a_t): how a patient's discourse state vector
-evolves following a given therapy exercise.
-
-Architecture: MLP with Monte Carlo Dropout for uncertainty estimation.
-(Gal & Ghahramani, 2016)
-
-Hyperparameter tuning
----------------------
-Call TransitionModel.tune() with a (states, actions, next_states) dataset
-to run Optuna-based HPO over hidden layer sizes, dropout, and learning rate.
-The best hyperparameters are stored in self.best_params and used automatically
-when fit() is called afterwards.
-"""
-
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -35,12 +18,6 @@ from dapta.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# ---------------------------------------------------------------------------
-# RCT-derived effect size priors  (Gorshkov et al., 2025)
-# Applied to CIU rate (discourse dim 0) and MC score (discourse dim 1)
-# when the transition model has not been fitted yet.
-# Values are approximate normalised effect magnitudes [0, 0.1].
-# ---------------------------------------------------------------------------
 PRIOR_EFFECT_SIZES: Dict[int, float] = {
     0:  0.04,
     1:  0.03,
@@ -56,22 +33,11 @@ PRIOR_EFFECT_SIZES: Dict[int, float] = {
     11: 0.09,
 }
 
-# Discourse block dim offsets (ciu_rate=0, mc_score=1 within each task block)
 _CIU_DIM = 0
 _MC_DIM  = 1
 
 
-# ---------------------------------------------------------------------------
-# Neural network
-# ---------------------------------------------------------------------------
-
 class TransitionMLP(nn.Module):
-    """
-    MLP predicting delta_state given current state + action one-hot.
-
-    Input  : [state (STATE_DIM) | action_ohe (N_ACTIONS)]
-    Output : delta_state (STATE_DIM)
-    """
 
     def __init__(
         self,
@@ -95,23 +61,8 @@ class TransitionMLP(nn.Module):
         return self.net(x)
 
 
-# ---------------------------------------------------------------------------
-# Transition model wrapper
-# ---------------------------------------------------------------------------
 
 class TransitionModel:
-    """
-    Wraps TransitionMLP with training, hyperparameter tuning,
-    inference, and uncertainty estimation.
-
-    Parameters
-    ----------
-    hidden_sizes    : MLP hidden layer sizes. Overridden by tune() if called.
-    dropout         : Dropout probability (also used for MC uncertainty).
-    mc_samples      : Number of MC Dropout forward passes for uncertainty.
-    device          : "cuda" | "cpu" | None (auto-detect).
-    checkpoint_path : Where to save/load weights.
-    """
 
     def __init__(
         self,
@@ -133,9 +84,6 @@ class TransitionModel:
         self._model:         Optional[TransitionMLP] = None
         self._fitted         = False
 
-    # ------------------------------------------------------------------
-    # Hyperparameter tuning
-    # ------------------------------------------------------------------
 
     def tune(
         self,
@@ -148,27 +96,6 @@ class TransitionModel:
         batch_size:  int   = 32,
         timeout:     Optional[int] = None,
     ) -> Dict:
-        """
-        Optuna HPO over hidden sizes, dropout, and learning rate.
-
-        Searches:
-          hidden_sizes : one of [(128,64), (256,128), (256,128,64), (512,256,128)]
-          dropout      : uniform [0.1, 0.4]
-          learning_rate: log-uniform [1e-4, 1e-2]
-
-        Parameters
-        ----------
-        states, actions, next_states : training data
-        n_trials    : number of Optuna trials
-        val_split   : fraction of data held out for validation
-        num_epochs  : epochs per trial (keep low for speed)
-        batch_size  : mini-batch size
-        timeout     : stop after this many seconds regardless of n_trials
-
-        Returns
-        -------
-        dict of best hyperparameters
-        """
         try:
             import optuna
             optuna.logging.set_verbosity(optuna.logging.WARNING)
@@ -242,7 +169,6 @@ class TransitionModel:
             "dropout":         best["dropout"],
             "learning_rate":   best["learning_rate"],
         }
-        # Update model config with best found
         self.hidden_sizes = self.best_params["hidden_sizes"]
         self.dropout      = self.best_params["dropout"]
 
@@ -251,10 +177,6 @@ class TransitionModel:
             f"Params: {self.best_params}"
         )
         return self.best_params
-
-    # ------------------------------------------------------------------
-    # Training
-    # ------------------------------------------------------------------
 
     def fit(
         self,
@@ -267,13 +189,7 @@ class TransitionModel:
         num_epochs:              int   = 200,
         early_stopping_patience: int   = 20,
     ) -> "TransitionModel":
-        """
-        Train on empirical (s, a, s') triples.
-
-        If tune() was called first, best_params overrides learning_rate,
-        hidden_sizes, and dropout.
-        """
-        # Use tuned hyperparameters if available
+  
         if self.best_params:
             learning_rate    = self.best_params.get("learning_rate", learning_rate)
             self.hidden_sizes = self.best_params.get("hidden_sizes",  self.hidden_sizes)
@@ -343,21 +259,12 @@ class TransitionModel:
         logger.info(f"TransitionModel trained. Best val loss: {best_val_loss:.6f}")
         return self
 
-    # ------------------------------------------------------------------
-    # Inference
-    # ------------------------------------------------------------------
-
     def predict_next_state(
         self,
         state:     np.ndarray,
         action:    int,
         use_prior: bool = False,
     ) -> np.ndarray:
-        """
-        Predict next state. Falls back to RCT priors if not fitted.
-
-        Returns np.ndarray shape (STATE_DIM,), clipped to [0, 1].
-        """
         if not self._fitted or use_prior:
             return self.prior_predict(state, action)
 
@@ -377,18 +284,11 @@ class TransitionModel:
         state:  np.ndarray,
         action: int,
     ) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        MC Dropout uncertainty estimation.
-
-        Returns
-        -------
-        (mean_next_state, std_next_state) — both shape (STATE_DIM,)
-        """
         if not self._fitted:
             pred = self.prior_predict(state, action)
             return pred, np.zeros_like(pred)
 
-        self._model.train()   # activates dropout at inference
+        self._model.train()  
         s_t   = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(self.device)
         a_ohe = torch.tensor(
             np.eye(N_ACTIONS, dtype=np.float32)[action]
@@ -407,26 +307,12 @@ class TransitionModel:
             samples.std(axis=0).astype(np.float32),
         )
 
-    # ------------------------------------------------------------------
-    # Prior fallback
-    # ------------------------------------------------------------------
-
     def prior_predict(self, state: np.ndarray, action: int) -> np.ndarray:
-        """
-        Fallback using RCT-derived effect size priors.
-        Applies a small positive delta to CIU rate (dim 0) and MC score
-        (dim 1) of the cookie_theft task block (the primary elicitation task).
-        Gaussian noise reflects uncertainty.
-        """
         effect = PRIOR_EFFECT_SIZES.get(action, 0.03)
         delta  = np.zeros(STATE_DIM, dtype=np.float32)
         delta[_CIU_DIM] = effect       + np.random.normal(0, 0.01)
         delta[_MC_DIM]  = effect * 0.6 + np.random.normal(0, 0.005)
         return np.clip(state + delta, 0.0, 1.0).astype(np.float32)
-
-    # ------------------------------------------------------------------
-    # Persistence
-    # ------------------------------------------------------------------
 
     def save(self) -> None:
         if not self.checkpoint_path:

@@ -1,22 +1,7 @@
-"""
-RQ4 supplementary analysis: Does aphasia subtype moderate the
-personalisation benefit (DAPTA vs G-DDQN)?
-
-Reads:
-  outputs/evaluation/improvements_DAPTA.npy
-  outputs/evaluation/improvements_G_DDQN.npy
-  outputs/dae/patient_profiles.json
-  outputs/dae/splits.json
-
-Usage:
-    python experiments/rq4_subtype_analysis.py
-    python experiments/rq4_subtype_analysis.py --data_dir outputs/evaluation --dae_dir outputs/dae
-"""
-
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import List
 
 import numpy as np
 from scipy import stats
@@ -35,10 +20,6 @@ NON_APHASIA = {
     "not_aphasic", "healthy",
 }
 
-
-# ---------------------------------------------------------------------------
-# Stats helpers
-# ---------------------------------------------------------------------------
 
 def cohens_d(a: np.ndarray, b: np.ndarray) -> float:
     na, nb = len(a), len(b)
@@ -81,10 +62,6 @@ def effect_size_label(d: float) -> str:
     return "large"
 
 
-# ---------------------------------------------------------------------------
-# Load test patient profiles
-# ---------------------------------------------------------------------------
-
 def load_test_profiles(dae_dir: Path) -> List[dict]:
     dae_data        = np.load(dae_dir / "state_vectors.npz", allow_pickle=True)
     all_session_ids = list(dae_data["session_ids"])
@@ -101,17 +78,11 @@ def load_test_profiles(dae_dir: Path) -> List[dict]:
     return [all_profiles[i] for i in test_indices]
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
 def main(data_dir: Path, dae_dir: Path) -> None:
 
-    # 1. Load improvement arrays
     dapta = np.load(data_dir / "improvements_DAPTA.npy")
     gddqn = np.load(data_dir / "improvements_G_DDQN.npy")
 
-    # Validate shape
     for name, arr in [("DAPTA", dapta), ("G_DDQN", gddqn)]:
         if arr.shape[1] != 5:
             print(f"[ERROR] {name} array has shape {arr.shape}, expected (N, 5).")
@@ -120,7 +91,7 @@ def main(data_dir: Path, dae_dir: Path) -> None:
 
     n_total = len(dapta)
 
-    # 2. Load test patient profiles
+
     test_profiles = load_test_profiles(dae_dir)
 
     if len(test_profiles) != n_total:
@@ -131,12 +102,11 @@ def main(data_dir: Path, dae_dir: Path) -> None:
         n_total       = min_n
         print(f"[WARNING] Length mismatch — truncated to {min_n} patients.")
 
-    # 3. Extract subtype per patient
     subtypes = np.array([
         p.get("aphasia_subtype", "Other") for p in test_profiles
     ])
 
-    # Filter out non-aphasic patients
+
     aphasia_mask = np.array([s not in NON_APHASIA for s in subtypes])
     n_aphasia    = int(aphasia_mask.sum())
     n_controls   = int((~aphasia_mask).sum())
@@ -146,7 +116,7 @@ def main(data_dir: Path, dae_dir: Path) -> None:
     subtypes_ap = subtypes[aphasia_mask]
     profiles_ap = [p for p, m in zip(test_profiles, aphasia_mask) if m]
 
-    # Personalisation benefit per patient (CIU rate)
+
     benefit_ciu = dapta_ap[:, 0] - gddqn_ap[:, 0]
 
     SEP  = "─" * 76
@@ -160,7 +130,6 @@ def main(data_dir: Path, dae_dir: Path) -> None:
     print(f"  Aphasia patients    : {n_aphasia}")
     print(f"  Controls excluded   : {n_controls}")
 
-    # 4. Per-subtype analysis
     print()
     print("SECTION 1 — PER-SUBTYPE PERSONALISATION BENEFIT (DAPTA vs G-DDQN)")
     print(SEP)
@@ -201,7 +170,6 @@ def main(data_dir: Path, dae_dir: Path) -> None:
             "clinically_meaningful": abs(d_val) >= BENCHMARK_D,
         }
 
-    # Bonferroni correction across subtypes
     if raw_pvals:
         p_corr, sig = bonferroni(raw_pvals)
         for subtype, pc, s in zip(subtype_order, p_corr, sig):
@@ -229,8 +197,6 @@ def main(data_dir: Path, dae_dir: Path) -> None:
 
     print(SEP)
     print("  * = Bonferroni-corrected p < 0.05   |   Positive benefit = DAPTA > G-DDQN")
-
-    # 5. Kruskal-Wallis test: does subtype significantly moderate benefit?
     print()
     print("SECTION 2 — KRUSKAL-WALLIS TEST: DOES SUBTYPE MODERATE PERSONALISATION?")
     print(SEP)
@@ -272,7 +238,6 @@ def main(data_dir: Path, dae_dir: Path) -> None:
         print("  Insufficient subtype groups (need at least 2 with n>=2) for Kruskal-Wallis.")
         stat, p_kw = None, None
 
-    # 6. Correlation: WAB-AQ within each subtype
     print()
     print("SECTION 3 — WAB-AQ MODERATES BENEFIT WITHIN EACH SUBTYPE")
     print(SEP)
@@ -310,8 +275,6 @@ def main(data_dir: Path, dae_dir: Path) -> None:
         print("  No subtype has n >= 5 for within-subtype WAB-AQ correlation.")
 
     print(SEP)
-
-    # 7. Summary ranking
     print()
     print("SECTION 4 — SUBTYPE RANKING BY PERSONALISATION BENEFIT (CIU rate)")
     print(SEP)
@@ -350,8 +313,6 @@ def main(data_dir: Path, dae_dir: Path) -> None:
     print()
     print(SEP2)
     print()
-
-    # 8. Save results
     out = {
         "n_total":          n_total,
         "n_aphasia":        n_aphasia,

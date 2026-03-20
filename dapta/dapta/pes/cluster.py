@@ -15,8 +15,6 @@ NON_APHASIA_SUBTYPES: Set[str] = {
     "not_aphasic", "healthy",
 }
 
-# Controls get assigned this reserved cluster ID so they can still be
-# tracked / evaluated but never influence the aphasia cluster centroids.
 CONTROL_CLUSTER_ID = -1
 
 
@@ -30,22 +28,12 @@ class PatientClusterer:
         self._scaler     = StandardScaler()
         self.n_clusters: Optional[int] = None
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
     def fit_predict(
         self,
         profiles:      List[PatientProfile],
         state_vectors: Optional[np.ndarray] = None,
         min_k:         int = 6,
     ) -> np.ndarray:
-        """
-        Cluster aphasia patients only, then assign controls CONTROL_CLUSTER_ID.
-
-        Returns an integer label array of length len(profiles).
-        Controls receive label -1 and are excluded from RL cluster agents.
-        """
         aphasia_mask = self._aphasia_mask(profiles)
         n_aphasia    = int(aphasia_mask.sum())
         n_controls   = int((~aphasia_mask).sum())
@@ -60,17 +48,13 @@ class PatientClusterer:
                 "No aphasia patients found. Check NON_APHASIA_SUBTYPES matches "
                 "your data's subtype labels."
             )
-
-        # Subset to aphasia patients only
         aphasia_profiles = [p for p, m in zip(profiles, aphasia_mask) if m]
         aphasia_states   = (
             state_vectors[aphasia_mask] if state_vectors is not None else None
         )
-
-        # Build feature matrix and fit KMeans
         X = self._fit_transform(aphasia_profiles, aphasia_states)
 
-        # Enforce sensible k bounds
+
         max_possible = min(self.max_k, n_aphasia - 1)
         min_k        = min(min_k, max_possible)
         self.n_clusters = self.find_elbow_k(X, min_k=min_k, max_k=max_possible)
@@ -87,7 +71,6 @@ class PatientClusterer:
             f"Counts: {np.bincount(aphasia_labels)}"
         )
 
-        # Build full label array — controls get CONTROL_CLUSTER_ID
         full_labels = np.full(len(profiles), CONTROL_CLUSTER_ID, dtype=int)
         full_labels[aphasia_mask] = aphasia_labels
 
@@ -98,10 +81,6 @@ class PatientClusterer:
         profiles:      List[PatientProfile],
         state_vectors: Optional[np.ndarray] = None,
     ) -> np.ndarray:
-        """
-        Assign new patients to existing clusters.
-        Controls are assigned CONTROL_CLUSTER_ID without touching the model.
-        """
         if self._kmeans is None:
             raise RuntimeError("Clusterer must be fitted before calling predict().")
 
@@ -124,11 +103,7 @@ class PatientClusterer:
         profiles: List[PatientProfile],
         labels:   np.ndarray,
     ) -> Dict[int, List[PatientProfile]]:
-        """
-        Returns a dict mapping cluster_id -> list of profiles.
-        Controls (label == CONTROL_CLUSTER_ID) are included under key -1
-        so callers can inspect them but skip training agents for that key.
-        """
+
         if self.n_clusters is None:
             raise RuntimeError("Clusterer must be fitted first.")
 
@@ -137,10 +112,6 @@ class PatientClusterer:
         for profile, label in zip(profiles, labels):
             groups[int(label)].append(profile)
         return groups
-
-    # ------------------------------------------------------------------
-    # Feature construction
-    # ------------------------------------------------------------------
 
     def _fit_transform(
         self,
@@ -174,10 +145,6 @@ class PatientClusterer:
         numeric_scaled = self._scaler.transform(np.hstack(numeric))
         return np.hstack([subtype_encoded, numeric_scaled]).astype(np.float32)
 
-    # ------------------------------------------------------------------
-    # Elbow method
-    # ------------------------------------------------------------------
-
     def compute_inertias(self, X: np.ndarray, max_k: int) -> List[float]:
         inertias = []
         for k in range(1, max_k + 1):
@@ -208,9 +175,6 @@ class PatientClusterer:
         logger.info(f"Elbow at k={elbow}, enforcing min_k={min_k} max_k={max_k}, using k={result}")
         return result
 
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
 
     @staticmethod
     def _aphasia_mask(profiles: List[PatientProfile]) -> np.ndarray:
@@ -221,12 +185,9 @@ class PatientClusterer:
 
     @staticmethod
     def _extract_discourse_means(state_vectors: np.ndarray) -> np.ndarray:
-        """
-        Returns shape (N, 5) — mean per discourse metric across all tasks.
-        """
         N          = state_vectors.shape[0]
-        n_metrics  = N_METRICS_PER_TASK   # 5
-        n_tasks    = N_TASKS              # 5
+        n_metrics  = N_METRICS_PER_TASK   
+        n_tasks    = N_TASKS              
         disc_means = np.zeros((N, n_metrics), dtype=np.float32)
 
         for m in range(n_metrics):

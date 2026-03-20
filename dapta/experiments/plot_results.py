@@ -1,21 +1,3 @@
-"""
-experiments/plot_results.py
----------------------------
-Generates all thesis result figures from evaluation_results.json.
-
-Produces:
-  fig1_mean_improvement.png     - Bar chart: mean improvement per agent per metric
-  fig2_cohens_d_heatmap.png     - Cohen's d heatmap (DAPTA vs baselines)
-  fig3_rq2_comparison.png       - RQ2: DAPTA vs RBDE and RTS
-  fig4_rq3_transfer.png         - RQ3: surprisal transfer
-  fig5_rq4_personalisation.png  - RQ4: DAPTA vs G-DDQN
-  fig6_subtype_benefit.png      - RQ4 subtype moderation
-
-Usage:
-  python experiments/plot_results.py
-  python experiments/plot_results.py --eval_dir outputs/evaluation --out_dir outputs/figures
-"""
-
 import argparse
 import json
 from pathlib import Path
@@ -86,20 +68,14 @@ def available_agents(rq2: dict) -> list:
                     agents.add("DAPTA")
                 if isinstance(metric_data, dict) and "baseline_mean" in metric_data:
                     pass
-    # Just return the standard order filtered by what comparisons exist
+
     comparisons = [k for k in rq2.keys() if k.startswith("DAPTA_vs_")]
     agents = ["DAPTA"] + [c.replace("DAPTA_vs_", "") for c in comparisons]
     return [a for a in AGENTS_ORDER if a in agents]
 
-
-# ---------------------------------------------------------------------------
-# Figure 1: Mean improvement bar chart
-# ---------------------------------------------------------------------------
-
 def plot_mean_improvement(results: dict, out_dir: Path) -> None:
     rq2 = results["rq2"]
 
-    # Build agent -> metric -> mean from rq2 and rq4
     agent_means = {}
     agent_means["DAPTA"] = {
         m: rq2["DAPTA_vs_RBDE"][m]["dapta_mean"]
@@ -223,10 +199,6 @@ def plot_cohens_d_heatmap(results: dict, out_dir: Path) -> None:
     print(f"  Saved: {path}")
 
 
-# ---------------------------------------------------------------------------
-# Figure 3: RQ2 comparison
-# ---------------------------------------------------------------------------
-
 def plot_rq2(results: dict, out_dir: Path) -> None:
     rq2 = results["rq2"]
 
@@ -288,10 +260,6 @@ def plot_rq2(results: dict, out_dir: Path) -> None:
     plt.close(fig)
     print(f"  Saved: {path}")
 
-
-# ---------------------------------------------------------------------------
-# Figure 4: RQ3 surprisal transfer
-# ---------------------------------------------------------------------------
 
 def plot_rq3(results: dict, out_dir: Path) -> None:
     rq3 = results.get("rq3", {})
@@ -723,10 +691,6 @@ def plot_rq4_aphasia_only(eval_dir: Path, out_dir: Path) -> None:
     fig.savefig(save_path, bbox_inches="tight")
     plt.close(fig)
     print(f"  Saved: {save_path}")
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main():
     parser = argparse.ArgumentParser(description="Plot DAPTA thesis results")

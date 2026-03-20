@@ -41,13 +41,7 @@ from dapta.utils.config import Config
 
 logger = get_logger(__name__, log_file="logs/run_pes.log")
 
-
-# ---------------------------------------------------------------------------
-# RCT-derived effect size priors per exercise × discourse metric
-# Shape: (N_ACTIONS, 6) — 6 discourse metrics
-# ---------------------------------------------------------------------------
 RCT_PRIORS = np.array([
-    # CIU   MC    MLU   TTR   SynComp Surprisal(-)
     [0.04, 0.02, 0.01, 0.02, 0.01, -0.02],   # 0: SFA naming
     [0.03, 0.01, 0.02, 0.02, 0.01, -0.01],   # 1: Phonological cueing
     [0.03, 0.02, 0.05, 0.02, 0.03, -0.02],   # 2: Sentence SVO
