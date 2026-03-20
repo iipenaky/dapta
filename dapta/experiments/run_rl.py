@@ -1,31 +1,3 @@
-"""
-Phase 2b: RL Agent Training.
-
-Trains and evaluates all agents to answer:
-  RQ2: Does RL outperform rule-based/random sequencing?
-  RQ3: Do discourse gains transfer to naturalistic speech (surprisal)?
-  RQ4: Does patient-specific RL beat generalised RL, and what patient
-       factors drive the difference?
-
-Requires:
-  outputs/pes/  (from run_pes.py)
-
-Outputs:
-  outputs/rl/ddqn_cluster_{i}.pt
-  outputs/rl/ddqn_generalised.pt
-  outputs/rl/ppo_agent/
-  outputs/rl/training_logs.json
-  outputs/rl/results_table.json
-  outputs/rl/rq2_results.json
-  outputs/rl/rq3_transfer.json
-  outputs/rl/rq4_personalisation.json
-  outputs/rl/cluster_performance.json
-
-Usage:
-  python experiments/run_rl.py
-  python experiments/run_rl.py --total_steps 5000  # quick test
-"""
-
 import argparse
 import json
 from pathlib import Path
@@ -290,11 +262,6 @@ def answer_rq2(
         }
 
     return out
-
-
-# ---------------------------------------------------------------------------
-# RQ3: Transfer to naturalistic speech (surprisal)
-# ---------------------------------------------------------------------------
 
 def answer_rq3(
     dapta_disc:  np.ndarray,
@@ -788,9 +755,9 @@ def main(args) -> None:
     logger.info("DAPTA Phase 2b: RL Agent Training")
     logger.info("=" * 60)
 
-    # ------------------------------------------------------------------
+
     # 1. Load PES outputs
-    # ------------------------------------------------------------------
+
     logger.info("\n[1/5] Loading PES outputs...")
     pes_dir = Path("outputs/pes")
 
@@ -818,9 +785,9 @@ def main(args) -> None:
     transition_model.load()
     logger.info("Transition model loaded.")
 
-    # ------------------------------------------------------------------
+
     # 2. Build environments
-    # ------------------------------------------------------------------
+
     logger.info("\n[2/5] Building environments per cluster...")
     cluster_envs = load_environments(
         transition_model=transition_model,
@@ -832,9 +799,9 @@ def main(args) -> None:
     n_clusters = len(cluster_envs)
     logger.info(f"Total environments: {len(all_envs)}, clusters: {n_clusters}")
 
-    # ------------------------------------------------------------------
+
     # 3. Train patient-specific DDQN per cluster
-    # ------------------------------------------------------------------
+
     logger.info(f"\n[3/5] Training patient-specific DDQN agents ({args.total_steps} steps each)...")
     training_logs  = {}
     cluster_agents: Dict[int, DDQNAgent] = {}
@@ -862,9 +829,9 @@ def main(args) -> None:
         training_logs[f"ddqn_cluster_{cluster_id}"] = logs
         logger.info(f"  Cluster {cluster_id} agent saved to {ckpt}")
 
-    # ------------------------------------------------------------------
+
     # 4. Train G-DDQN (generalised)
-    # ------------------------------------------------------------------
+
     logger.info(f"\n  Training G-DDQN on all {len(all_envs)} environments...")
     g_ddqn_ckpt = str(output_dir / "ddqn_generalised.pt")
     g_ddqn      = make_ddqn_agent(checkpoint_path=g_ddqn_ckpt)
@@ -880,9 +847,9 @@ def main(args) -> None:
     training_logs["ddqn_generalised"] = g_logs
     logger.info(f"  G-DDQN saved to {g_ddqn_ckpt}")
 
-    # ------------------------------------------------------------------
+
     # 5. Train PPO
-    # ------------------------------------------------------------------
+
     if all_envs and not args.skip_ppo:
         logger.info(f"\n  Training PPO...")
         ppo_save  = str(output_dir / "ppo_agent")
@@ -898,9 +865,9 @@ def main(args) -> None:
     else:
         logger.info("  Skipping PPO.")
 
-    # ------------------------------------------------------------------
+
     # 6. Collect per-patient improvement arrays for all agents
-    # ------------------------------------------------------------------
+
     logger.info("\n[4/5] Collecting per-patient improvement arrays...")
 
     # DAPTA: run each cluster's specialist agent on its own patients
@@ -971,9 +938,9 @@ def main(args) -> None:
     np.save(str(output_dir / "improvements_RBDE.npy"),   rbde_disc)
     np.save(str(output_dir / "improvements_RTS.npy"),    rts_disc)
 
-    # ------------------------------------------------------------------
+
     # 7. Answer RQ2, RQ3, RQ4
-    # ------------------------------------------------------------------
+
     logger.info("\n[5/5] Computing RQ2 / RQ3 / RQ4 statistics...")
 
     # RQ2
@@ -996,9 +963,6 @@ def main(args) -> None:
         f"answered positively: {rq3['rq3_answered_positively']}"
     )
 
-    # RQ4 — align arrays: DAPTA and G-DDQN must cover same patients
-    # G-DDQN covers all_envs; DAPTA covers only cluster agents' patients
-    # For RQ4 we use only patients covered by both
     n_dapta   = len(dapta_disc)
     n_all     = len(all_envs)
     min_n     = min(n_dapta, n_all)
@@ -1014,7 +978,7 @@ def main(args) -> None:
     with open(output_dir / "rq4_personalisation.json", "w") as f:
         json.dump(rq4, f, indent=2)
 
-    # Save cluster_performance.json for rq4_aphasia_only.py
+
     cluster_perf = {}
     for c_str, c_data in rq4["per_cluster"].items():
         cluster_perf[c_str] = {
@@ -1034,9 +998,6 @@ def main(args) -> None:
         f"CIU variance reduction: {rq4['ciu_variance_reduction_pct']:.1f}%"
     )
 
-    # ------------------------------------------------------------------
-    # Save training logs and results table
-    # ------------------------------------------------------------------
     def convert(obj):
         if isinstance(obj, (np.float32, np.float64)): return float(obj)
         if isinstance(obj, (np.int32,  np.int64)):    return int(obj)
@@ -1081,9 +1042,9 @@ def main(args) -> None:
     with open(output_dir / "results_table.json", "w") as f:
         json.dump(results_table, f, indent=2, default=str)
 
-    # ------------------------------------------------------------------
+
     # Print summary
-    # ------------------------------------------------------------------
+
     print("\n" + "=" * 70)
     print("DAPTA PHASE 2b — RQ SUMMARY")
     print("=" * 70)

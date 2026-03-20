@@ -1,29 +1,3 @@
-"""
-Phase 2a: Patient Environment Simulator (PES) Training.
-
-What this script does:
-  1. Loads DAE outputs (state vectors, longitudinal participants)
-  2. Builds (s, a, s') transition triples from longitudinal sessions
-  3. Augments with RCT-derived effect size priors for single-session patients
-  4. Trains the neural transition model (MLP with MC Dropout)
-  5. Clusters patients into groups for personalised RL training
-  6. Builds TherapyEnv instances for each patient
-  7. Saves transition model, cluster assignments, and environments
-
-Requires:
-  outputs/dae/  (from run_dae.py)
-
-Outputs (used by run_rl.py):
-  outputs/pes/transition_model.pt
-  outputs/pes/cluster_assignments.json
-  outputs/pes/env_initial_states.npz
-  outputs/pes/pes_report.json
-  outputs/pes/transition_model_validation.json
-
-Usage:
-  python experiments/run_pes.py
-"""
-
 import argparse
 import json
 from pathlib import Path
@@ -56,7 +30,6 @@ RCT_PRIORS = np.array([
     [0.09, 0.07, 0.05, 0.05, 0.03, -0.05],   # 11: Free conversation
 ], dtype=np.float32)
 
-# Names for the first 5 discourse dims — used in validation report
 METRIC_NAMES_VAL = ["ciu_rate", "mc_score", "mlu_morphemes", "mattr", "syntactic_complexity"]
 
 
@@ -65,10 +38,6 @@ def build_transition_triples_from_longitudinal(
     session_ids: np.ndarray,
     longitudinal: Dict[str, List[str]],
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Build (s, a, s') triples from participants with 2+ sessions.
-    Action is inferred by matching observed delta to RCT prior vectors.
-    """
     session_to_vec = {
         sid: state_vectors[i]
         for i, sid in enumerate(session_ids)
@@ -126,9 +95,6 @@ def augment_with_priors(
     n_augment:          int   = 500,
     noise_std:          float = 0.02,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Augment longitudinal triples with RCT prior-based synthetic triples.
-    """
     rng = np.random.default_rng(42)
     aug_states, aug_actions, aug_next = [], [], []
 
@@ -138,7 +104,6 @@ def augment_with_priors(
         a   = rng.integers(0, N_ACTIONS)
 
         delta = np.zeros(STATE_DIM, dtype=np.float32)
-        # Fixed: assign all 6 prior values including surprisal
         delta[:6] = RCT_PRIORS[a] + rng.normal(0, noise_std, 6)
         ns = np.clip(s + delta, 0.0, 1.0)
 
@@ -174,9 +139,7 @@ def main(args) -> None:
     logger.info("DAPTA Phase 2a: Patient Environment Simulator")
     logger.info("=" * 60)
 
-    # ------------------------------------------------------------------
-    # 1. Load DAE outputs
-    # ------------------------------------------------------------------
+
     logger.info("\n[1/5] Loading DAE outputs...")
     dae_dir = Path("outputs/dae")
 
@@ -210,16 +173,10 @@ def main(args) -> None:
         )
         for p in profiles_data
     ]
-
-    # ------------------------------------------------------------------
-    # 2. Build transition triples
-    # ------------------------------------------------------------------
     logger.info("\n[2/5] Building transition triples from longitudinal data...")
     states, actions, next_states = build_transition_triples_from_longitudinal(
         state_vectors, session_ids, longitudinal
     )
-
-    # Hold out real longitudinal data for validation BEFORE augmentation
     n_real     = len(states)
     real_split = int(n_real * 0.9)
 
@@ -236,9 +193,7 @@ def main(args) -> None:
         n_augment=args.n_augment,
     )
 
-    # ------------------------------------------------------------------
-    # 3. Train transition model
-    # ------------------------------------------------------------------
+
     logger.info("\n[3/5] Training transition model (MLP + MC Dropout)...")
     transition_model = TransitionModel(
         hidden_sizes=(128, 64),
@@ -261,9 +216,6 @@ def main(args) -> None:
 
     logger.info("Transition model trained.")
 
-    # ------------------------------------------------------------------
-    # 3b. Validate transition model on held-out real longitudinal data
-    # ------------------------------------------------------------------
     logger.info("\n[3b/5] Computing transition model validation metrics...")
 
     val_metrics_out = {
@@ -290,8 +242,6 @@ def main(args) -> None:
             for s, a in zip(val_states_real, val_actions_real)
         ])
         pred_deltas = pred_nexts - val_states_real
-
-        # Fixed: only index first 5 discourse dims
         mae_per_dim = np.mean(
             np.abs(pred_deltas[:, :5] - val_deltas[:, :5]), axis=0
         )
@@ -320,14 +270,12 @@ def main(args) -> None:
         json.dump(val_metrics_out, f, indent=2)
     logger.info("  Saved to outputs/pes/transition_model_validation.json")
 
-    # ------------------------------------------------------------------
-    # 4. Cluster patients
-    # ------------------------------------------------------------------
+
     logger.info("\n[4/5] Clustering patients...")
     clusterer      = PatientClusterer(max_k=10, random_seed=42)
     cluster_labels = clusterer.fit_predict(profiles, state_vectors=state_vectors)
     cluster_groups = clusterer.get_cluster_groups(profiles, cluster_labels)
-    n_clusters     = clusterer.n_clusters  # actual number, not hardcoded 6
+    n_clusters     = clusterer.n_clusters 
 
     cluster_assignments = {
         p.participant_id: int(label)
@@ -339,9 +287,6 @@ def main(args) -> None:
         subtypes = [p.aphasia_subtype for p in group[:5]]
         logger.info(f"    Sample subtypes: {subtypes}")
 
-    # ------------------------------------------------------------------
-    # 5. Build environments
-    # ------------------------------------------------------------------
     logger.info("\n[5/5] Building TherapyEnv instances...")
 
     initial_states = state_vectors
@@ -351,8 +296,6 @@ def main(args) -> None:
         transition_model=transition_model,
         episode_horizon=20,
     )
-
-    # Fixed: use actual n_clusters not hardcoded 6
     session_to_cluster = {
         sid: int(cluster_labels[i])
         for i, sid in enumerate(session_ids)
@@ -362,8 +305,6 @@ def main(args) -> None:
     for i, sid in enumerate(session_ids):
         c = session_to_cluster.get(sid, 0)
         cluster_env_indices[c].append(i)
-
-    # Save outputs
     np.savez(
         str(output_dir / "env_initial_states.npz"),
         initial_states=initial_states,

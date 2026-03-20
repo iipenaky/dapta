@@ -64,7 +64,7 @@ def run_ddqn_episode(
     agent: DDQNAgent,
     env:   TherapyEnv,
 ) -> Tuple[np.ndarray, float]:
-    """Returns (discourse_improvement (5,), surprisal_improvement)."""
+
     state, _       = env.reset()
     state_history  = []
     action_history = []
@@ -123,9 +123,9 @@ def run_baseline_episode(
     return disc_imp, surp_imp
 
 
-# ---------------------------------------------------------------------------
+
 # Load agents
-# ---------------------------------------------------------------------------
+
 
 def load_ddqn_agents(
     rl_dir:         Path,
@@ -157,9 +157,9 @@ def load_ddqn_agents(
     return cluster_agents, g_ddqn
 
 
-# ---------------------------------------------------------------------------
+
 # Run all agents on test environments
-# ---------------------------------------------------------------------------
+
 
 def evaluate_all_agents(
     test_envs:           List[TherapyEnv],
@@ -217,9 +217,9 @@ def evaluate_all_agents(
     )
 
 
-# ---------------------------------------------------------------------------
+
 # RQ2: RL vs baselines
-# ---------------------------------------------------------------------------
+
 
 def answer_rq2(
     dapta_disc: np.ndarray,
@@ -270,9 +270,9 @@ def answer_rq2(
     return out
 
 
-# ---------------------------------------------------------------------------
+
 # RQ3: Transfer to naturalistic speech
-# ---------------------------------------------------------------------------
+
 
 def answer_rq3(
     dapta_disc: np.ndarray,
@@ -320,9 +320,9 @@ def answer_rq3(
     return out
 
 
-# ---------------------------------------------------------------------------
+
 # RQ4: Patient-specific vs generalised RL
-# ---------------------------------------------------------------------------
+
 
 def answer_rq4(
     dapta_disc:      np.ndarray,
@@ -438,9 +438,9 @@ def answer_rq4(
     return out
 
 
-# ---------------------------------------------------------------------------
+
 # Print results
-# ---------------------------------------------------------------------------
+
 
 def print_results(rq2: dict, rq3: dict, rq4: dict) -> None:
     print("\n" + "=" * 70)
@@ -489,9 +489,9 @@ def print_results(rq2: dict, rq3: dict, rq4: dict) -> None:
     print("=" * 70)
 
 
-# ---------------------------------------------------------------------------
+
 # Main
-# ---------------------------------------------------------------------------
+
 
 def parse_args():
     p = argparse.ArgumentParser(description="DAPTA Phase 3: Held-out Test Evaluation")
@@ -521,9 +521,9 @@ def main():
     logger.info("DAPTA Phase 3: Held-out Test Set Evaluation")
     logger.info("=" * 60)
 
-    # ------------------------------------------------------------------
+ 
     # 1. Load test set from splits.json
-    # ------------------------------------------------------------------
+ 
     logger.info("\n[1/5] Loading held-out test set...")
     dae_data        = np.load(dae_dir / "state_vectors.npz", allow_pickle=True)
     state_vectors   = dae_data["state_vectors"]
@@ -544,9 +544,9 @@ def main():
 
     logger.info(f"  Test patients: {len(test_indices)}  state_dim: {state_dim}")
 
-    # ------------------------------------------------------------------
+ 
     # 2. Load cluster labels for test patients
-    # ------------------------------------------------------------------
+ 
     logger.info("\n[2/5] Loading cluster assignments...")
     with open(pes_dir / "cluster_assignments.json") as f:
         cluster_info = json.load(f)
@@ -556,9 +556,9 @@ def main():
         assignments.get(sid, 0) for sid in test_ids if sid in sid_to_idx
     ], dtype=int)
 
-    # ------------------------------------------------------------------
+ 
     # 3. Build test environments
-    # ------------------------------------------------------------------
+ 
     logger.info("\n[3/5] Building test environments...")
     transition_model = TransitionModel(
             hidden_sizes=(128, 64),
@@ -574,9 +574,9 @@ def main():
     )
     logger.info(f"  Built {len(test_envs)} test environments.")
 
-    # ------------------------------------------------------------------
+ 
     # 4. Load trained agents
-    # ------------------------------------------------------------------
+ 
     logger.info("\n[4/5] Loading trained agents...")
     cluster_agents, g_ddqn = load_ddqn_agents(
         rl_dir=rl_dir,
@@ -599,9 +599,9 @@ def main():
         except Exception as e:
             logger.warning(f"  Could not load PPO: {e}. Skipping.")
 
-    # ------------------------------------------------------------------
+ 
     # 5. Run evaluation
-    # ------------------------------------------------------------------
+ 
     logger.info("\n[5/5] Running evaluation on test set...")
     disc_improvements, surp_improvements = evaluate_all_agents(
         test_envs=test_envs,
@@ -620,9 +620,9 @@ def main():
     for agent, arr in surp_improvements.items():
         np.save(out_dir / f"surp_improvements_{agent}.npy", arr)
 
-    # ------------------------------------------------------------------
+ 
     # Answer RQ2, RQ3, RQ4 on test set
-    # ------------------------------------------------------------------
+ 
     rq2 = answer_rq2(
         disc_improvements["DAPTA"],
         disc_improvements["RBDE"],
@@ -642,8 +642,6 @@ def main():
         cluster_labels=test_cluster_labels,
         profiles_data=test_profiles,
     )
-
-    # Save cluster_performance.json for rq4_aphasia_only.py
     cluster_perf = {}
     for c_str, c_data in rq4["per_cluster"].items():
         cluster_perf[c_str] = {
@@ -657,7 +655,6 @@ def main():
     with open(out_dir / "cluster_performance.json", "w") as f:
         json.dump(cluster_perf, f, indent=2)
 
-    # Save full results
     full_results = {
         "rq2": rq2,
         "rq3": rq3,

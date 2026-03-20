@@ -1,23 +1,3 @@
-"""
-RQ1 Full Analysis: 
-  1. Automated metric accuracy vs CLAN gold standard
-  2. Metric correlation with WAB-AQ (functional ability)
-  3. Comparison of CLAN vs automated metric correlation with WAB-AQ
-     (does automation degrade the functional signal?)
-
-Usage:
-  python experiments/validate_against_clan.py \
-      --clan_dir   data/clan/ \
-      --cha_dir    data/aphasiabank/
-
-Outputs:
-  outputs/validation/correlation_report.json
-  outputs/validation/matched_comparison.csv
-  outputs/validation/scatter_plots.png
-  outputs/validation/rq1_full_report.json
-  outputs/validation/wabaq_lookup.csv
-"""
-
 import argparse
 import json
 from pathlib import Path
@@ -70,7 +50,6 @@ METRIC_MAP = [
     ),
 ]
 
-# WAB-AQ comes from .cha headers, not .eval.xls
 WAB_AQ_COL = "wab_aq"
 
 WAB_METRICS = [
@@ -87,15 +66,7 @@ def normalise_id(path) -> str:
     stem = Path(stem).stem
     return stem.lower().strip()
 
-
-# ---------------------------------------------------------------------------
-# NEW: Extract WAB-AQ from .cha headers
-# ---------------------------------------------------------------------------
 def extract_wabaq_from_cha(cha_dir: str, session_ids: set) -> pd.DataFrame:
-    """
-    Pull WAB-AQ from .cha @ID headers for the validation patients.
-    Returns a DataFrame with columns: _session_id, wab_aq
-    """
     cha_dir = Path(cha_dir)
     parser  = CHATParser(participant_tier="PAR")
     rows    = []
@@ -128,10 +99,6 @@ def extract_wabaq_from_cha(cha_dir: str, session_ids: set) -> pd.DataFrame:
     logger.info(f"WAB-AQ extracted for {n_found} / {len(df)} matched transcripts")
     return df
 
-
-# ---------------------------------------------------------------------------
-# Read one CLAN .eval.xls file
-# ---------------------------------------------------------------------------
 def read_clan_eval(path: Path) -> Optional[Dict]:
     import xml.etree.ElementTree as ET
     try:
@@ -174,10 +141,6 @@ def read_clan_eval(path: Path) -> Optional[Dict]:
         logger.warning(f"Unexpected error reading {path.name}: {e}")
         return None
 
-
-# ---------------------------------------------------------------------------
-# Load all CLAN eval files
-# ---------------------------------------------------------------------------
 def load_all_clan_evals(clan_dir: str) -> pd.DataFrame:
     clan_dir   = Path(clan_dir)
     eval_files = sorted(clan_dir.rglob("*.eval.xls")) + \
@@ -211,9 +174,7 @@ def load_all_clan_evals(clan_dir: str) -> pd.DataFrame:
     return df
 
 
-# ---------------------------------------------------------------------------
-# Compute auto metrics
-# ---------------------------------------------------------------------------
+
 def compute_auto_metrics(
     cha_dir: str,
     clan_session_ids: set,
@@ -303,10 +264,6 @@ def compute_auto_metrics(
     logger.info(f"Auto-scored {len(df)} transcripts")
     return df
 
-
-# ---------------------------------------------------------------------------
-# Correlation helpers
-# ---------------------------------------------------------------------------
 def _correlate_pair(x: np.ndarray, y: np.ndarray, threshold: float) -> dict:
     if len(x) < 3:
         return None
@@ -334,8 +291,6 @@ def _correlate_with_wabaq(values: np.ndarray, wab_aq: np.ndarray, label: str) ->
         return None
 
     r, p = stats.pearsonr(values, wab_aq)
-
-    # Manual bootstrap CI for Pearson r
     rng = np.random.default_rng(42)
     boot_rs = []
     n = len(values)
@@ -356,9 +311,7 @@ def _correlate_with_wabaq(values: np.ndarray, wab_aq: np.ndarray, label: str) ->
         "ci_95_high":  round(ci_high, 3),
         "significant": bool(p < 0.05),
     }
-# ---------------------------------------------------------------------------
-# Step 1: Auto vs CLAN accuracy
-# ---------------------------------------------------------------------------
+
 def run_validation(clan_df: pd.DataFrame, auto_df: pd.DataFrame):
     merged     = pd.merge(clan_df, auto_df, on="_session_id", how="inner")
     n_match    = len(merged)
@@ -443,10 +396,6 @@ def run_validation(clan_df: pd.DataFrame, auto_df: pd.DataFrame):
 
     return results, merged
 
-
-# ---------------------------------------------------------------------------
-# Step 2 & 3: WAB-AQ correlation analysis
-# ---------------------------------------------------------------------------
 def run_wabaq_analysis(merged: pd.DataFrame) -> dict:
     if WAB_AQ_COL not in merged.columns:
         logger.warning(
@@ -477,7 +426,6 @@ def run_wabaq_analysis(merged: pd.DataFrame) -> dict:
     }
 
     for metric_attr, clan_col, auto_col in WAB_METRICS:
-        # Step 2: automated metric vs WAB-AQ
         if auto_col in merged_valid.columns:
             auto_vals = merged_valid[auto_col].values.astype(float)
             auto_mask = ~np.isnan(auto_vals)
@@ -489,8 +437,6 @@ def run_wabaq_analysis(merged: pd.DataFrame) -> dict:
                 )
                 if entry:
                     results["step2_metric_wabaq_correlations"][metric_attr] = entry
-
-        # Step 3: CLAN metric vs WAB-AQ compared to automated metric vs WAB-AQ
         if clan_col in merged_valid.columns and auto_col in merged_valid.columns:
             pair = merged_valid[[clan_col, auto_col]].copy()
             pair[WAB_AQ_COL] = wab_aq
@@ -525,10 +471,6 @@ def run_wabaq_analysis(merged: pd.DataFrame) -> dict:
 
     return results
 
-
-# ---------------------------------------------------------------------------
-# Scatter plots
-# ---------------------------------------------------------------------------
 def make_scatter_plots(merged: pd.DataFrame, output_dir: Path) -> None:
     try:
         import matplotlib.pyplot as plt
@@ -620,9 +562,6 @@ def make_scatter_plots(merged: pd.DataFrame, output_dir: Path) -> None:
     plt.close(fig)
 
 
-# ---------------------------------------------------------------------------
-# Print full RQ1 report
-# ---------------------------------------------------------------------------
 def print_rq1_report(validation_results: dict, wabaq_results: dict) -> None:
     print("\n" + "=" * 76)
     print("RQ1 FULL ANSWER")
@@ -674,24 +613,13 @@ def print_rq1_report(validation_results: dict, wabaq_results: dict) -> None:
     print("=" * 76)
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 def main(args) -> None:
     output_dir = Path("outputs/validation")
     output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Load CLAN eval files
     clan_df          = load_all_clan_evals(args.clan_dir)
     clan_session_ids = set(clan_df["_session_id"].tolist())
-
-    # Compute auto metrics
     auto_df = compute_auto_metrics(args.cha_dir, clan_session_ids, clan_df)
-
-    # Step 1: merge and validate
     validation_results, merged = run_validation(clan_df, auto_df)
-
-    # Extract WAB-AQ from .cha headers and join into merged
     logger.info("Extracting WAB-AQ from .cha headers...")
     wabaq_df = extract_wabaq_from_cha(args.cha_dir, clan_session_ids)
     wabaq_df.to_csv(str(output_dir / "wabaq_lookup.csv"), index=False)
@@ -701,11 +629,7 @@ def main(args) -> None:
     logger.info(
         f"WAB-AQ joined: {merged['wab_aq'].notna().sum()} / {n_before} patients have a value"
     )
-
-    # Steps 2 & 3: WAB-AQ correlation
     wabaq_results = run_wabaq_analysis(merged)
-
-    # Save outputs
     merged.to_csv(str(output_dir / "matched_comparison.csv"), index=False)
 
     with open(output_dir / "correlation_report.json", "w") as f:
