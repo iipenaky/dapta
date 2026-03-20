@@ -7,7 +7,7 @@ Import these with Depends() in route handlers.
 They handle auth, DB sessions, and the DAPTA system singleton.
 """
 
-from __future__ import annotations
+
 from typing import AsyncGenerator
 
 from fastapi import Depends, HTTPException, status

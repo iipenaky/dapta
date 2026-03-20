@@ -4,7 +4,7 @@ routers/sessions.py
 Session CRUD endpoints.
 """
 
-from __future__ import annotations
+
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession

@@ -1,12 +1,8 @@
-# =============================================================================
 # DAPTA — Default Configuration
 # All hyperparameters and paths in one place.
 # Override per-experiment via CLI or experiment-specific YAML files.
-# =============================================================================
 
-# ---------------------------------------------------------------------------
 # Paths
-# ---------------------------------------------------------------------------
 paths:
   data_dir: "data/aphasiabank"          # Root of AphasiaBank CHAT files
   processed_dir: "data/processed"       # Processed state vectors & splits
@@ -14,9 +10,7 @@ paths:
   results_dir: "results"                # Evaluation outputs & plots
   logs_dir: "logs"                      # Training logs
 
-# ---------------------------------------------------------------------------
 # Dataset splits
-# ---------------------------------------------------------------------------
 dataset:
   train_ratio: 0.70
   val_ratio: 0.15
@@ -24,9 +18,7 @@ dataset:
   random_seed: 42
   min_sessions_for_longitudinal: 2      # Min sessions to be used in PES
 
-# ---------------------------------------------------------------------------
 # DAE — Discourse Assessment Engine
-# ---------------------------------------------------------------------------
 dae:
   # Discourse metrics
   metrics:
@@ -36,6 +28,7 @@ dae:
     - ttr              # Type-token ratio
     - syntactic_complexity   # Subordinate clause ratio
     - mean_surprisal   # RoBERTa surprisal (lower = better)
+    -
 
   # Metric weights for reward function (must sum to 1.0)
   # CIU rate is highest per Stark et al. (2021)
@@ -79,13 +72,13 @@ dae:
     - stroke_narrative
     - conversation
 
-# ---------------------------------------------------------------------------
+
 # PES — Patient Environment Simulator
-# ---------------------------------------------------------------------------
+
 pes:
   # Patient clustering
   clustering:
-    n_clusters: 6                    # Matches 6 aphasia subtypes
+    n_clusters: 6                    
     method: "kmeans"
     features: ["aphasia_subtype_encoded", "wab_aq", "months_post_onset"]
 
@@ -105,9 +98,9 @@ pes:
     discount_factor: 0.95
     reward_clip: [-1.0, 1.0]         # Clip reward to prevent instability
 
-# ---------------------------------------------------------------------------
+
 # PRTA — Personalised RL Therapy Agent
-# ---------------------------------------------------------------------------
+
 prta:
   # Action space
   n_actions: 12                      # 12 therapy exercise types
@@ -148,9 +141,9 @@ prta:
     vf_coef: 0.5
     max_grad_norm: 0.5
 
-# ---------------------------------------------------------------------------
+
 # Evaluation
-# ---------------------------------------------------------------------------
+
 evaluation:
   significance_level: 0.05
   min_effect_size: 0.4               # Cohen's d threshold (iTalkBetter benchmark)

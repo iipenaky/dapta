@@ -4,7 +4,7 @@ schemas/auth.py
 Pydantic request/response shapes for authentication endpoints.
 """
 
-from __future__ import annotations
+
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 

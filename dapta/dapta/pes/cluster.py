@@ -1,94 +1,197 @@
-"""
-Patient clustering for personalised RL training.
-
-Groups patients by aphasia subtype and severity to enable
-patient-specific policy training (addressing RQ4).
-"""
-
-from __future__ import annotations
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set
 
 import numpy as np
 from sklearn.cluster import KMeans
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from dapta.dae.state_builder import PatientProfile, APHASIA_SUBTYPES
+from dapta.dae.state_builder import PatientProfile, N_METRICS_PER_TASK, N_TASKS
 from dapta.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+NON_APHASIA_SUBTYPES: Set[str] = {
+    "control", "Control", "CONTROL",
+    "NotAphasicByWAB", "NotAphasicByWab", "notaphasicbywab",
+    "not_aphasic", "healthy",
+}
+
+CONTROL_CLUSTER_ID = -1
+
 
 class PatientClusterer:
-    """
-    Clusters patients using aphasia subtype, WAB-AQ severity, and months post-onset.
 
-    Default: 6 clusters (one per major aphasia subtype).
-    Clusters are used to train separate RL policies.
-
-    Parameters
-    ----------
-    n_clusters  : Number of clusters (default 6)
-    random_seed : For reproducibility
-    """
-
-    def __init__(self, n_clusters: int = 6, random_seed: int = 42) -> None:
-        self.n_clusters = n_clusters
+    def __init__(self, max_k: int = 10, random_seed: int = 42):
+        self.max_k       = max_k
         self.random_seed = random_seed
-        self._kmeans: Optional[KMeans] = None
-        self._le = LabelEncoder().fit(APHASIA_SUBTYPES)
+        self._kmeans:    Optional[KMeans] = None
+        self._encoder    = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
+        self._scaler     = StandardScaler()
+        self.n_clusters: Optional[int] = None
 
     def fit_predict(
-        self, profiles: List[PatientProfile]
+        self,
+        profiles:      List[PatientProfile],
+        state_vectors: Optional[np.ndarray] = None,
+        min_k:         int = 6,
     ) -> np.ndarray:
-        """
-        Fit the clusterer and return cluster labels.
+        aphasia_mask = self._aphasia_mask(profiles)
+        n_aphasia    = int(aphasia_mask.sum())
+        n_controls   = int((~aphasia_mask).sum())
 
-        Returns
-        -------
-        np.ndarray of int, shape (N,)
-        """
-        X = self._build_feature_matrix(profiles)
+        logger.info(
+            f"Clustering {n_aphasia} aphasia patients "
+            f"(excluding {n_controls} non-aphasic patients)."
+        )
+
+        if n_aphasia == 0:
+            raise ValueError(
+                "No aphasia patients found. Check NON_APHASIA_SUBTYPES matches "
+                "your data's subtype labels."
+            )
+        aphasia_profiles = [p for p, m in zip(profiles, aphasia_mask) if m]
+        aphasia_states   = (
+            state_vectors[aphasia_mask] if state_vectors is not None else None
+        )
+        X = self._fit_transform(aphasia_profiles, aphasia_states)
+
+
+        max_possible = min(self.max_k, n_aphasia - 1)
+        min_k        = min(min_k, max_possible)
+        self.n_clusters = self.find_elbow_k(X, min_k=min_k, max_k=max_possible)
+        logger.info(f"Optimal clusters found: k={self.n_clusters}")
+
         self._kmeans = KMeans(
             n_clusters=self.n_clusters,
             random_state=self.random_seed,
             n_init=10,
         )
-        labels = self._kmeans.fit_predict(X)
+        aphasia_labels = self._kmeans.fit_predict(X)
         logger.info(
-            f"Clustered {len(profiles)} patients into {self.n_clusters} clusters. "
-            f"Counts: {np.bincount(labels)}"
+            f"Clustered {n_aphasia} aphasia patients into {self.n_clusters} clusters. "
+            f"Counts: {np.bincount(aphasia_labels)}"
         )
-        return labels
 
-    def predict(self, profiles: List[PatientProfile]) -> np.ndarray:
-        """Predict cluster for new patients."""
+        full_labels = np.full(len(profiles), CONTROL_CLUSTER_ID, dtype=int)
+        full_labels[aphasia_mask] = aphasia_labels
+
+        return full_labels
+
+    def predict(
+        self,
+        profiles:      List[PatientProfile],
+        state_vectors: Optional[np.ndarray] = None,
+    ) -> np.ndarray:
         if self._kmeans is None:
-            raise RuntimeError("Clusterer not fitted. Call fit_predict() first.")
-        X = self._build_feature_matrix(profiles)
-        return self._kmeans.predict(X)
+            raise RuntimeError("Clusterer must be fitted before calling predict().")
+
+        aphasia_mask     = self._aphasia_mask(profiles)
+        aphasia_profiles = [p for p, m in zip(profiles, aphasia_mask) if m]
+        aphasia_states   = (
+            state_vectors[aphasia_mask] if state_vectors is not None else None
+        )
+
+        full_labels = np.full(len(profiles), CONTROL_CLUSTER_ID, dtype=int)
+
+        if aphasia_profiles:
+            X = self._transform(aphasia_profiles, aphasia_states)
+            full_labels[aphasia_mask] = self._kmeans.predict(X)
+
+        return full_labels
 
     def get_cluster_groups(
         self,
         profiles: List[PatientProfile],
-        labels: np.ndarray,
+        labels:   np.ndarray,
     ) -> Dict[int, List[PatientProfile]]:
-        """
-        Returns
-        -------
-        {cluster_id: [profiles in that cluster]}
-        """
-        groups: Dict[int, List[PatientProfile]] = {i: [] for i in range(self.n_clusters)}
+
+        if self.n_clusters is None:
+            raise RuntimeError("Clusterer must be fitted first.")
+
+        unique = sorted(set(int(l) for l in labels))
+        groups: Dict[int, List[PatientProfile]] = {i: [] for i in unique}
         for profile, label in zip(profiles, labels):
             groups[int(label)].append(profile)
         return groups
 
-    def _build_feature_matrix(self, profiles: List[PatientProfile]) -> np.ndarray:
-        """Build clustering feature matrix: [subtype_encoded, wab_aq_norm, months_norm]."""
-        subtypes_enc = self._le.transform([
-            p.aphasia_subtype if p.aphasia_subtype in self._le.classes_ else "Other"
-            for p in profiles
-        ])
-        wab_aq = np.array([p.wab_aq for p in profiles]) / 100.0
-        months = np.array([min(p.months_post_onset, 60) for p in profiles]) / 60.0
+    def _fit_transform(
+        self,
+        profiles:      List[PatientProfile],
+        state_vectors: Optional[np.ndarray] = None,
+    ) -> np.ndarray:
+        subtypes        = np.array([[p.aphasia_subtype] for p in profiles])
+        wab_aq          = np.array([p.wab_aq for p in profiles]).reshape(-1, 1)
+        subtype_encoded = self._encoder.fit_transform(subtypes)
 
-        return np.column_stack([subtypes_enc, wab_aq, months]).astype(np.float32)
+        numeric = [wab_aq]
+        if state_vectors is not None:
+            numeric.append(self._extract_discourse_means(state_vectors))
+
+        numeric_scaled = self._scaler.fit_transform(np.hstack(numeric))
+        return np.hstack([subtype_encoded, numeric_scaled]).astype(np.float32)
+
+    def _transform(
+        self,
+        profiles:      List[PatientProfile],
+        state_vectors: Optional[np.ndarray] = None,
+    ) -> np.ndarray:
+        subtypes        = np.array([[p.aphasia_subtype] for p in profiles])
+        wab_aq          = np.array([p.wab_aq for p in profiles]).reshape(-1, 1)
+        subtype_encoded = self._encoder.transform(subtypes)
+
+        numeric = [wab_aq]
+        if state_vectors is not None:
+            numeric.append(self._extract_discourse_means(state_vectors))
+
+        numeric_scaled = self._scaler.transform(np.hstack(numeric))
+        return np.hstack([subtype_encoded, numeric_scaled]).astype(np.float32)
+
+    def compute_inertias(self, X: np.ndarray, max_k: int) -> List[float]:
+        inertias = []
+        for k in range(1, max_k + 1):
+            kmeans = KMeans(
+                n_clusters=k,
+                random_state=self.random_seed,
+                n_init=10,
+            )
+            kmeans.fit(X)
+            inertias.append(kmeans.inertia_)
+        return inertias
+
+    def find_elbow_k(self, X: np.ndarray, min_k: int = 6, max_k: int = 10) -> int:
+        if max_k < 3:
+            return min_k
+
+        inertias      = self.compute_inertias(X, max_k)
+        logger.info(f"Inertia values: {inertias}")
+
+        deltas        = np.diff(inertias)
+        second_deltas = np.diff(deltas)
+
+        if len(second_deltas) == 0:
+            return min_k
+
+        elbow  = int(np.argmax(np.abs(second_deltas))) + 2
+        result = max(min_k, min(elbow, max_k))
+        logger.info(f"Elbow at k={elbow}, enforcing min_k={min_k} max_k={max_k}, using k={result}")
+        return result
+
+
+    @staticmethod
+    def _aphasia_mask(profiles: List[PatientProfile]) -> np.ndarray:
+        return np.array(
+            [p.aphasia_subtype not in NON_APHASIA_SUBTYPES for p in profiles],
+            dtype=bool,
+        )
+
+    @staticmethod
+    def _extract_discourse_means(state_vectors: np.ndarray) -> np.ndarray:
+        N          = state_vectors.shape[0]
+        n_metrics  = N_METRICS_PER_TASK   
+        n_tasks    = N_TASKS              
+        disc_means = np.zeros((N, n_metrics), dtype=np.float32)
+
+        for m in range(n_metrics):
+            dims = [t * n_metrics + m for t in range(n_tasks)]
+            disc_means[:, m] = state_vectors[:, dims].mean(axis=1)
+
+        return disc_means

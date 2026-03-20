@@ -5,7 +5,7 @@ Password hashing and JWT creation / verification.
 Nothing in here touches the database — pure crypto utilities.
 """
 
-from __future__ import annotations
+
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import hashlib

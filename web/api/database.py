@@ -5,7 +5,7 @@ Async SQLAlchemy engine, session factory, and Base declarative class.
 Everything that needs a DB session imports from here.
 """
 
-from __future__ import annotations
+
 
 from sqlalchemy.ext.asyncio import (
     AsyncSession,

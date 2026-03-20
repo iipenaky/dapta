@@ -5,7 +5,7 @@ Assessment endpoints: text, file upload (.cha or audio), audio blob.
 All three input modes produce the same AssessmentResult shape.
 """
 
-from __future__ import annotations
+
 import tempfile
 from pathlib import Path
 

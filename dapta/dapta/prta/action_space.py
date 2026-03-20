@@ -1,37 +1,9 @@
-"""
-Defines the 12 therapy exercise types in DAPTA's action space.
-
-Each exercise is classified along two theoretically motivated dimensions
-(per Gorshkov et al., 2025):
-  - Target level    : word | sentence | discourse
-  - Context degree  : structured_drill | functional
-
-This classification is used for analysis of which exercise types the
-RL agent selects for different patient profiles.
-"""
-
-from __future__ import annotations
 from dataclasses import dataclass
 from typing import List
 
 
 @dataclass(frozen=True)
 class TherapyExercise:
-    """
-    A single therapy exercise type.
-
-    Attributes
-    ----------
-    action_id      : Integer action index [0, 11]
-    name           : Short identifier
-    description    : Full clinical description
-    target_level   : "word" | "sentence" | "discourse"
-    context        : "structured_drill" | "functional"
-    evidence_level : "Level_I" (RCT) | "Level_II" (cohort)
-    generalisation_potential : float in [0, 1] — estimated from literature
-        Higher = more likely to produce functional transfer.
-        Discourse + functional exercises score highest (Gorshkov et al., 2025).
-    """
     action_id: int
     name: str
     description: str
@@ -39,10 +11,6 @@ class TherapyExercise:
     context: str
     evidence_level: str
     generalisation_potential: float
-
-
-
-# The 12 therapy exercises
 
 
 THERAPY_EXERCISES: List[TherapyExercise] = [
@@ -58,7 +26,7 @@ THERAPY_EXERCISES: List[TherapyExercise] = [
         target_level="word",
         context="structured_drill",
         evidence_level="Level_I",
-        generalisation_potential=0.25,   # Low transfer to connected speech
+        generalisation_potential=0.25,   
     ),
 
     TherapyExercise(
@@ -158,7 +126,7 @@ THERAPY_EXERCISES: List[TherapyExercise] = [
         target_level="discourse",
         context="functional",
         evidence_level="Level_I",
-        generalisation_potential=0.85,   # Highest: directly targets transfer
+        generalisation_potential=0.85,  
     ),
 
     TherapyExercise(
@@ -200,7 +168,7 @@ THERAPY_EXERCISES: List[TherapyExercise] = [
         target_level="word",
         context="structured_drill",
         evidence_level="Level_I",
-        generalisation_potential=0.15,   # Lowest: very task-specific
+        generalisation_potential=0.15,   
     ),
 
     TherapyExercise(
@@ -215,11 +183,10 @@ THERAPY_EXERCISES: List[TherapyExercise] = [
         target_level="discourse",
         context="functional",
         evidence_level="Level_I",
-        generalisation_potential=0.90,   # Highest in set
+        generalisation_potential=0.90,  
     ),
 ]
 
-# Convenience accessors
 
 N_ACTIONS = len(THERAPY_EXERCISES)  # 12
 
@@ -234,16 +201,15 @@ ACTION_ID_TO_NAME: dict[int, str] = {
 DISCOURSE_FUNCTIONAL_ACTIONS = [
     ex.action_id for ex in THERAPY_EXERCISES
     if ex.target_level == "discourse" and ex.context == "functional"
-]  # Actions 4, 5, 7, 11
+]  
 
 
 def get_exercise(action_id: int) -> TherapyExercise:
-    """Return TherapyExercise by action_id."""
     if action_id not in ACTION_ID_TO_EXERCISE:
         raise ValueError(f"Invalid action_id {action_id}. Must be in [0, {N_ACTIONS - 1}].")
     return ACTION_ID_TO_EXERCISE[action_id]
 
 
 def get_generalisation_potentials() -> List[float]:
-    """Return list of generalisation potentials indexed by action_id."""
+
     return [ACTION_ID_TO_EXERCISE[i].generalisation_potential for i in range(N_ACTIONS)]

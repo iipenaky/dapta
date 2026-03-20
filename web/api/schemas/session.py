@@ -4,7 +4,7 @@ schemas/session.py
 Pydantic shapes for session, assessment, and recommendation endpoints.
 """
 
-from __future__ import annotations
+
 from datetime import datetime
 from typing import Any
 

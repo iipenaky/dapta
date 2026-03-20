@@ -3,7 +3,7 @@ Structured, colour-coded logger used across all DAPTA modules.
 Uses Python's built-in logging + rich for pretty console output.
 """
 
-from __future__ import annotations
+
 import logging
 import sys
 from pathlib import Path

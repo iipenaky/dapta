@@ -8,7 +8,7 @@ Gracefully degrades when models are not yet trained —
 returns mock data so the web app is fully usable during development.
 """
 
-from __future__ import annotations
+
 import logging
 import sys
 from pathlib import Path

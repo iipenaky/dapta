@@ -21,7 +21,7 @@ Requirements:
   apt-get install ffmpeg  (or module load ffmpeg on cluster)
 """
 
-from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -131,7 +131,7 @@ def batch_extract_audio(
 
 def clean_chat_text(raw: str) -> str:
     """Strip CHAT markup, return clean text."""
-    text = _CHAT_NOISE.sub(" ", raw)
+    text = CHAT_NOISE.sub(" ", raw)
     text = re.sub(r"\s+", " ", text).strip()
     return text.lower()
 

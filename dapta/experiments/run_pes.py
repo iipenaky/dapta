@@ -6,7 +6,7 @@ What this script does:
   2. Builds (s, a, s') transition triples from longitudinal sessions
   3. Augments with RCT-derived effect size priors for single-session patients
   4. Trains the neural transition model (MLP with MC Dropout)
-  5. Clusters patients into 6 groups for personalised RL training
+  5. Clusters patients into groups for personalised RL training
   6. Builds TherapyEnv instances for each patient
   7. Saves transition model, cluster assignments, and environments
 
@@ -14,16 +14,16 @@ Requires:
   outputs/dae/  (from run_dae.py)
 
 Outputs (used by run_rl.py):
-  outputs/pes/transition_model.pt     - trained MLP weights
+  outputs/pes/transition_model.pt
   outputs/pes/cluster_assignments.json
-  outputs/pes/env_initial_states.npz  - initial state per patient
-  outputs/pes/pes_report.json         - training stats
+  outputs/pes/env_initial_states.npz
+  outputs/pes/pes_report.json
+  outputs/pes/transition_model_validation.json
 
 Usage:
   python experiments/run_pes.py
 """
 
-from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
@@ -34,21 +34,14 @@ import numpy as np
 from dapta.pes.transition_model import TransitionModel
 from dapta.pes.cluster import PatientClusterer
 from dapta.pes.environment import TherapyEnv, build_env_population
-from dapta.dae.state_builder import PatientProfile
+from dapta.dae.state_builder import PatientProfile, STATE_DIM
 from dapta.prta.action_space import N_ACTIONS
 from dapta.utils.logger import get_logger
 from dapta.utils.config import Config
 
 logger = get_logger(__name__, log_file="logs/run_pes.log")
 
-
-# ---------------------------------------------------------------------------
-# RCT-derived effect size priors per exercise × discourse metric
-# Based on Gorshkov et al. (2025) and Upton et al. (2024)
-# Shape: (N_ACTIONS, 6) — 6 discourse metrics
-# ---------------------------------------------------------------------------
 RCT_PRIORS = np.array([
-    # CIU   MC    MLU   TTR   SynComp Surprisal(-)
     [0.04, 0.02, 0.01, 0.02, 0.01, -0.02],   # 0: SFA naming
     [0.03, 0.01, 0.02, 0.02, 0.01, -0.01],   # 1: Phonological cueing
     [0.03, 0.02, 0.05, 0.02, 0.03, -0.02],   # 2: Sentence SVO
@@ -63,6 +56,9 @@ RCT_PRIORS = np.array([
     [0.09, 0.07, 0.05, 0.05, 0.03, -0.05],   # 11: Free conversation
 ], dtype=np.float32)
 
+# Names for the first 5 discourse dims — used in validation report
+METRIC_NAMES_VAL = ["ciu_rate", "mc_score", "mlu_morphemes", "mattr", "syntactic_complexity"]
+
 
 def build_transition_triples_from_longitudinal(
     state_vectors: np.ndarray,
@@ -71,17 +67,7 @@ def build_transition_triples_from_longitudinal(
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Build (s, a, s') triples from participants with 2+ sessions.
-
-    Since AphasiaBank doesn't have explicit exercise logs, we infer
-    the action from session-to-session changes using cosine similarity
-    to the RCT prior effect vectors — the action whose prior best
-    matches the observed delta is assigned as the inferred action.
-
-    Returns
-    -------
-    states      : (N, STATE_DIM)
-    actions     : (N,) int
-    next_states : (N, STATE_DIM)
+    Action is inferred by matching observed delta to RCT prior vectors.
     """
     session_to_vec = {
         sid: state_vectors[i]
@@ -92,11 +78,10 @@ def build_transition_triples_from_longitudinal(
 
     for base_id, session_list in longitudinal.items():
         for i in range(len(session_list) - 1):
-            s_id = session_list[i].lower()
+            s_id  = session_list[i].lower()
             ns_id = session_list[i + 1].lower()
 
-            # Find matching session vectors (case-insensitive)
-            s_vec = None
+            s_vec  = None
             ns_vec = None
             for sid, vec in session_to_vec.items():
                 if sid.lower() == s_id:
@@ -107,11 +92,10 @@ def build_transition_triples_from_longitudinal(
             if s_vec is None or ns_vec is None:
                 continue
 
-            delta = ns_vec[:6] - s_vec[:6]  # discourse dims only
+            delta = ns_vec[:5] - s_vec[:5]
 
-            # Infer action: match delta to RCT prior
-            prior_discourse = RCT_PRIORS[:, :6]
-            similarities = prior_discourse @ delta
+            prior_discourse = RCT_PRIORS[:, :5]
+            similarities    = prior_discourse @ delta
             inferred_action = int(np.argmax(similarities))
 
             states_list.append(s_vec)
@@ -120,7 +104,11 @@ def build_transition_triples_from_longitudinal(
 
     if not states_list:
         logger.warning("No longitudinal triples found. Using prior-only data.")
-        return np.zeros((0, 14)), np.zeros(0, dtype=int), np.zeros((0, 14))
+        return (
+            np.zeros((0, STATE_DIM), dtype=np.float32),
+            np.zeros(0, dtype=int),
+            np.zeros((0, STATE_DIM), dtype=np.float32),
+        )
 
     logger.info(f"Built {len(states_list)} transition triples from longitudinal data.")
     return (
@@ -131,30 +119,26 @@ def build_transition_triples_from_longitudinal(
 
 
 def augment_with_priors(
-    states: np.ndarray,
-    actions: np.ndarray,
-    next_states: np.ndarray,
+    states:             np.ndarray,
+    actions:            np.ndarray,
+    next_states:        np.ndarray,
     all_initial_states: np.ndarray,
-    n_augment: int = 500,
-    noise_std: float = 0.02,
+    n_augment:          int   = 500,
+    noise_std:          float = 0.02,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Augment longitudinal triples with RCT prior-based synthetic triples.
-    This addresses the small sample size limitation of AphasiaBank.
     """
     rng = np.random.default_rng(42)
     aug_states, aug_actions, aug_next = [], [], []
 
     for _ in range(n_augment):
-        # Sample a random initial state
         idx = rng.integers(0, len(all_initial_states))
-        s = all_initial_states[idx].copy()
+        s   = all_initial_states[idx].copy()
+        a   = rng.integers(0, N_ACTIONS)
 
-        # Sample a random action
-        a = rng.integers(0, N_ACTIONS)
-
-        # Apply RCT prior + noise
-        delta = np.zeros(14, dtype=np.float32)
+        delta = np.zeros(STATE_DIM, dtype=np.float32)
+        # Fixed: assign all 6 prior values including surprisal
         delta[:6] = RCT_PRIORS[a] + rng.normal(0, noise_std, 6)
         ns = np.clip(s + delta, 0.0, 1.0)
 
@@ -162,25 +146,26 @@ def augment_with_priors(
         aug_actions.append(a)
         aug_next.append(ns)
 
-    aug_s = np.stack(aug_states)
-    aug_a = np.array(aug_actions, dtype=int)
+    aug_s  = np.stack(aug_states)
+    aug_a  = np.array(aug_actions, dtype=int)
     aug_ns = np.stack(aug_next)
 
     if len(states) > 0:
-        combined_s = np.concatenate([states, aug_s])
-        combined_a = np.concatenate([actions, aug_a])
+        combined_s  = np.concatenate([states,      aug_s])
+        combined_a  = np.concatenate([actions,     aug_a])
         combined_ns = np.concatenate([next_states, aug_ns])
     else:
         combined_s, combined_a, combined_ns = aug_s, aug_a, aug_ns
 
     logger.info(
-        f"Augmented: {len(states)} real + {n_augment} synthetic = {len(combined_s)} total triples"
+        f"Augmented: {len(states)} real + {n_augment} synthetic = "
+        f"{len(combined_s)} total triples"
     )
     return combined_s, combined_a, combined_ns
 
 
 def main(args) -> None:
-    cfg = Config.load()
+    cfg        = Config.load()
     output_dir = Path("outputs/pes")
     output_dir.mkdir(parents=True, exist_ok=True)
     Path("logs").mkdir(exist_ok=True)
@@ -190,7 +175,7 @@ def main(args) -> None:
     logger.info("=" * 60)
 
     # ------------------------------------------------------------------
-    # Load DAE outputs
+    # 1. Load DAE outputs
     # ------------------------------------------------------------------
     logger.info("\n[1/5] Loading DAE outputs...")
     dae_dir = Path("outputs/dae")
@@ -199,9 +184,9 @@ def main(args) -> None:
         logger.error("DAE outputs not found. Run experiments/run_dae.py first.")
         return
 
-    dae_data = np.load(str(dae_dir / "state_vectors.npz"), allow_pickle=True)
+    dae_data      = np.load(str(dae_dir / "state_vectors.npz"), allow_pickle=True)
     state_vectors = dae_data["state_vectors"]
-    session_ids = dae_data["session_ids"]
+    session_ids   = dae_data["session_ids"]
 
     with open(dae_dir / "patient_profiles.json") as f:
         profiles_data = json.load(f)
@@ -212,36 +197,47 @@ def main(args) -> None:
     with open(dae_dir / "splits.json") as f:
         splits = json.load(f)
 
-    logger.info(f"Loaded {len(state_vectors)} state vectors, {len(longitudinal)} longitudinal patients")
+    logger.info(
+        f"Loaded {len(state_vectors)} state vectors, "
+        f"{len(longitudinal)} longitudinal patients"
+    )
 
-    # Build PatientProfile objects
     profiles = [
         PatientProfile(
             participant_id=p["participant_id"],
             aphasia_subtype=p.get("aphasia_subtype", "Other"),
             wab_aq=p.get("wab_aq", 50.0),
-            months_post_onset=p.get("months_post_onset", 12.0),
         )
         for p in profiles_data
     ]
 
     # ------------------------------------------------------------------
-    # Build transition triples
+    # 2. Build transition triples
     # ------------------------------------------------------------------
     logger.info("\n[2/5] Building transition triples from longitudinal data...")
     states, actions, next_states = build_transition_triples_from_longitudinal(
         state_vectors, session_ids, longitudinal
     )
 
-    # Augment with RCT priors
-    states, actions, next_states = augment_with_priors(
-        states, actions, next_states,
+    # Hold out real longitudinal data for validation BEFORE augmentation
+    n_real     = len(states)
+    real_split = int(n_real * 0.9)
+
+    val_states_real  = states[real_split:]
+    val_actions_real = actions[real_split:]
+    val_next_real    = next_states[real_split:]
+    train_states     = states[:real_split]
+    train_actions    = actions[:real_split]
+    train_next       = next_states[:real_split]
+
+    train_states, train_actions, train_next = augment_with_priors(
+        train_states, train_actions, train_next,
         all_initial_states=state_vectors,
         n_augment=args.n_augment,
     )
 
     # ------------------------------------------------------------------
-    # Train transition model
+    # 3. Train transition model
     # ------------------------------------------------------------------
     logger.info("\n[3/5] Training transition model (MLP + MC Dropout)...")
     transition_model = TransitionModel(
@@ -253,9 +249,9 @@ def main(args) -> None:
     )
 
     transition_model.fit(
-        states=states,
-        actions=actions,
-        next_states=next_states,
+        states=train_states,
+        actions=train_actions,
+        next_states=train_next,
         val_split=0.1,
         learning_rate=1e-3,
         batch_size=32,
@@ -266,56 +262,72 @@ def main(args) -> None:
     logger.info("Transition model trained.")
 
     # ------------------------------------------------------------------
-    # Transition model validation metrics
+    # 3b. Validate transition model on held-out real longitudinal data
     # ------------------------------------------------------------------
     logger.info("\n[3b/5] Computing transition model validation metrics...")
-    split = int(len(states) * 0.9)
-    val_states  = states[split:]
-    val_actions = actions[split:]
-    val_next    = next_states[split:]
-    val_deltas  = val_next - val_states          # observed deltas
 
-    pred_nexts = np.array([
-        transition_model.predict_next_state(s, int(a))
-        for s, a in zip(val_states, val_actions)
-    ])
-    pred_deltas = pred_nexts - val_states        # predicted deltas
+    val_metrics_out = {
+        "val_mse": None,
+        "mae_per_metric": {},
+        "directional_accuracy": {},
+        "note": None,
+    }
 
-    mae_per_dim = np.mean(np.abs(pred_deltas - val_deltas), axis=0)
-    mse_overall = float(np.mean((pred_deltas - val_deltas) ** 2))
-    dir_acc     = np.mean(np.sign(pred_deltas) == np.sign(val_deltas), axis=0)
+    if len(val_states_real) == 0:
+        logger.warning(
+            "No real longitudinal validation data available "
+            "(fewer than 2 longitudinal sessions found). "
+            "Skipping held-out validation — metrics will be None."
+        )
+        val_metrics_out["note"] = (
+            "Validation skipped: no held-out real longitudinal triples available."
+        )
+    else:
+        val_deltas = val_next_real - val_states_real
 
-    METRIC_NAMES_VAL = ["CIU_rate", "MC_score", "MLU_m", "TTR", "SynComp", "Surprisal"]
-    logger.info(f"  Val MSE (overall): {mse_overall:.6f}")
-    for i, m in enumerate(METRIC_NAMES_VAL):
-        logger.info(
-            f"  {m:<14}  MAE={mae_per_dim[i]:.4f}  DirAcc={dir_acc[i]:.3f}"
+        pred_nexts = np.array([
+            transition_model.predict_next_state(s, int(a))
+            for s, a in zip(val_states_real, val_actions_real)
+        ])
+        pred_deltas = pred_nexts - val_states_real
+
+        # Fixed: only index first 5 discourse dims
+        mae_per_dim = np.mean(
+            np.abs(pred_deltas[:, :5] - val_deltas[:, :5]), axis=0
+        )
+        mse_overall = float(np.mean((pred_deltas - val_deltas) ** 2))
+        dir_acc     = np.mean(
+            np.sign(pred_deltas[:, :5]) == np.sign(val_deltas[:, :5]), axis=0
         )
 
-    import json as _json
-    Path("outputs/pes").mkdir(parents=True, exist_ok=True)
-    val_metrics = {
-        "val_mse": round(mse_overall, 6),
-        "mae_per_metric": {
+        logger.info(f"  Val MSE (overall): {mse_overall:.6f}")
+        for i, m in enumerate(METRIC_NAMES_VAL):
+            logger.info(
+                f"  {m:<25}  MAE={mae_per_dim[i]:.4f}  DirAcc={dir_acc[i]:.3f}"
+            )
+
+        val_metrics_out["val_mse"] = round(mse_overall, 6)
+        val_metrics_out["mae_per_metric"] = {
             m: round(float(mae_per_dim[i]), 4)
             for i, m in enumerate(METRIC_NAMES_VAL)
-        },
-        "directional_accuracy": {
+        }
+        val_metrics_out["directional_accuracy"] = {
             m: round(float(dir_acc[i]), 3)
             for i, m in enumerate(METRIC_NAMES_VAL)
-        },
-    }
-    with open("outputs/pes/transition_model_validation.json", "w") as _f:
-        _json.dump(val_metrics, _f, indent=2)
+        }
+
+    with open(output_dir / "transition_model_validation.json", "w") as f:
+        json.dump(val_metrics_out, f, indent=2)
     logger.info("  Saved to outputs/pes/transition_model_validation.json")
 
     # ------------------------------------------------------------------
-    # Cluster patients
+    # 4. Cluster patients
     # ------------------------------------------------------------------
     logger.info("\n[4/5] Clustering patients...")
-    clusterer = PatientClusterer(n_clusters=6, random_seed=42)
-    cluster_labels = clusterer.fit_predict(profiles)
+    clusterer      = PatientClusterer(max_k=10, random_seed=42)
+    cluster_labels = clusterer.fit_predict(profiles, state_vectors=state_vectors)
     cluster_groups = clusterer.get_cluster_groups(profiles, cluster_labels)
+    n_clusters     = clusterer.n_clusters  # actual number, not hardcoded 6
 
     cluster_assignments = {
         p.participant_id: int(label)
@@ -324,18 +336,14 @@ def main(args) -> None:
 
     for cluster_id, group in cluster_groups.items():
         logger.info(f"  Cluster {cluster_id}: {len(group)} patients")
-        action_counts = np.bincount(
-            np.array(actions)[cluster_labels == cluster_id].astype(int),
-            minlength=12
-        )
-        logger.info(f"    Action distribution: {action_counts.tolist()}")
+        subtypes = [p.aphasia_subtype for p in group[:5]]
+        logger.info(f"    Sample subtypes: {subtypes}")
 
     # ------------------------------------------------------------------
-    # Build environments
+    # 5. Build environments
     # ------------------------------------------------------------------
     logger.info("\n[5/5] Building TherapyEnv instances...")
 
-    # Initial state per session = state vector
     initial_states = state_vectors
 
     envs = build_env_population(
@@ -344,17 +352,18 @@ def main(args) -> None:
         episode_horizon=20,
     )
 
-    # Group envs by cluster
-    session_to_cluster = {}
-    for i, (sid, profile) in enumerate(zip(session_ids, profiles)):
-        session_to_cluster[sid] = int(cluster_labels[i])
+    # Fixed: use actual n_clusters not hardcoded 6
+    session_to_cluster = {
+        sid: int(cluster_labels[i])
+        for i, sid in enumerate(session_ids)
+    }
 
-    cluster_env_indices: Dict[int, List[int]] = {i: [] for i in range(6)}
+    cluster_env_indices: Dict[int, List[int]] = {i: [] for i in range(n_clusters)}
     for i, sid in enumerate(session_ids):
         c = session_to_cluster.get(sid, 0)
         cluster_env_indices[c].append(i)
 
-    # Save initial states for environments
+    # Save outputs
     np.savez(
         str(output_dir / "env_initial_states.npz"),
         initial_states=initial_states,
@@ -362,33 +371,31 @@ def main(args) -> None:
         cluster_labels=cluster_labels,
     )
 
-    # Save cluster assignments
     with open(output_dir / "cluster_assignments.json", "w") as f:
         json.dump({
-            "assignments": cluster_assignments,
+            "assignments":        cluster_assignments,
             "cluster_env_indices": {str(k): v for k, v in cluster_env_indices.items()},
-            "cluster_sizes": {str(k): len(v) for k, v in cluster_env_indices.items()},
+            "cluster_sizes":      {str(k): len(v) for k, v in cluster_env_indices.items()},
         }, f, indent=2)
 
-    # Save report
     report = {
-        "n_transition_triples": len(states),
-        "n_longitudinal_real": int((states == states).all(axis=1).sum()),
-        "n_augmented_synthetic": args.n_augment,
-        "n_clusters": 6,
-        "cluster_sizes": {str(k): len(v) for k, v in cluster_env_indices.items()},
-        "n_environments": len(envs),
-        "train_split_size": len(splits["train"]),
-        "val_split_size": len(splits["val"]),
-        "test_split_size": len(splits["test"]),
+        "n_transition_triples":   len(train_states),
+        "n_longitudinal_real":    real_split,
+        "n_augmented_synthetic":  args.n_augment,
+        "n_clusters":             n_clusters,
+        "cluster_sizes":          {str(k): len(v) for k, v in cluster_env_indices.items()},
+        "n_environments":         len(envs),
+        "train_split_size":       len(splits["train"]),
+        "val_split_size":         len(splits["val"]),
+        "test_split_size":        len(splits["test"]),
     }
     with open(output_dir / "pes_report.json", "w") as f:
         json.dump(report, f, indent=2)
 
     logger.info("\n" + "=" * 60)
     logger.info("Phase 2a Complete.")
-    logger.info(f"  Transition triples : {len(states)}")
-    logger.info(f"  Patient clusters   : 6")
+    logger.info(f"  Transition triples : {len(train_states)}")
+    logger.info(f"  Patient clusters   : {n_clusters}")
     logger.info(f"  Environments built : {len(envs)}")
     logger.info(f"  Outputs saved to   : {output_dir}/")
     logger.info("=" * 60)

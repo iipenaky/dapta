@@ -15,7 +15,7 @@ Usage (in dapta_service.py):
     metrics, _ = self.extract_metrics_from_cha(cha_path)
 """
 
-from __future__ import annotations
+
 import re
 import tempfile
 from datetime import datetime
