@@ -22,19 +22,11 @@ from dapta.utils.config import Config
 
 logger = get_logger(__name__, log_file="logs/run_rl.log")
 
-# Metric names matching the first 5 dims of the discourse block
 METRIC_NAMES = ["ciu_rate", "mc_score", "mlu_morphemes", "mattr", "syntactic_complexity"]
 
-# Surprisal is dim 38 in the full state vector (SLICE_STATIC.start + 2)
 SURPRISAL_DIM = 38
 
-# iTalkBetter clinical benchmark (Upton et al., 2024)
 CLINICAL_THRESHOLD = 0.40
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 def cohens_d_paired(before: np.ndarray, after: np.ndarray) -> float:
     diff = after - before
@@ -81,10 +73,6 @@ def effect_size_label(d: float) -> str:
     return "large"
 
 
-# ---------------------------------------------------------------------------
-# Environment builder
-# ---------------------------------------------------------------------------
-
 def load_environments(
     transition_model: TransitionModel,
     initial_states:   np.ndarray,
@@ -111,11 +99,6 @@ def load_environments(
 
     return cluster_envs
 
-
-# ---------------------------------------------------------------------------
-# Agent factory
-# ---------------------------------------------------------------------------
-
 def make_ddqn_agent(checkpoint_path: str = None) -> DDQNAgent:
     return DDQNAgent(
         state_dim=STATE_DIM,
@@ -133,26 +116,12 @@ def make_ddqn_agent(checkpoint_path: str = None) -> DDQNAgent:
         checkpoint_path=checkpoint_path,
     )
 
-
-# ---------------------------------------------------------------------------
-# Full episode runner — returns per-patient improvement arrays
-# ---------------------------------------------------------------------------
-
 def run_episodes(
     agent,
     envs: List[TherapyEnv],
     is_ddqn: bool = True,
     greedy: bool  = True,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Run one episode per environment.
-
-    Returns
-    -------
-    discourse_improvements : (N, 5)  — first 5 discourse dims
-    surprisal_improvements : (N,)    — surprisal delta per patient
-    total_rewards          : (N,)
-    """
     disc_imps  = []
     surp_imps  = []
     rewards    = []
@@ -183,13 +152,11 @@ def run_episodes(
             state = next_state
             if done:
                 break
-
-        # Discourse improvement — first 5 dims of discourse block
         disc_imp = env.get_cumulative_discourse_improvement()[:5]
         final_surp = float(state[SURPRISAL_DIM])
 
         disc_imps.append(disc_imp)
-        surp_imps.append(initial_surp - final_surp)  # positive = improvement
+        surp_imps.append(initial_surp - final_surp) 
         rewards.append(total_reward)
 
     return (
@@ -198,23 +165,12 @@ def run_episodes(
         np.array(rewards,   dtype=np.float32),
     )
 
-
-# ---------------------------------------------------------------------------
-# RQ2: RL vs rule-based and random baselines
-# ---------------------------------------------------------------------------
-
 def answer_rq2(
     dapta_disc:  np.ndarray,
     rbde_disc:   np.ndarray,
     rts_disc:    np.ndarray,
     alpha:       float = 0.05,
 ) -> dict:
-    """
-    RQ2: Does RL outperform rule-based/random sequencing?
-
-    For each metric, compute Cohen's d and Wilcoxon test
-    (DAPTA vs RBDE, DAPTA vs RTS) with Bonferroni correction.
-    """
     out = {
         "DAPTA_vs_RBDE": {},
         "DAPTA_vs_RTS":  {},
@@ -251,7 +207,6 @@ def answer_rq2(
 
         out[comparison] = entries
 
-    # Summary: how many metrics are clinically meaningful?
     for comp in ["DAPTA_vs_RBDE", "DAPTA_vs_RTS"]:
         n_sig  = sum(1 for v in out[comp].values() if v["significant"])
         n_clin = sum(1 for v in out[comp].values() if v["clinically_meaningful"])
@@ -269,18 +224,8 @@ def answer_rq3(
     rbde_disc:   np.ndarray,
     rbde_surp:   np.ndarray,
 ) -> dict:
-    """
-    RQ3: Do discourse gains transfer to naturalistic connected speech?
-
-    Two tests:
-    1. Does DAPTA produce significantly greater surprisal improvement
-       than RBDE? (direct comparison)
-    2. Within DAPTA patients, does discourse improvement (CIU) correlate
-       with surprisal improvement? (transfer correlation)
-    """
     out = {}
 
-    # Test 1: DAPTA vs RBDE on surprisal improvement
     d_surp   = cohens_d_paired(rbde_surp, dapta_surp)
     stat, p  = wilcoxon_test(dapta_surp, rbde_surp)
     ci_lo, ci_hi = bootstrap_ci(dapta_surp - rbde_surp)
@@ -295,9 +240,7 @@ def answer_rq3(
         "significant":                  bool(p < 0.05),
         "ci_95":                        [round(ci_lo, 4), round(ci_hi, 4)],
     }
-
-    # Test 2: Correlation between CIU improvement and surprisal improvement
-    ciu_imp = dapta_disc[:, 0]  # CIU rate is index 0
+    ciu_imp = dapta_disc[:, 0]
     if len(ciu_imp) >= 5:
         r, p_corr = scipy_stats.pearsonr(ciu_imp, dapta_surp)
         out["discourse_to_surprisal_correlation"] = {
@@ -315,18 +258,11 @@ def answer_rq3(
         out["discourse_to_surprisal_correlation"] = {
             "note": "insufficient data for correlation"
         }
-
-    # RQ3 answered positively if either test shows significant transfer
     surp_sig  = out["surprisal_improvement"]["significant"]
     corr_sig  = out.get("discourse_to_surprisal_correlation", {}).get("significant", False)
     out["rq3_answered_positively"] = bool(surp_sig or corr_sig)
 
     return out
-
-
-# ---------------------------------------------------------------------------
-# RQ4: Patient-specific vs generalised RL
-# ---------------------------------------------------------------------------
 
 def answer_rq4(
     dapta_disc:    np.ndarray,
@@ -337,13 +273,7 @@ def answer_rq4(
     profiles_data:  list,
     alpha:          float = 0.05,
 ) -> dict:
-    """
-    RQ4: Does patient-specific RL beat generalised RL?
-    And what patient factors drive the difference?
-    """
     out = {}
-
-    # --- Pooled comparison: DAPTA vs G-DDQN ---
     p_values = []
     entries  = {}
 
@@ -367,8 +297,6 @@ def answer_rq4(
     for i, metric in enumerate(METRIC_NAMES):
         entries[metric]["p_corrected"] = round(p_corr[i], 4)
         entries[metric]["significant"] = sig[i]
-
-    # Variance reduction: does DAPTA reduce patient-level variability?
     ciu_dapta = dapta_disc[:, 0]
     ciu_gddqn = g_ddqn_disc[:, 0]
     var_reduction = (
@@ -383,7 +311,6 @@ def answer_rq4(
         and any(sig)
     )
 
-    # --- Per-cluster breakdown ---
     unique_clusters = np.unique(cluster_labels)
     per_cluster     = {}
 
@@ -396,8 +323,6 @@ def answer_rq4(
         d_ciu = dapta_disc[mask, 0]
         g_ciu = g_ddqn_disc[mask, 0]
         d_val = cohens_d_paired(g_ciu, d_ciu)
-
-        # Dominant subtype in this cluster
         cluster_profiles = [
             p for p, m in zip(profiles_data, mask) if m
         ]
@@ -417,7 +342,6 @@ def answer_rq4(
 
     out["per_cluster"] = per_cluster
 
-    # --- Patient factor analysis: WAB-AQ moderates personalisation benefit ---
     wab_aqs = np.array([
         float(p.get("wab_aq") or 55.0) for p in profiles_data
     ], dtype=np.float32)
@@ -438,8 +362,6 @@ def answer_rq4(
                 else "WAB-AQ does not significantly moderate personalisation benefit"
             ),
         }
-
-        # Split by severity: low (<50) vs high (>=50) WAB-AQ
         low_mask  = wab_aqs < 50
         high_mask = wab_aqs >= 50
 
@@ -458,16 +380,12 @@ def answer_rq4(
 
     return out
 def run_eval_only(args) -> None:
-    """
-    Load saved agents and compute RQ2-4 results on training environments.
-    Skips all training — agents must already be saved in outputs/rl/.
-    """
+
     from scipy import stats as scipy_stats
 
     output_dir = Path("outputs/rl")
     pes_dir    = Path("outputs/pes")
 
-    # Load environments
     pes_data       = np.load(str(pes_dir / "env_initial_states.npz"), allow_pickle=True)
     initial_states = pes_data["initial_states"]
     cluster_labels = pes_data["cluster_labels"]
@@ -492,7 +410,6 @@ def run_eval_only(args) -> None:
     all_envs   = [env for envs in cluster_envs.values() for env in envs]
     n_clusters = len(cluster_envs)
 
-    # Load saved agents
     from dapta.dae.state_builder import STATE_DIM
     from dapta.prta.action_space import N_ACTIONS
 
@@ -514,7 +431,6 @@ def run_eval_only(args) -> None:
     g_ddqn.eps = 0.0
     logger.info(f"  Loaded G-DDQN from {g_ddqn_ckpt}")
 
-    # Collect per-patient improvements
     SURPRISAL_DIM  = 38
     METRIC_NAMES   = ["ciu_rate", "mc_score", "mlu_morphemes", "mattr", "syntactic_complexity"]
     CLINICAL_THRESHOLD = 0.40
@@ -539,7 +455,6 @@ def run_eval_only(args) -> None:
         surp_imp = initial_surp - float(state[SURPRISAL_DIM])
         return disc_imp, surp_imp
 
-    # DAPTA
     dapta_disc_list, dapta_surp_list, dapta_labels = [], [], []
     for cluster_id, agent in cluster_agents.items():
         for env in cluster_envs[cluster_id]:
@@ -552,7 +467,7 @@ def run_eval_only(args) -> None:
     dapta_surp   = np.array(dapta_surp_list, dtype=np.float32)
     dapta_labels = np.array(dapta_labels, dtype=int)
 
-    # G-DDQN
+
     g_disc_list, g_surp_list = [], []
     for env in all_envs:
         d, s = run_episode(g_ddqn, env)
@@ -561,7 +476,6 @@ def run_eval_only(args) -> None:
     g_ddqn_disc = np.stack(g_disc_list)
     g_ddqn_surp = np.array(g_surp_list, dtype=np.float32)
 
-    # RBDE
     rbde = RuleBasedBaseline()
     rbde_disc_list, rbde_surp_list = [], []
     for env in all_envs:
@@ -578,7 +492,6 @@ def run_eval_only(args) -> None:
     rbde_disc = np.stack(rbde_disc_list)
     rbde_surp = np.array(rbde_surp_list, dtype=np.float32)
 
-    # RTS
     rts = RandomBaseline()
     rts_disc_list, rts_surp_list = [], []
     for env in all_envs:
@@ -594,14 +507,12 @@ def run_eval_only(args) -> None:
     rts_disc = np.stack(rts_disc_list)
     rts_surp = np.array(rts_surp_list, dtype=np.float32)
 
-    # Save improvement arrays
     np.save(str(output_dir / "improvements_DAPTA.npy"),  dapta_disc)
     np.save(str(output_dir / "improvements_G_DDQN.npy"), g_ddqn_disc)
     np.save(str(output_dir / "improvements_RBDE.npy"),   rbde_disc)
     np.save(str(output_dir / "improvements_RTS.npy"),    rts_disc)
     
 
-    # RQ2
     rq2 = {"DAPTA_vs_RBDE": {}, "DAPTA_vs_RTS": {}, "summary": {}}
     for comp, baseline_disc in [("DAPTA_vs_RBDE", rbde_disc), ("DAPTA_vs_RTS", rts_disc)]:
         p_values = []
@@ -634,7 +545,6 @@ def run_eval_only(args) -> None:
     with open(output_dir / "rq2_results.json", "w") as f:
         json.dump(rq2, f, indent=2)
 
-    # RQ3
     d_surp       = cohens_d_paired(rbde_surp, dapta_surp)
     stat, p      = wilcoxon_test(dapta_surp, rbde_surp)
     ci_lo, ci_hi = bootstrap_ci(dapta_surp - rbde_surp)
@@ -660,7 +570,6 @@ def run_eval_only(args) -> None:
     with open(output_dir / "rq3_transfer.json", "w") as f:
         json.dump(rq3, f, indent=2)
 
-    # RQ4
     ciu_dapta = dapta_disc[:, 0]
     ciu_gddqn = g_ddqn_disc[:, 0]
     min_n     = min(len(ciu_dapta), len(ciu_gddqn))
@@ -672,7 +581,6 @@ def run_eval_only(args) -> None:
     ci_lo, ci_hi = bootstrap_ci(ciu_dapta - ciu_gddqn)
     var_red      = (np.var(ciu_gddqn, ddof=1) - np.var(ciu_dapta, ddof=1)) / max(np.var(ciu_gddqn, ddof=1), 1e-8) * 100
 
-    # Per-cluster
     per_cluster = {}
     for c in np.unique(dapta_labels):
         mask      = dapta_labels == c
@@ -720,7 +628,6 @@ def run_eval_only(args) -> None:
     with open(output_dir / "rq4_personalisation.json", "w") as f:
         json.dump(rq4, f, indent=2)
 
-    # Save cluster_performance.json for rq4_aphasia_only.py
     Path("outputs/evaluation").mkdir(parents=True, exist_ok=True)
     with open("outputs/evaluation/cluster_performance.json", "w") as f:
         json.dump(per_cluster, f, indent=2)
@@ -739,10 +646,6 @@ def run_eval_only(args) -> None:
     print(f"RQ4: Personalisation beneficial — {rq4['personalisation_beneficial']}")
     print("=" * 60)
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
 def main(args) -> None:
     cfg        = Config.load()
     output_dir = Path("outputs/rl")
@@ -755,8 +658,6 @@ def main(args) -> None:
     logger.info("DAPTA Phase 2b: RL Agent Training")
     logger.info("=" * 60)
 
-
-    # 1. Load PES outputs
 
     logger.info("\n[1/5] Loading PES outputs...")
     pes_dir = Path("outputs/pes")
@@ -772,7 +673,6 @@ def main(args) -> None:
     with open(pes_dir / "cluster_assignments.json") as f:
         cluster_info = json.load(f)
 
-    # Load patient profiles for RQ4 factor analysis
     with open("outputs/dae/patient_profiles.json") as f:
         profiles_data = json.load(f)
 
@@ -786,7 +686,6 @@ def main(args) -> None:
     logger.info("Transition model loaded.")
 
 
-    # 2. Build environments
 
     logger.info("\n[2/5] Building environments per cluster...")
     cluster_envs = load_environments(
@@ -798,9 +697,6 @@ def main(args) -> None:
     all_envs   = [env for envs in cluster_envs.values() for env in envs]
     n_clusters = len(cluster_envs)
     logger.info(f"Total environments: {len(all_envs)}, clusters: {n_clusters}")
-
-
-    # 3. Train patient-specific DDQN per cluster
 
     logger.info(f"\n[3/5] Training patient-specific DDQN agents ({args.total_steps} steps each)...")
     training_logs  = {}
@@ -829,9 +725,6 @@ def main(args) -> None:
         training_logs[f"ddqn_cluster_{cluster_id}"] = logs
         logger.info(f"  Cluster {cluster_id} agent saved to {ckpt}")
 
-
-    # 4. Train G-DDQN (generalised)
-
     logger.info(f"\n  Training G-DDQN on all {len(all_envs)} environments...")
     g_ddqn_ckpt = str(output_dir / "ddqn_generalised.pt")
     g_ddqn      = make_ddqn_agent(checkpoint_path=g_ddqn_ckpt)
@@ -847,8 +740,6 @@ def main(args) -> None:
     training_logs["ddqn_generalised"] = g_logs
     logger.info(f"  G-DDQN saved to {g_ddqn_ckpt}")
 
-
-    # 5. Train PPO
 
     if all_envs and not args.skip_ppo:
         logger.info(f"\n  Training PPO...")
@@ -866,11 +757,10 @@ def main(args) -> None:
         logger.info("  Skipping PPO.")
 
 
-    # 6. Collect per-patient improvement arrays for all agents
 
     logger.info("\n[4/5] Collecting per-patient improvement arrays...")
 
-    # DAPTA: run each cluster's specialist agent on its own patients
+
     dapta_disc_list = []
     dapta_surp_list = []
     dapta_label_list = []
@@ -879,7 +769,7 @@ def main(args) -> None:
         envs = cluster_envs[cluster_id]
         if not envs:
             continue
-        agent.eps = 0.0  # greedy
+        agent.eps = 0.0  
         disc, surp, _ = run_episodes(agent, envs, is_ddqn=True, greedy=True)
         dapta_disc_list.append(disc)
         dapta_surp_list.append(surp)
@@ -889,11 +779,9 @@ def main(args) -> None:
     dapta_surp   = np.concatenate(dapta_surp_list,  axis=0) if dapta_surp_list  else np.zeros(0)
     dapta_labels = np.array(dapta_label_list, dtype=int)
 
-    # G-DDQN: run on all environments
-    g_ddqn.eps = 0.0  # greedy — fixed attribute name
+    g_ddqn.eps = 0.0  
     g_ddqn_disc, g_ddqn_surp, _ = run_episodes(g_ddqn, all_envs, is_ddqn=True, greedy=True)
 
-    # RBDE baseline
     rbde = RuleBasedBaseline()
     rbde_disc_list, rbde_surp_list = [], []
     for env in all_envs:
@@ -914,7 +802,6 @@ def main(args) -> None:
     rbde_disc = np.stack(rbde_disc_list)
     rbde_surp = np.array(rbde_surp_list, dtype=np.float32)
 
-    # RTS baseline
     rts = RandomBaseline()
     rts_disc_list, rts_surp_list = [], []
     for env in all_envs:
@@ -932,18 +819,14 @@ def main(args) -> None:
     rts_disc = np.stack(rts_disc_list)
     rts_surp = np.array(rts_surp_list, dtype=np.float32)
 
-    # Save improvement arrays for run_evaluation.py and rq4_aphasia_only.py
     np.save(str(output_dir / "improvements_DAPTA.npy"),  dapta_disc)
     np.save(str(output_dir / "improvements_G_DDQN.npy"), g_ddqn_disc)
     np.save(str(output_dir / "improvements_RBDE.npy"),   rbde_disc)
     np.save(str(output_dir / "improvements_RTS.npy"),    rts_disc)
 
 
-    # 7. Answer RQ2, RQ3, RQ4
-
     logger.info("\n[5/5] Computing RQ2 / RQ3 / RQ4 statistics...")
 
-    # RQ2
     rq2 = answer_rq2(dapta_disc, rbde_disc, rts_disc)
     with open(output_dir / "rq2_results.json", "w") as f:
         json.dump(rq2, f, indent=2)
@@ -954,7 +837,6 @@ def main(args) -> None:
         f"Answered positively: {rq2['summary']['DAPTA_vs_RBDE']['rq2_answered_positively']}"
     )
 
-    # RQ3
     rq3 = answer_rq3(dapta_disc, dapta_surp, rbde_disc, rbde_surp)
     with open(output_dir / "rq3_transfer.json", "w") as f:
         json.dump(rq3, f, indent=2)
@@ -1041,9 +923,6 @@ def main(args) -> None:
 
     with open(output_dir / "results_table.json", "w") as f:
         json.dump(results_table, f, indent=2, default=str)
-
-
-    # Print summary
 
     print("\n" + "=" * 70)
     print("DAPTA PHASE 2b — RQ SUMMARY")

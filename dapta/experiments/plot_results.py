@@ -138,9 +138,9 @@ def plot_mean_improvement(results: dict, out_dir: Path) -> None:
     print(f"  Saved: {path}")
 
 
-# ---------------------------------------------------------------------------
+
 # Figure 2: Cohen's d heatmap
-# ---------------------------------------------------------------------------
+
 
 def plot_cohens_d_heatmap(results: dict, out_dir: Path) -> None:
     rq2 = results["rq2"]
@@ -339,9 +339,9 @@ def plot_rq3(results: dict, out_dir: Path) -> None:
     print(f"  Saved: {path}")
 
 
-# ---------------------------------------------------------------------------
+
 # Figure 5: RQ4 personalisation
-# ---------------------------------------------------------------------------
+
 
 def plot_rq4(results: dict, out_dir: Path) -> None:
     rq4 = results.get("rq4", {})
@@ -421,9 +421,7 @@ def plot_rq4(results: dict, out_dir: Path) -> None:
     print(f"  Saved: {path}")
 
 
-# ---------------------------------------------------------------------------
-# Figure 6: Subtype moderation
-# ---------------------------------------------------------------------------
+
 
 def plot_subtype(subtype_data: dict, out_dir: Path) -> None:
     per_subtype = subtype_data.get("per_subtype", {})
@@ -499,7 +497,6 @@ def plot_subtype(subtype_data: dict, out_dir: Path) -> None:
     print(f"  Saved: {path}")
 
 def plot_ppo_comparison(results: dict, ppo_disc: np.ndarray, out_dir: Path) -> None:
-    """Figure 7 — PPO vs DAPTA and RBDE comparison."""
     if ppo_disc is None:
         print("  Skipping fig7 — improvements_PPO.npy not found.")
         return
@@ -519,7 +516,6 @@ def plot_ppo_comparison(results: dict, ppo_disc: np.ndarray, out_dir: Path) -> N
     ax.bar(x,       ppo_means,   w, color=COLOURS["PPO"],    label="PPO",    alpha=0.88, zorder=3)
     ax.bar(x + w,   rbde_means,  w, color=COLOURS["RBDE"],   label="RBDE",   alpha=0.88, zorder=3)
 
-    # Cohen's d annotations: DAPTA vs PPO
     for i in range(len(METRICS)):
         dapta_arr = np.array([rq2["DAPTA_vs_RBDE"][m]["dapta_mean"] for m in METRICS])
         diff = ppo_disc[:, i] - dapta_arr[i]
@@ -548,7 +544,6 @@ def plot_ppo_comparison(results: dict, ppo_disc: np.ndarray, out_dir: Path) -> N
     print(f"  Saved: {path}")
 
 def plot_rq4_aphasia_only(eval_dir: Path, out_dir: Path) -> None:
-    """Figure 8 — RQ4 aphasia-only reanalysis."""
     path = eval_dir / "rq4_aphasia_only_results.json"
     if not path.exists():
         print("  Skipping fig8 — rq4_aphasia_only_results.json not found.")

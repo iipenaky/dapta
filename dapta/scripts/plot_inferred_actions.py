@@ -1,28 +1,3 @@
-"""
-experiments/plot_inferred_actions.py
--------------------------------------
-Generates a heatmap showing which therapy action is most aligned with
-each aphasia subtype's deficit profile.
-
-Rows    : Aphasia subtypes (Broca, Wernicke, Anomic, Conduction, Global, Other)
-Columns : Therapy actions  (SFA, SVO, CILT, Script Training, Phonological Cue)
-Values  : Proportion of patients in each subtype assigned each therapy
-
-State vector layout (from state_builder.py):
-  [0:25]  Discourse block — 5 metrics × 5 tasks
-          per task: [ciu_rate, mc_score, mlu_morphemes, syn_comp, mattr]
-          cookie_theft[0:5], cinderella[5:10], sandwich[10:15],
-          stroke_narrative[15:20], conversation[20:25]
-  [25:30] Task presence flags
-  [30:36] Aphasia subtype one-hot: Broca/Wernicke/Anomic/Conduction/Global/Other
-  [36:40] Static: wab_aq, wab_aq_known, mean_surprisal, log_session_num
-  [40:47] Signal: maze_rate, utt_length_std×5, mean_pause_ms
-
-Usage:
-    python experiments/plot_inferred_actions.py
-    python experiments/plot_inferred_actions.py --dae_dir outputs/dae --out_dir outputs/figures
-"""
-
 import argparse
 import json
 from collections import defaultdict
@@ -45,10 +20,6 @@ matplotlib.rcParams.update({
     "savefig.facecolor": "white",
 })
 
-# ---------------------------------------------------------------------------
-# State vector constants (mirrors state_builder.py)
-# ---------------------------------------------------------------------------
-
 METRICS        = ["ciu_rate", "mc_score", "mlu_morphemes", "syn_comp", "mattr"]
 METRIC_LABELS  = ["CIU Rate", "MC Score", "MLU-m", "Syn. Comp.", "MATTR"]
 N_METRICS      = 5
@@ -63,15 +34,6 @@ NON_APHASIA = {
     "not_aphasic", "healthy",
 }
 
-# ---------------------------------------------------------------------------
-# Therapy prior vectors — shape (5,) matching METRICS order
-# [ciu_rate, mc_score, mlu_morphemes, syn_comp, mattr]
-#
-# Values represent the expected *improvement* direction for each metric.
-# Higher = this therapy strongly targets that metric.
-# Based on Section 3.5.3 priors.
-# ---------------------------------------------------------------------------
-
 THERAPY_PRIORS = {
     "SFA\n(Naming)":      [0.8, 0.1, 0.1, 0.0, 0.2],  # CIU primary
     "SVO\n(Syntax)":      [0.0, 0.0, 0.5, 0.9, 0.0],  # SynComp primary, MLU secondary
@@ -83,23 +45,7 @@ THERAPY_PRIORS = {
 THERAPY_NAMES = list(THERAPY_PRIORS.keys())
 PRIOR_MATRIX  = np.array(list(THERAPY_PRIORS.values()), dtype=np.float32)  # (5, 5)
 
-
-# ---------------------------------------------------------------------------
-# Feature extraction
-# ---------------------------------------------------------------------------
-
 def extract_discourse_means(state_vectors: np.ndarray) -> np.ndarray:
-    """
-    Extract mean per discourse metric across all tasks.
-
-    Parameters
-    ----------
-    state_vectors : (N, 47)
-
-    Returns
-    -------
-    (N, 5) — one mean value per metric [ciu, mc, mlu, syn, mattr]
-    """
     N          = state_vectors.shape[0]
     disc_means = np.zeros((N, N_METRICS), dtype=np.float32)
 
@@ -118,23 +64,8 @@ def get_subtype_from_vector(state_vector: np.ndarray) -> str:
     return SUBTYPES[idx]
 
 
-# ---------------------------------------------------------------------------
-# Action inference
-# ---------------------------------------------------------------------------
 
 def infer_best_therapy(deficit_vector: np.ndarray) -> str:
-    """
-    Given a patient's deficit vector (1 - metric_means),
-    find the therapy whose prior is most cosine-similar to the deficit.
-
-    Parameters
-    ----------
-    deficit_vector : (5,) — values in [0, 1], higher = bigger deficit
-
-    Returns
-    -------
-    Name of the best-matching therapy
-    """
     # Clip to avoid negative values confusing cosine similarity
     deficit = np.clip(deficit_vector, 0.0, 1.0).reshape(1, -1)
 
@@ -144,10 +75,6 @@ def infer_best_therapy(deficit_vector: np.ndarray) -> str:
     sims = cosine_similarity(deficit, PRIOR_MATRIX)[0]  # (5,)
     return THERAPY_NAMES[int(np.argmax(sims))]
 
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main(dae_dir: Path, out_dir: Path):
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -175,8 +102,6 @@ def main(dae_dir: Path, out_dir: Path):
 
     print(f"Unique patients: {len(patient_sessions)}")
 
-    # 4. Build per-patient feature rows
-    #    We also need subtype — read from profile or state vector one-hot
     profiles_by_pid: dict = {}
     for profile in all_profiles:
         pid = re.sub(r'\d+[a-z]?$', '', str(profile.get("participant_id", "")).lower())
@@ -220,9 +145,6 @@ def main(dae_dir: Path, out_dir: Path):
     if len(rows) == 0:
         print("[ERROR] No aphasia patients found. Check dae_dir path.")
         return
-
-    # 5. Build heatmap matrix: rows=subtypes, cols=therapies
-    #    Values = proportion of patients in each subtype assigned each therapy
     count_matrix = np.zeros((len(SUBTYPES), len(THERAPY_NAMES)), dtype=np.float32)
 
     for row in rows:
