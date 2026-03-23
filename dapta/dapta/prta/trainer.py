@@ -119,7 +119,7 @@ def evaluate_agent(
 
         all_rewards.append(total_reward)
         improvement = env.get_cumulative_discourse_improvement()
-        all_ciu_improvements.append(float(improvement[0]))  
+        all_ciu_improvements.append(float(np.mean(improvement[:5])))  
 
     return float(np.mean(all_rewards)), float(np.mean(all_ciu_improvements))
 

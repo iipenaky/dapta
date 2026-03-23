@@ -12,7 +12,7 @@ try:
 except ImportError:
     _TORCH = False
 
-from dapta.dae.state_builder import STATE_DIM
+from dapta.dae.state_builder import STATE_DIM, N_METRICS_PER_TASK, N_TASKS
 from dapta.prta.action_space import N_ACTIONS
 from dapta.utils.logger import get_logger
 
@@ -33,6 +33,7 @@ PRIOR_EFFECT_SIZES: Dict[int, float] = {
     11: 0.09,
 }
 
+# Indices within each task's metric block
 _CIU_DIM = 0
 _MC_DIM  = 1
 
@@ -48,29 +49,32 @@ class TransitionMLP(nn.Module):
     ):
         super().__init__()
         input_dim = state_dim + n_actions
-        layers = []
-        in_dim = input_dim
+        layers    = []
+        in_dim    = input_dim
         for h in hidden_sizes:
             layers += [nn.Linear(in_dim, h), nn.ReLU(), nn.Dropout(dropout)]
-            in_dim = h
+            in_dim  = h
         layers.append(nn.Linear(in_dim, state_dim))
         self.net = nn.Sequential(*layers)
 
-    def forward(self, state: "torch.Tensor", action_ohe: "torch.Tensor") -> "torch.Tensor":
+    def forward(
+        self,
+        state:      "torch.Tensor",
+        action_ohe: "torch.Tensor",
+    ) -> "torch.Tensor":
         x = torch.cat([state, action_ohe], dim=-1)
         return self.net(x)
-
 
 
 class TransitionModel:
 
     def __init__(
         self,
-        hidden_sizes:    List[int]       = (256, 128),
-        dropout:         float           = 0.2,
-        mc_samples:      int             = 50,
-        device:          Optional[str]   = None,
-        checkpoint_path: Optional[str]   = None,
+        hidden_sizes:    List[int]     = (256, 128),
+        dropout:         float         = 0.2,
+        mc_samples:      int           = 50,
+        device:          Optional[str] = None,
+        checkpoint_path: Optional[str] = None,
     ):
         if not _TORCH:
             raise ImportError("PyTorch is required for TransitionModel.")
@@ -84,17 +88,17 @@ class TransitionModel:
         self._model:         Optional[TransitionMLP] = None
         self._fitted         = False
 
-
+    # ------------------------------------------------------------------
     def tune(
         self,
         states:      np.ndarray,
         actions:     np.ndarray,
         next_states: np.ndarray,
-        n_trials:    int   = 30,
-        val_split:   float = 0.15,
-        num_epochs:  int   = 50,
-        batch_size:  int   = 32,
-        timeout:     Optional[int] = None,
+        n_trials:    int            = 30,
+        val_split:   float          = 0.15,
+        num_epochs:  int            = 50,
+        batch_size:  int            = 32,
+        timeout:     Optional[int]  = None,
     ) -> Dict:
         try:
             import optuna
@@ -109,9 +113,9 @@ class TransitionModel:
         action_ohe = np.eye(N_ACTIONS, dtype=np.float32)[actions]
         split      = int(len(states) * (1 - val_split))
 
-        tr_s = torch.tensor(states[:split]).float()
-        tr_a = torch.tensor(action_ohe[:split]).float()
-        tr_d = torch.tensor(deltas[:split]).float()
+        tr_s  = torch.tensor(states[:split]).float()
+        tr_a  = torch.tensor(action_ohe[:split]).float()
+        tr_d  = torch.tensor(deltas[:split]).float()
         val_s = torch.tensor(states[split:]).float().to(self.device)
         val_a = torch.tensor(action_ohe[split:]).float().to(self.device)
         val_d = torch.tensor(deltas[split:]).float().to(self.device)
@@ -131,16 +135,18 @@ class TransitionModel:
 
         def objective(trial):
             hs  = list(hidden_choices[
-                trial.suggest_categorical("hidden_idx", list(range(len(hidden_choices))))
+                trial.suggest_categorical(
+                    "hidden_idx", list(range(len(hidden_choices)))
+                )
             ])
             dr  = trial.suggest_float("dropout",       0.1,  0.4)
             lr  = trial.suggest_float("learning_rate", 1e-4, 1e-2, log=True)
 
             model = TransitionMLP(
-                state_dim=STATE_DIM,
-                n_actions=N_ACTIONS,
-                hidden_sizes=hs,
-                dropout=dr,
+                state_dim    = STATE_DIM,
+                n_actions    = N_ACTIONS,
+                hidden_sizes = hs,
+                dropout      = dr,
             ).to(self.device)
 
             opt     = optim.Adam(model.parameters(), lr=lr)
@@ -165,9 +171,9 @@ class TransitionModel:
 
         best = study.best_params
         self.best_params = {
-            "hidden_sizes":    list(hidden_choices[best["hidden_idx"]]),
-            "dropout":         best["dropout"],
-            "learning_rate":   best["learning_rate"],
+            "hidden_sizes":  list(hidden_choices[best["hidden_idx"]]),
+            "dropout":       best["dropout"],
+            "learning_rate": best["learning_rate"],
         }
         self.hidden_sizes = self.best_params["hidden_sizes"]
         self.dropout      = self.best_params["dropout"]
@@ -178,6 +184,7 @@ class TransitionModel:
         )
         return self.best_params
 
+    # ------------------------------------------------------------------
     def fit(
         self,
         states:                  np.ndarray,
@@ -189,11 +196,11 @@ class TransitionModel:
         num_epochs:              int   = 200,
         early_stopping_patience: int   = 20,
     ) -> "TransitionModel":
-  
+
         if self.best_params:
-            learning_rate    = self.best_params.get("learning_rate", learning_rate)
+            learning_rate     = self.best_params.get("learning_rate", learning_rate)
             self.hidden_sizes = self.best_params.get("hidden_sizes",  self.hidden_sizes)
-            self.dropout      = self.best_params.get("dropout",        self.dropout)
+            self.dropout      = self.best_params.get("dropout",       self.dropout)
 
         N = len(states)
         assert len(actions) == N and len(next_states) == N, "Mismatched input lengths."
@@ -216,10 +223,10 @@ class TransitionModel:
         )
 
         self._model = TransitionMLP(
-            state_dim=STATE_DIM,
-            n_actions=N_ACTIONS,
-            hidden_sizes=self.hidden_sizes,
-            dropout=self.dropout,
+            state_dim    = STATE_DIM,
+            n_actions    = N_ACTIONS,
+            hidden_sizes = self.hidden_sizes,
+            dropout      = self.dropout,
         ).to(self.device)
 
         optimizer = optim.Adam(self._model.parameters(), lr=learning_rate)
@@ -259,6 +266,7 @@ class TransitionModel:
         logger.info(f"TransitionModel trained. Best val loss: {best_val_loss:.6f}")
         return self
 
+    # ------------------------------------------------------------------
     def predict_next_state(
         self,
         state:     np.ndarray,
@@ -277,8 +285,14 @@ class TransitionModel:
         with torch.no_grad():
             delta = self._model(s_t, a_ohe).cpu().numpy()[0]
 
+        # FIX 1: clip delta to prevent unrealistic state jumps.
+        # Without this the model can produce large deltas that send the
+        # state vector to 0 or 1 in a single step, destabilising RL training.
+        delta = np.clip(delta, -0.1, 0.1)
+
         return np.clip(state + delta, 0.0, 1.0).astype(np.float32)
 
+    # ------------------------------------------------------------------
     def predict_with_uncertainty(
         self,
         state:  np.ndarray,
@@ -288,7 +302,7 @@ class TransitionModel:
             pred = self.prior_predict(state, action)
             return pred, np.zeros_like(pred)
 
-        self._model.train()  
+        self._model.train()   # dropout active for MC sampling
         s_t   = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(self.device)
         a_ohe = torch.tensor(
             np.eye(N_ACTIONS, dtype=np.float32)[action]
@@ -298,6 +312,7 @@ class TransitionModel:
         with torch.no_grad():
             for _ in range(self.mc_samples):
                 delta = self._model(s_t, a_ohe).cpu().numpy()[0]
+                delta = np.clip(delta, -0.1, 0.1)   # same clip as predict_next_state
                 samples.append(np.clip(state + delta, 0.0, 1.0))
 
         self._model.eval()
@@ -307,13 +322,31 @@ class TransitionModel:
             samples.std(axis=0).astype(np.float32),
         )
 
+    # ------------------------------------------------------------------
     def prior_predict(self, state: np.ndarray, action: int) -> np.ndarray:
+        """
+        FIX 2: apply prior effect across ALL task slots, not just the
+        first two dimensions.
+
+        The old version wrote to delta[_CIU_DIM] and delta[_MC_DIM] which
+        are absolute indices 0 and 1 — i.e. only the cookie_theft task slot.
+        The reward function averages over all tasks with presence flags = 1,
+        so a prior that only nudges one task's metrics produces a near-zero
+        reward signal, making prior-based transitions useless for RL training.
+        """
         effect = PRIOR_EFFECT_SIZES.get(action, 0.03)
         delta  = np.zeros(STATE_DIM, dtype=np.float32)
-        delta[_CIU_DIM] = effect       + np.random.normal(0, 0.01)
-        delta[_MC_DIM]  = effect * 0.6 + np.random.normal(0, 0.005)
+
+        for t in range(N_TASKS):
+            base = t * N_METRICS_PER_TASK
+            delta[base + _CIU_DIM] = effect        + np.random.normal(0, 0.01)
+            delta[base + _MC_DIM]  = effect * 0.6  + np.random.normal(0, 0.005)
+
+        # clip consistent with predict_next_state
+        delta = np.clip(delta, -0.1, 0.1)
         return np.clip(state + delta, 0.0, 1.0).astype(np.float32)
 
+    # ------------------------------------------------------------------
     def save(self) -> None:
         if not self.checkpoint_path:
             raise ValueError("No checkpoint_path set.")
@@ -325,10 +358,10 @@ class TransitionModel:
         if not self.checkpoint_path or not self.checkpoint_path.exists():
             raise FileNotFoundError(f"No checkpoint at {self.checkpoint_path}")
         self._model = TransitionMLP(
-            state_dim=STATE_DIM,
-            n_actions=N_ACTIONS,
-            hidden_sizes=self.hidden_sizes,
-            dropout=self.dropout,
+            state_dim    = STATE_DIM,
+            n_actions    = N_ACTIONS,
+            hidden_sizes = self.hidden_sizes,
+            dropout      = self.dropout,
         ).to(self.device)
         self._model.load_state_dict(
             torch.load(str(self.checkpoint_path), map_location=self.device)

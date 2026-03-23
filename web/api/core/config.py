@@ -50,6 +50,9 @@ class Settings(BaseSettings):
     # ── DAPTA ─────────────────────────────────────────────────────────────────
     dapta_path: Path = Path(__file__).resolve().parents[3] / "dapta"
     dapta_models_path: Path = Path(__file__).resolve().parents[3] / "models"
+    wab_aq_mild_threshold: float = 75.0
+    no_gru_g_ddqn_checkpoint: str = "no_gru_ddqn_generalised.pt"
+    ppo_personalised_checkpoint: str = "ppo_personalised"
 
     # ── Runtime ────────────────────────────────────────────────────────────────
     environment: str = "development"

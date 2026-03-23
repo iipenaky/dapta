@@ -33,6 +33,8 @@ class DAPTAService:
         self._chat_parser = None
         self._state_builder = None
         self._agent = None
+        self._agent_no_gru = None
+        self._ppo_personalised = None
         self._explainer = None
         self._whisper = None
 
@@ -67,6 +69,24 @@ class DAPTAService:
                 logger.info("  ✓ DDQN agent loaded")
         except Exception as e:
             logger.warning("  ✗ DDQN agent not loaded: %s", e)
+
+        try:
+            from dapta.prta.ddqn_agent import DDQNAgent
+            no_gru_path = models / settings.no_gru_g_ddqn_checkpoint
+            if no_gru_path.exists():
+                self._agent_no_gru = DDQNAgent(checkpoint_path=no_gru_path, use_gru=False).load()
+                logger.info("  ✓ NO_GRU_G_DDQN agent loaded")
+        except Exception as e:
+            logger.warning("  ✗ NO_GRU_G_DDQN agent not loaded: %s", e)
+
+        try:
+            from stable_baselines3 import PPO
+            ppo_path = models / settings.ppo_personalised_checkpoint
+            if (ppo_path.with_suffix(".zip")).exists() or ppo_path.exists():
+                self._ppo_personalised = PPO.load(str(ppo_path))
+                logger.info("  ✓ PPO_PERSONALISED agent loaded")
+        except Exception as e:
+            logger.warning("  ✗ PPO_PERSONALISED agent not loaded: %s", e)
 
         try:
             from dapta.prta.explainer import DAPTAExplainer
@@ -170,7 +190,7 @@ class DAPTAService:
         Run the DDQN agent and explainer to produce a recommendation.
         Falls back to the rule-based baseline if agent not loaded.
         """
-        if self._agent is None or self._state_builder is None:
+        if self._state_builder is None:
             return self._mock_recommendation()
 
         try:
@@ -196,16 +216,40 @@ class DAPTAService:
             surprisal = metrics.get("mean_surprisal", 3.0) or 3.0
             state = self._state_builder.build(dm, surprisal, profile)
             history = np.zeros((10, state.shape[0] + 1), dtype=np.float32)
-            action_id = self._agent.select_action(state, history, greedy=True)
+            model_name, action_id = self._select_action_by_phase(
+                wab_aq=profile.wab_aq,
+                state=state,
+                history=history,
+            )
+            if action_id is None:
+                return self._mock_recommendation()
             exercise = get_exercise(action_id)
 
-            explanation = {"plain_explanation": f"Based on your speech profile, {exercise.name.replace('_', ' ')} is recommended to target your current areas for improvement.", "primary_reason": "discourse_metrics"}
+            explanation = {
+                "plain_explanation": (
+                    f"Based on your speech profile, {exercise.name.replace('_', ' ')} is "
+                    f"recommended to target your current areas for improvement."
+                ),
+                "primary_reason": f"discourse_metrics:{model_name}",
+            }
             if self._explainer:
                 try:
                     exp = self._explainer.explain(state[:6], action_id, profile.aphasia_subtype)
-                    explanation = exp
+                    if isinstance(exp, dict):
+                        exp.setdefault("primary_reason", f"discourse_metrics:{model_name}")
+                        plain = exp.get("plain_explanation", "")
+                        if plain:
+                            exp["plain_explanation"] = f"{plain} (Model: {model_name})"
+                        else:
+                            exp["plain_explanation"] = f"Model selected: {model_name}."
+                        explanation = exp
                 except Exception:
                     pass
+
+            if "(Model:" not in explanation.get("plain_explanation", ""):
+                explanation["plain_explanation"] = (
+                    f"{explanation.get('plain_explanation', '').strip()} (Model: {model_name})"
+                ).strip()
 
             confidence = "High" if exercise.generalisation_potential > 0.7 else "Moderate"
 
@@ -223,6 +267,30 @@ class DAPTAService:
         except Exception as e:
             logger.error("Recommendation failed: %s", e)
             return self._mock_recommendation()
+
+    def _select_action_by_phase(
+        self, wab_aq: float, state: np.ndarray, history: np.ndarray
+    ) -> tuple[str, Optional[int]]:
+        """
+        Phase-based model policy:
+        - Initial phase (severe/moderate): NO_GRU_G_DDQN
+        - Maintenance/advanced phase (mild): PPO_PERSONALISED
+
+        Falls back to DDQN if a preferred model is unavailable.
+        """
+        if wab_aq >= settings.wab_aq_mild_threshold and self._ppo_personalised is not None:
+            action, _ = self._ppo_personalised.predict(state, deterministic=True)
+            return "PPO_PERSONALISED", int(action)
+
+        if self._agent_no_gru is not None:
+            action_id = self._agent_no_gru.select_action(state, history, greedy=True)
+            return "NO_GRU_G_DDQN", int(action_id)
+
+        if self._agent is not None:
+            action_id = self._agent.select_action(state, history, greedy=True)
+            return "DDQN_GENERALISED_FALLBACK", int(action_id)
+
+        return "NO_MODEL_AVAILABLE", None
 
     def compute_feedback(self, metrics_before: dict, metrics_after: dict) -> dict:
         """Generate session feedback from pre/post metric comparison."""

@@ -13,21 +13,22 @@ _spacy_nlp  = None
 
 
 def get_stanza():
-    global _stanza_nlp
-    if _stanza_nlp is None:
-        try:
-            import stanza
-            _stanza_nlp = stanza.Pipeline(
-                "en",
-                processors    = "tokenize,mwt,pos,lemma,depparse",
-                verbose       = False,
-                download_method = None,
-            )
-            logger.info("Stanza pipeline loaded (cached).")
-        except Exception as e:
-            logger.warning(f"Stanza unavailable: {e}")
-            _stanza_nlp = False
-    return _stanza_nlp if _stanza_nlp else None
+    # global _stanza_nlp
+    # if _stanza_nlp is None:
+    #     try:
+    #         import stanza
+    #         _stanza_nlp = stanza.Pipeline(
+    #             "en",
+    #             processors    = "tokenize,mwt,pos,lemma,depparse",
+    #             verbose       = False,
+    #             download_method = None,
+    #         )
+    #         logger.info("Stanza pipeline loaded (cached).")
+    #     except Exception as e:
+    #         logger.warning(f"Stanza unavailable: {e}")
+    #         _stanza_nlp = False
+    # return _stanza_nlp if _stanza_nlp else None
+    return None  # Stanza is currently disabled due to loading time and memory usage
 
 
 def get_spacy():
