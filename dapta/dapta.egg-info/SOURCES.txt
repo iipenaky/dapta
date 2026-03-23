@@ -23,9 +23,4 @@ dapta/prta/trainer.py
 dapta/utils/__init__.py
 dapta/utils/config.py
 dapta/utils/logger.py
-dapta/utils/metrics_eval.py
 dapta/utils/reward.py
-tests/__init__.py
-tests/test_metrics.py
-tests/test_reward_and_env.py
-tests/test_state_builder.py

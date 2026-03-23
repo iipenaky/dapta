@@ -66,8 +66,8 @@ RCT_PRIORS = np.array([
 
 def build_transition_triples_from_longitudinal(
     state_vectors: np.ndarray,
-    session_ids: np.ndarray,
-    longitudinal: Dict[str, List[str]],
+    session_ids:   np.ndarray,
+    longitudinal:  Dict[str, List[str]],
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Build (s, a, s') triples from participants with 2+ sessions.
@@ -150,6 +150,7 @@ def augment_with_priors(
         idx = rng.integers(0, len(all_initial_states))
         s = all_initial_states[idx].copy()
 
+<<<<<<< Updated upstream
         # Sample a random action
         a = rng.integers(0, N_ACTIONS)
 
@@ -157,6 +158,11 @@ def augment_with_priors(
         delta = np.zeros(14, dtype=np.float32)
         delta[:6] = RCT_PRIORS[a] + rng.normal(0, noise_std, 6)
         ns = np.clip(s + delta, 0.0, 1.0)
+=======
+        delta        = np.zeros(STATE_DIM, dtype=np.float32)
+        delta[:6]    = RCT_PRIORS[a] + rng.normal(0, noise_std, 6)
+        ns           = np.clip(s + delta, 0.0, 1.0)
+>>>>>>> Stashed changes
 
         aug_states.append(s)
         aug_actions.append(a)
@@ -189,9 +195,13 @@ def main(args) -> None:
     logger.info("DAPTA Phase 2a: Patient Environment Simulator")
     logger.info("=" * 60)
 
+<<<<<<< Updated upstream
     # ------------------------------------------------------------------
     # Load DAE outputs
     # ------------------------------------------------------------------
+=======
+    # ── 1. Load DAE outputs ──────────────────────────────────────
+>>>>>>> Stashed changes
     logger.info("\n[1/5] Loading DAE outputs...")
     dae_dir = Path("outputs/dae")
 
@@ -214,7 +224,11 @@ def main(args) -> None:
 
     logger.info(f"Loaded {len(state_vectors)} state vectors, {len(longitudinal)} longitudinal patients")
 
+<<<<<<< Updated upstream
     # Build PatientProfile objects
+=======
+    # Build PatientProfile objects (subtypes normalised by state_builder)
+>>>>>>> Stashed changes
     profiles = [
         PatientProfile(
             participant_id=p["participant_id"],
@@ -225,9 +239,13 @@ def main(args) -> None:
         for p in profiles_data
     ]
 
+<<<<<<< Updated upstream
     # ------------------------------------------------------------------
     # Build transition triples
     # ------------------------------------------------------------------
+=======
+    # ── 2. Build transition triples ──────────────────────────────
+>>>>>>> Stashed changes
     logger.info("\n[2/5] Building transition triples from longitudinal data...")
     states, actions, next_states = build_transition_triples_from_longitudinal(
         state_vectors, session_ids, longitudinal
@@ -240,9 +258,13 @@ def main(args) -> None:
         n_augment=args.n_augment,
     )
 
+<<<<<<< Updated upstream
     # ------------------------------------------------------------------
     # Train transition model
     # ------------------------------------------------------------------
+=======
+    # ── 3. Train transition model ────────────────────────────────
+>>>>>>> Stashed changes
     logger.info("\n[3/5] Training transition model (MLP + MC Dropout)...")
     transition_model = TransitionModel(
         hidden_sizes=(128, 64),
@@ -262,9 +284,9 @@ def main(args) -> None:
         num_epochs=args.epochs,
         early_stopping_patience=15,
     )
-
     logger.info("Transition model trained.")
 
+<<<<<<< Updated upstream
     # ------------------------------------------------------------------
     # Cluster patients
     # ------------------------------------------------------------------
@@ -272,6 +294,79 @@ def main(args) -> None:
     clusterer = PatientClusterer(n_clusters=8, random_seed=42)
     cluster_labels = clusterer.fit_predict(profiles)
     cluster_groups = clusterer.get_cluster_groups(profiles, cluster_labels)
+=======
+    # ── 3b. Validate transition model ───────────────────────────
+    logger.info("\n[3b/5] Computing transition model validation metrics...")
+
+    val_metrics_out = {
+        "val_mse":              None,
+        "mae_per_metric":       {},
+        "directional_accuracy": {},
+        "note":                 None,
+    }
+
+    if len(val_states_real) == 0:
+        logger.warning(
+            "No real longitudinal validation data available. "
+            "Skipping held-out validation."
+        )
+        val_metrics_out["note"] = (
+            "Validation skipped: no held-out real longitudinal triples available."
+        )
+    else:
+        val_deltas  = val_next_real - val_states_real
+        pred_nexts  = np.array([
+            transition_model.predict_next_state(s, int(a))
+            for s, a in zip(val_states_real, val_actions_real)
+        ])
+        pred_deltas = pred_nexts - val_states_real
+        mae_per_dim = np.mean(
+            np.abs(pred_deltas[:, :5] - val_deltas[:, :5]), axis=0
+        )
+        mse_overall = float(np.mean((pred_deltas - val_deltas) ** 2))
+        dir_acc     = np.mean(
+            np.sign(pred_deltas[:, :5]) == np.sign(val_deltas[:, :5]), axis=0
+        )
+
+        logger.info(f"  Val MSE (overall): {mse_overall:.6f}")
+        for i, m in enumerate(METRIC_NAMES_VAL):
+            logger.info(
+                f"  {m:<25}  MAE={mae_per_dim[i]:.4f}  DirAcc={dir_acc[i]:.3f}"
+            )
+
+        val_metrics_out["val_mse"] = round(mse_overall, 6)
+        val_metrics_out["mae_per_metric"] = {
+            m: round(float(mae_per_dim[i]), 4)
+            for i, m in enumerate(METRIC_NAMES_VAL)
+        }
+        val_metrics_out["directional_accuracy"] = {
+            m: round(float(dir_acc[i]), 3)
+            for i, m in enumerate(METRIC_NAMES_VAL)
+        }
+
+    with open(output_dir / "transition_model_validation.json", "w") as f:
+        json.dump(val_metrics_out, f, indent=2)
+    logger.info("  Saved to outputs/pes/transition_model_validation.json")
+
+    # ── 4. Cluster patients ──────────────────────────────────────
+    logger.info("\n[4/5] Clustering patients...")
+
+    # Pass raw subtypes from JSON so controls (e.g. "NotAphasicByWAB")
+    # are correctly excluded — they get normalised to "Other" by
+    # state_builder._normalise_subtype so we can't rely on PatientProfile
+    # for the exclusion check.
+    raw_subtypes = [p.get("aphasia_subtype", "Other") for p in profiles_data]
+
+    clusterer      = PatientClusterer(max_k=10, random_seed=42)
+    cluster_labels = clusterer.fit_predict(
+        profiles,
+        state_vectors=state_vectors,
+        min_k=6,
+        raw_subtypes=raw_subtypes,
+    )
+    cluster_groups = clusterer.get_cluster_groups(profiles, cluster_labels)
+    n_clusters     = clusterer.n_clusters
+>>>>>>> Stashed changes
 
     cluster_assignments = {
         p.participant_id: int(label)
@@ -281,9 +376,13 @@ def main(args) -> None:
     for cluster_id, group in cluster_groups.items():
         logger.info(f"  Cluster {cluster_id}: {len(group)} patients")
 
+<<<<<<< Updated upstream
     # ------------------------------------------------------------------
     # Build environments
     # ------------------------------------------------------------------
+=======
+    # ── 5. Build TherapyEnv instances ────────────────────────────
+>>>>>>> Stashed changes
     logger.info("\n[5/5] Building TherapyEnv instances...")
 
     # Initial state per session = state vector
@@ -303,9 +402,15 @@ def main(args) -> None:
     cluster_env_indices: Dict[int, List[int]] = {i: [] for i in range(8)}
     for i, sid in enumerate(session_ids):
         c = session_to_cluster.get(sid, 0)
+<<<<<<< Updated upstream
         cluster_env_indices[c].append(i)
 
     # Save initial states for environments
+=======
+        if c >= 0:   # exclude controls (cluster_id = -1)
+            cluster_env_indices[c].append(i)
+
+>>>>>>> Stashed changes
     np.savez(
         str(output_dir / "env_initial_states.npz"),
         initial_states=initial_states,
@@ -315,14 +420,26 @@ def main(args) -> None:
 
     # Save cluster assignments
     with open(output_dir / "cluster_assignments.json", "w") as f:
+<<<<<<< Updated upstream
         json.dump({
             "assignments": cluster_assignments,
             "cluster_env_indices": {str(k): v for k, v in cluster_env_indices.items()},
             "cluster_sizes": {str(k): len(v) for k, v in cluster_env_indices.items()},
         }, f, indent=2)
+=======
+        json.dump(
+            {
+                "assignments":         cluster_assignments,
+                "cluster_env_indices": {str(k): v for k, v in cluster_env_indices.items()},
+                "cluster_sizes":       {str(k): len(v) for k, v in cluster_env_indices.items()},
+            },
+            f, indent=2,
+        )
+>>>>>>> Stashed changes
 
     # Save report
     report = {
+<<<<<<< Updated upstream
         "n_transition_triples": len(states),
         "n_longitudinal_real": int((states == states).all(axis=1).sum()),
         "n_augmented_synthetic": args.n_augment,
@@ -332,6 +449,17 @@ def main(args) -> None:
         "train_split_size": len(splits["train"]),
         "val_split_size": len(splits["val"]),
         "test_split_size": len(splits["test"]),
+=======
+        "n_transition_triples":  len(train_states),
+        "n_longitudinal_real":   real_split,
+        "n_augmented_synthetic": args.n_augment,
+        "n_clusters":            n_clusters,
+        "cluster_sizes":         {str(k): len(v) for k, v in cluster_env_indices.items()},
+        "n_environments":        len(envs),
+        "train_split_size":      len(splits["train"]),
+        "val_split_size":        len(splits["val"]),
+        "test_split_size":       len(splits["test"]),
+>>>>>>> Stashed changes
     }
     with open(output_dir / "pes_report.json", "w") as f:
         json.dump(report, f, indent=2)
