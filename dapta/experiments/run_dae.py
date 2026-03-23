@@ -154,14 +154,16 @@ def main(args) -> None:
         t.metadata["filepath"] = cha_by_stem.get(t.session_id.lower(), "")
 
     # ------------------------------------------------------------------
+    from tqdm import tqdm
     logger.info("\n[2/5] Extracting discourse metrics...")
 
     all_task_metrics:    List[Dict[str, DiscourseMetrics]] = []
     all_session_signals: List[SessionSignals]              = []
     all_session_ids:     List[str]                         = []
     failed:              List[str]                         = []
-
-    for t in transcripts:
+    pbar = tqdm(transcripts, desc="Processing Transcripts")
+    for t in pbar:
+        pbar.set_description(f"Processing {t.session_id}")
         try:
             task_dict: Dict[str, DiscourseMetrics] = {}
 
