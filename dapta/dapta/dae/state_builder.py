@@ -1,9 +1,12 @@
 from pathlib import Path
 from typing import Dict, List, Optional, Union
+
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+
 from dapta.dae.metrics import DiscourseMetrics
 from dapta.utils.logger import get_logger
+
 logger = get_logger(__name__)
 
 TASKS = [
@@ -20,7 +23,7 @@ METRIC_NAMES = [
     "mc_score",
     "mlu_morphemes",
     "syntactic_complexity",
-    "mattr"
+    "mattr",
 ]
 
 APHASIA_SUBTYPES = ["Broca", "Wernicke", "Anomic", "Conduction", "Global", "Other"]
@@ -35,14 +38,14 @@ WAB_AQ_MEDIAN: Dict[str, float] = {
     "Global":     18.0,
 }
 
-N_METRICS_PER_TASK = len(METRIC_NAMES)            
-N_TASKS            = len(TASKS)                    
-N_DISCOURSE        = N_METRICS_PER_TASK * N_TASKS  
-N_FLAGS            = N_TASKS                       
-N_SUBTYPE          = len(APHASIA_SUBTYPES)         
-N_STATIC           = 4  
-N_SIGNAL           = 7  
-STATE_DIM          = N_DISCOURSE + N_FLAGS + N_SUBTYPE + N_STATIC + N_SIGNAL 
+N_METRICS_PER_TASK = len(METRIC_NAMES)             # 5
+N_TASKS            = len(TASKS)                    # 5
+N_DISCOURSE        = N_METRICS_PER_TASK * N_TASKS  # 25
+N_FLAGS            = N_TASKS                       # 5
+N_SUBTYPE          = len(APHASIA_SUBTYPES)         # 6
+N_STATIC           = 4
+N_SIGNAL           = 7
+STATE_DIM          = N_DISCOURSE + N_FLAGS + N_SUBTYPE + N_STATIC + N_SIGNAL  # 47
 
 SLICE_DISCOURSE = slice(0,  25)
 SLICE_FLAGS     = slice(25, 30)
@@ -50,17 +53,36 @@ SLICE_SUBTYPE   = slice(30, 36)
 SLICE_STATIC    = slice(36, 40)
 SLICE_SIGNAL    = slice(40, 47)
 
+
+# ==================================================================
 class PatientProfile:
+    """
+    Holds per-patient clinical metadata.
+
+    is_control is True when the participant is flagged as
+    NotAphasicByWAB, 'control', or has WAB-AQ ≥ 93.8.
+    Controls should be excluded from RL training/clustering
+    but may still be used for DAE validation (RQ1).
+    """
+
     def __init__(
         self,
         participant_id:  str,
-        aphasia_subtype: str             = "Other",
+        aphasia_subtype: str           = "Other",
         wab_aq:          Optional[float] = None,
-        session_number:  int             = 1,
+        session_number:  int           = 1,
     ) -> None:
         self.participant_id  = participant_id
-        self.aphasia_subtype = self._normalise_subtype(aphasia_subtype)
+        self.aphasia_subtype = self.normalise_subtype(aphasia_subtype)
         self.session_number  = max(1, int(session_number))
+
+        # Detect control participants
+        raw_lower = aphasia_subtype.lower().strip()
+        self.is_control = (
+            "notaphasic"  in raw_lower
+            or "control"  in raw_lower
+            or (wab_aq is not None and float(wab_aq) >= 93.8)
+        )
 
         if wab_aq is None:
             self.wab_aq       = WAB_AQ_MEDIAN[self.aphasia_subtype]
@@ -69,11 +91,20 @@ class PatientProfile:
             self.wab_aq       = float(np.clip(wab_aq, 0.0, 100.0))
             self.wab_aq_known = True
 
+        if self.is_control:
+            logger.info(
+                f"PatientProfile: {participant_id!r} flagged as control "
+                f"(subtype={aphasia_subtype!r}, wab_aq={self.wab_aq:.1f}). "
+                f"Exclude from RL training."
+            )
+
     @staticmethod
-    def _normalise_subtype(subtype: str) -> str:
+    def normalise_subtype(subtype: str) -> str:
         mapping = {
-            "broca":      "Broca",    "brocas":    "Broca",   "non-fluent": "Broca",
-            "wernicke":   "Wernicke", "wernickes": "Wernicke","fluent":     "Wernicke",
+            "broca":      "Broca",    "brocas":    "Broca",
+            "non-fluent": "Broca",
+            "wernicke":   "Wernicke", "wernickes": "Wernicke",
+            "fluent":     "Wernicke",
             "anomic":     "Anomic",   "anomia":    "Anomic",
             "conduction": "Conduction",
             "global":     "Global",
@@ -88,25 +119,27 @@ class PatientProfile:
 
     def __repr__(self) -> str:
         known = "real" if self.wab_aq_known else "imputed"
+        ctrl  = ", CONTROL" if self.is_control else ""
         return (
             f"PatientProfile(id={self.participant_id!r}, "
             f"subtype={self.aphasia_subtype!r}, "
             f"wab_aq={self.wab_aq:.1f} ({known}), "
-            f"session={self.session_number})"
+            f"session={self.session_number}{ctrl})"
         )
 
+
+# ==================================================================
 class SessionSignals:
 
     def __init__(
         self,
-        maze_rate:      float            = 0.0,
-        utt_length_std: Dict[str, float] = None,
-        mean_pause_ms:  float            = 0.0,
+        maze_rate:      float              = 0.0,
+        utt_length_std: Dict[str, float]   = None,
+        mean_pause_ms:  float              = 0.0,
     ) -> None:
         self.maze_rate      = float(maze_rate)
         self.utt_length_std = utt_length_std or {}
         self.mean_pause_ms  = float(mean_pause_ms)
-
 
     def std_array(self) -> np.ndarray:
         arr = np.zeros(N_TASKS, dtype=np.float32)
@@ -116,7 +149,9 @@ class SessionSignals:
                 arr[idx] = float(val)
         return arr
 
-def _fit_nanaware_scaler(matrix: np.ndarray) -> MinMaxScaler:
+
+# ==================================================================
+def fit_nanaware_scaler(matrix: np.ndarray) -> MinMaxScaler:
     col_min = np.nanmin(matrix, axis=0)
     col_max = np.nanmax(matrix, axis=0)
 
@@ -127,34 +162,37 @@ def _fit_nanaware_scaler(matrix: np.ndarray) -> MinMaxScaler:
     scaler.scale_      = np.where(scaler.data_range_ > 0,
                                   1.0 / scaler.data_range_, 0.0)
     scaler.min_        = -col_min * scaler.scale_
-    scaler.n_features_in_   = matrix.shape[1]
-    scaler.n_samples_seen_  = int(np.sum(~np.isnan(matrix[:, 0])))
+    scaler.n_features_in_    = matrix.shape[1]
+    scaler.n_samples_seen_   = int(np.sum(~np.isnan(matrix[:, 0])))
     scaler.feature_names_in_ = None
     return scaler
 
 
-def _transform_nanaware(scaler: MinMaxScaler, row: np.ndarray) -> np.ndarray:
+def transform_nanaware(scaler: MinMaxScaler, row: np.ndarray) -> np.ndarray:
     out = row * scaler.scale_ + scaler.min_
     return np.clip(out, 0.0, 1.0).astype(np.float32)
 
 
-
-def _metrics_to_array(m: DiscourseMetrics) -> np.ndarray:
+def metrics_to_array(m: DiscourseMetrics) -> np.ndarray:
     return np.array([
         m.ciu_rate,
         m.mc_score,
         m.mlu_morphemes,
         m.syntactic_complexity,
-        m.mattr
+        m.mattr,
     ], dtype=np.float32)
 
-class PatientStateBuilder:
-    def __init__(self, scaler_path: Optional[Union[str, Path]] = None) -> None:
-        self.scaler_path         = Path(scaler_path) if scaler_path else None
-        self._discourse_scaler:  Optional[MinMaxScaler] = None
-        self._static_scaler:     Optional[MinMaxScaler] = None
-        self._fitted             = False
 
+# ==================================================================
+class PatientStateBuilder:
+
+    def __init__(self, scaler_path: Optional[Union[str, Path]] = None) -> None:
+        self.scaler_path        = Path(scaler_path) if scaler_path else None
+        self._discourse_scaler: Optional[MinMaxScaler] = None
+        self._static_scaler:    Optional[MinMaxScaler] = None
+        self._fitted            = False
+
+    # ------------------------------------------------------------------
     def fit(
         self,
         all_task_metrics: List[Dict[str, DiscourseMetrics]],
@@ -173,16 +211,15 @@ class PatientStateBuilder:
             self._build_discourse_block(tm, nan_for_absent=True)
             for tm in all_task_metrics
         ])
-
-        static_signal_matrix = np.stack([
+        static_matrix = np.stack([
             self._build_static_signal_raw(p, s, sup)
             for p, s, sup in zip(all_profiles, all_signals, all_surprisals)
         ])
 
-        self._discourse_scaler = _fit_nanaware_scaler(discourse_matrix)
-        self._static_scaler    = _fit_nanaware_scaler(static_signal_matrix)
+        self._discourse_scaler = fit_nanaware_scaler(discourse_matrix)
+        self._static_scaler    = fit_nanaware_scaler(static_matrix)
+        self._fitted           = True
 
-        self._fitted = True
         logger.info(
             f"PatientStateBuilder fitted on {n} transcripts. "
             f"State dim = {STATE_DIM}."
@@ -191,6 +228,7 @@ class PatientStateBuilder:
             self.save_scaler()
         return self
 
+    # ------------------------------------------------------------------
     def build(
         self,
         task_metrics: Dict[str, DiscourseMetrics],
@@ -201,32 +239,32 @@ class PatientStateBuilder:
         if not self._fitted:
             raise RuntimeError(
                 "PatientStateBuilder has not been fitted. "
-                "Call .fit() on training data first, or load a saved scaler."
+                "Call .fit() on training data first."
             )
-
         if signals is None:
             signals = SessionSignals()
 
-        raw_discourse  = self._build_discourse_block(task_metrics, nan_for_absent=False)
-        norm_discourse = _transform_nanaware(self._discourse_scaler, raw_discourse)
+        raw_disc  = self._build_discourse_block(task_metrics, nan_for_absent=False)
+        norm_disc = transform_nanaware(self._discourse_scaler, raw_disc)
+        # Zero out absent task slots after scaling
         for task, idx in TASK_TO_IDX.items():
             if task not in task_metrics:
-                start = idx * N_METRICS_PER_TASK
-                norm_discourse[start : start + N_METRICS_PER_TASK] = 0.0
+                s = idx * N_METRICS_PER_TASK
+                norm_disc[s: s + N_METRICS_PER_TASK] = 0.0
 
-        flags = self._build_flags(task_metrics)
-
-        subtype_ohe = profile.subtype_one_hot()
+        flags      = self._build_flags(task_metrics)
+        subtype_oh = profile.subtype_one_hot()
 
         raw_ss  = self._build_static_signal_raw(profile, signals, surprisal)
-        norm_ss = _transform_nanaware(self._static_scaler, raw_ss)
+        norm_ss = transform_nanaware(self._static_scaler, raw_ss)
 
-        state = np.concatenate([norm_discourse, flags, subtype_ohe, norm_ss])
+        state = np.concatenate([norm_disc, flags, subtype_oh, norm_ss])
         assert state.shape == (STATE_DIM,), (
             f"State shape mismatch: expected ({STATE_DIM},), got {state.shape}"
         )
         return state.astype(np.float32)
 
+    # ------------------------------------------------------------------
     def build_batch(
         self,
         all_task_metrics: List[Dict[str, DiscourseMetrics]],
@@ -238,7 +276,9 @@ class PatientStateBuilder:
             all_signals = [SessionSignals() for _ in profiles]
         return np.stack([
             self.build(tm, s, p, sig)
-            for tm, s, p, sig in zip(all_task_metrics, surprisals, profiles, all_signals)
+            for tm, s, p, sig in zip(
+                all_task_metrics, surprisals, profiles, all_signals
+            )
         ])
 
     def build_trajectory(
@@ -248,14 +288,16 @@ class PatientStateBuilder:
         profile:              PatientProfile,
         session_signals:      Optional[List[SessionSignals]] = None,
     ) -> np.ndarray:
-
         if session_signals is None:
             session_signals = [SessionSignals() for _ in session_surprisals]
         return np.stack([
             self.build(tm, s, profile, sig)
-            for tm, s, sig in zip(session_task_metrics, session_surprisals, session_signals)
+            for tm, s, sig in zip(
+                session_task_metrics, session_surprisals, session_signals
+            )
         ])
 
+    # ------------------------------------------------------------------
     @staticmethod
     def _build_discourse_block(
         task_metrics:   Dict[str, DiscourseMetrics],
@@ -263,15 +305,13 @@ class PatientStateBuilder:
     ) -> np.ndarray:
         fill  = np.nan if nan_for_absent else 0.0
         block = np.full(N_DISCOURSE, fill, dtype=np.float32)
-
         for task, metrics in task_metrics.items():
             idx = TASK_TO_IDX.get(task)
             if idx is None:
                 logger.warning(f"Unknown task '{task}' — skipping.")
                 continue
-            start = idx * N_METRICS_PER_TASK
-            block[start : start + N_METRICS_PER_TASK] = _metrics_to_array(metrics)
-
+            s = idx * N_METRICS_PER_TASK
+            block[s: s + N_METRICS_PER_TASK] = metrics_to_array(metrics)
         return block
 
     @staticmethod
@@ -285,8 +325,8 @@ class PatientStateBuilder:
 
     @staticmethod
     def _build_static_signal_raw(
-        profile:   "PatientProfile",
-        signals:   "SessionSignals",
+        profile:   PatientProfile,
+        signals:   SessionSignals,
         surprisal: float,
     ) -> np.ndarray:
         return np.array([
@@ -295,10 +335,11 @@ class PatientStateBuilder:
             float(surprisal),
             float(np.log1p(profile.session_number - 1)),
             signals.maze_rate,
-            *signals.std_array(),  
+            *signals.std_array(),
             signals.mean_pause_ms,
         ], dtype=np.float32)
 
+    # ------------------------------------------------------------------
     def save_scaler(self) -> None:
         self.scaler_path.parent.mkdir(parents=True, exist_ok=True)
         np.savez(
@@ -337,6 +378,7 @@ class PatientStateBuilder:
         logger.info(f"Scalers loaded from {self.scaler_path}")
         return self
 
+    # ------------------------------------------------------------------
     @staticmethod
     def dim_names() -> List[str]:
         names = []

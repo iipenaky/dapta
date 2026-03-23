@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Union
 
 import numpy as np
 from sklearn.cluster import KMeans
@@ -10,9 +10,12 @@ from dapta.utils.logger import get_logger
 logger = get_logger(__name__)
 
 NON_APHASIA_SUBTYPES: Set[str] = {
+    # Raw labels from AphasiaBank CHAT files (before _normalise_subtype)
     "control", "Control", "CONTROL",
     "NotAphasicByWAB", "NotAphasicByWab", "notaphasicbywab",
     "not_aphasic", "healthy",
+    # Normalised fallback — in case state_builder ever maps these to Other
+    # We do NOT include "Other" here because Other is a valid aphasia subtype
 }
 
 CONTROL_CLUSTER_ID = -1
@@ -30,11 +33,30 @@ class PatientClusterer:
 
     def fit_predict(
         self,
-        profiles:      List[PatientProfile],
-        state_vectors: Optional[np.ndarray] = None,
-        min_k:         int = 6,
+        profiles:        List[PatientProfile],
+        state_vectors:   Optional[np.ndarray] = None,
+        min_k:           int = 6,
+        raw_subtypes:    Optional[List[str]] = None,
     ) -> np.ndarray:
-        aphasia_mask = self._aphasia_mask(profiles)
+        """
+        Cluster aphasia patients and return per-patient cluster labels.
+
+        Parameters
+        ----------
+        profiles : List[PatientProfile]
+            PatientProfile objects (subtypes already normalised by state_builder).
+        state_vectors : np.ndarray, optional
+            Full 47-dim state vectors aligned with profiles.
+        min_k : int
+            Minimum number of clusters to enforce.
+        raw_subtypes : List[str], optional
+            Raw subtype strings from patient_profiles.json, aligned with
+            profiles.  When provided, these are used for the aphasia mask
+            instead of the normalised PatientProfile.aphasia_subtype — this
+            correctly excludes controls whose raw label is "NotAphasicByWAB"
+            but whose normalised label is "Other".
+        """
+        aphasia_mask = self._aphasia_mask(profiles, raw_subtypes)
         n_aphasia    = int(aphasia_mask.sum())
         n_controls   = int((~aphasia_mask).sum())
 
@@ -46,17 +68,18 @@ class PatientClusterer:
         if n_aphasia == 0:
             raise ValueError(
                 "No aphasia patients found. Check NON_APHASIA_SUBTYPES matches "
-                "your data's subtype labels."
+                "your data's subtype labels, or pass raw_subtypes from "
+                "patient_profiles.json."
             )
+
         aphasia_profiles = [p for p, m in zip(profiles, aphasia_mask) if m]
         aphasia_states   = (
             state_vectors[aphasia_mask] if state_vectors is not None else None
         )
         X = self._fit_transform(aphasia_profiles, aphasia_states)
 
-
-        max_possible = min(self.max_k, n_aphasia - 1)
-        min_k        = min(min_k, max_possible)
+        max_possible    = min(self.max_k, n_aphasia - 1)
+        min_k           = min(min_k, max_possible)
         self.n_clusters = self.find_elbow_k(X, min_k=min_k, max_k=max_possible)
         logger.info(f"Optimal clusters found: k={self.n_clusters}")
 
@@ -80,11 +103,12 @@ class PatientClusterer:
         self,
         profiles:      List[PatientProfile],
         state_vectors: Optional[np.ndarray] = None,
+        raw_subtypes:  Optional[List[str]]  = None,
     ) -> np.ndarray:
         if self._kmeans is None:
             raise RuntimeError("Clusterer must be fitted before calling predict().")
 
-        aphasia_mask     = self._aphasia_mask(profiles)
+        aphasia_mask     = self._aphasia_mask(profiles, raw_subtypes)
         aphasia_profiles = [p for p, m in zip(profiles, aphasia_mask) if m]
         aphasia_states   = (
             state_vectors[aphasia_mask] if state_vectors is not None else None
@@ -103,7 +127,6 @@ class PatientClusterer:
         profiles: List[PatientProfile],
         labels:   np.ndarray,
     ) -> Dict[int, List[PatientProfile]]:
-
         if self.n_clusters is None:
             raise RuntimeError("Clusterer must be fitted first.")
 
@@ -157,7 +180,9 @@ class PatientClusterer:
             inertias.append(kmeans.inertia_)
         return inertias
 
-    def find_elbow_k(self, X: np.ndarray, min_k: int = 6, max_k: int = 10) -> int:
+    def find_elbow_k(
+        self, X: np.ndarray, min_k: int = 6, max_k: int = 10
+    ) -> int:
         if max_k < 3:
             return min_k
 
@@ -172,12 +197,45 @@ class PatientClusterer:
 
         elbow  = int(np.argmax(np.abs(second_deltas))) + 2
         result = max(min_k, min(elbow, max_k))
-        logger.info(f"Elbow at k={elbow}, enforcing min_k={min_k} max_k={max_k}, using k={result}")
+        logger.info(
+            f"Elbow at k={elbow}, enforcing min_k={min_k} "
+            f"max_k={max_k}, using k={result}"
+        )
         return result
 
-
     @staticmethod
-    def _aphasia_mask(profiles: List[PatientProfile]) -> np.ndarray:
+    def _aphasia_mask(
+        profiles:     List[PatientProfile],
+        raw_subtypes: Optional[List[str]] = None,
+    ) -> np.ndarray:
+        """
+        Build a boolean mask: True = aphasia patient, False = control.
+
+        If raw_subtypes is provided, uses those strings for the check —
+        this correctly catches controls whose raw label is "NotAphasicByWAB"
+        but whose normalised PatientProfile.aphasia_subtype is "Other".
+
+        If raw_subtypes is not provided, falls back to the normalised
+        PatientProfile.aphasia_subtype (legacy behaviour).
+        """
+        if raw_subtypes is not None:
+            if len(raw_subtypes) != len(profiles):
+                raise ValueError(
+                    f"raw_subtypes length ({len(raw_subtypes)}) must match "
+                    f"profiles length ({len(profiles)})."
+                )
+            return np.array(
+                [s not in NON_APHASIA_SUBTYPES for s in raw_subtypes],
+                dtype=bool,
+            )
+
+        # Fallback — normalised subtypes (may miss controls mapped to Other)
+        logger.warning(
+            "raw_subtypes not provided to _aphasia_mask. "
+            "Controls whose subtype was normalised to 'Other' will NOT be "
+            "excluded. Pass raw_subtypes from patient_profiles.json for "
+            "correct behaviour."
+        )
         return np.array(
             [p.aphasia_subtype not in NON_APHASIA_SUBTYPES for p in profiles],
             dtype=bool,
@@ -186,8 +244,8 @@ class PatientClusterer:
     @staticmethod
     def _extract_discourse_means(state_vectors: np.ndarray) -> np.ndarray:
         N          = state_vectors.shape[0]
-        n_metrics  = N_METRICS_PER_TASK   
-        n_tasks    = N_TASKS              
+        n_metrics  = N_METRICS_PER_TASK
+        n_tasks    = N_TASKS
         disc_means = np.zeros((N, n_metrics), dtype=np.float32)
 
         for m in range(n_metrics):

@@ -19,9 +19,9 @@ def get_stanza():
             import stanza
             _stanza_nlp = stanza.Pipeline(
                 "en",
-                processors="tokenize,mwt,pos,lemma,depparse",
-                verbose=False,
-                download_method=None,
+                processors    = "tokenize,mwt,pos,lemma,depparse",
+                verbose       = False,
+                download_method = None,
             )
             logger.info("Stanza pipeline loaded (cached).")
         except Exception as e:
@@ -51,7 +51,21 @@ TASK_DURATION_FALLBACK = {
     "conversation":    10.0,
 }
 
-MAIN_CONCEPTS = {
+# ------------------------------------------------------------------
+# MAIN_CONCEPTS
+#
+# Keyed by the original @G marker keyword (u.g_marker), NOT by the
+# task bucket.  This lets WAB sub-pictures (window / umbrella / cat /
+# flood) score against their own concept lists instead of the BDAE
+# Cookie Theft list, which they do not match.
+#
+# For any utterances whose g_marker is absent or not listed here, the
+# task bucket name is used as a fallback key (covers cookie_theft on
+# BDAE files, cinderella, sandwich, stroke_narrative).
+# ------------------------------------------------------------------
+MAIN_CONCEPTS: Dict[str, List] = {
+
+    # --- BDAE Cookie Theft scene ---
     "cookie_theft": [
         [["woman", "lady", "she", "mother", "mom"],
          ["washing", "drying", "cleaning", "dishes", "sink"]],
@@ -68,6 +82,68 @@ MAIN_CONCEPTS = {
          ["unaware", "ignoring", "oblivious", "noticing", "notice"]],
         [["window", "curtains", "outside"]],
     ],
+
+    # --- WAB: Window / broken window picture ---
+    "window": [
+        [["boy", "he", "kid", "child"],
+         ["kick", "kicked", "kicking", "soccer", "ball"]],
+        [["window"],
+         ["broke", "broken", "break", "smash", "shattered", "crack"]],
+        [["glass"],
+         ["floor", "ground", "fell", "broken", "shattered"]],
+        [["woman", "lady", "she", "man"],
+         ["sitting", "reading", "lamp", "nearby", "beside"]],
+        [["ball"],
+         ["window", "hit", "went", "through"]],
+    ],
+
+    # --- WAB: Umbrella / rainy day picture ---
+    "umbrella": [
+        [["woman", "lady", "mother", "mom", "she"],
+         ["umbrella", "give", "gives", "gave", "offer", "hand"]],
+        [["child", "boy", "girl", "kid", "he", "she"],
+         ["refuse", "refused", "didn't", "don't", "need", "want"]],
+        [["rain", "raining", "rainy", "wet", "soaked", "drenched"]],
+        [["she", "he", "child", "boy", "girl"],
+         ["outside", "went", "go", "walk", "left"]],
+        [["woman", "lady", "mother", "she"],
+         ["disappoint", "disappointed", "upset", "sad", "regret"]],
+        [["umbrella"],
+         ["put on", "opened", "use", "used", "took", "back"]],
+    ],
+
+    # --- WAB: Cat / cat up a tree picture ---
+    "cat": [
+        [["cat"],
+         ["tree", "stuck", "up", "trapped", "climb", "climbed"]],
+        [["girl", "child", "she", "little"],
+         ["cry", "crying", "cried", "upset", "worried"]],
+        [["man", "dad", "father", "he"],
+         ["ladder", "use", "used", "climb", "get", "rescue"]],
+        [["ladder"],
+         ["fell", "fall", "fell down", "tipped", "dropped"]],
+        [["man", "dad", "father", "he"],
+         ["stuck", "trapped", "tree", "stranded"]],
+        [["fireman", "firemen", "firefighter", "fire department"],
+         ["rescue", "help", "came", "arrive"]],
+        [["dog"],
+         ["bark", "barking", "barked", "watch", "looking"]],
+    ],
+
+    # --- WAB: Flood / rescue picture ---
+    "flood": [
+        [["girl", "woman", "she", "child"],
+         ["water", "flood", "stuck", "trapped", "rising", "caught"]],
+        [["man", "rescuer", "he"],
+         ["rescue", "save", "help", "hold", "reach", "pull"]],
+        [["water"],
+         ["rising", "flood", "high", "deep"]],
+        [["rope", "hand", "arm"],
+         ["hold", "holding", "reach", "reaching", "grab"]],
+        [["rescue", "save", "saved", "pull", "pulled", "out"]],
+    ],
+
+    # --- Cinderella ---
     "cinderella": [
         [["cinderella", "she", "girl"],
          ["poor", "mistreated", "servants", "maid", "work", "working"]],
@@ -91,6 +167,8 @@ MAIN_CONCEPTS = {
          ["fit", "fits", "fitted", "cinderella"]],
         [["married", "marry", "wedding", "lived", "happily"]],
     ],
+
+    # --- Sandwich ---
     "sandwich": [
         [["bread", "loaf", "slice", "slices"]],
         [["peanut", "butter", "jelly", "jam"]],
@@ -98,6 +176,8 @@ MAIN_CONCEPTS = {
         [["together", "slices", "bread", "sandwich"]],
         [["cut", "cutting", "slice", "half"]],
     ],
+
+    # --- Stroke narrative ---
     "stroke_narrative": [
         [["stroke", "attack", "brain"]],
         [["hospital", "ambulance", "emergency", "doctor"]],
@@ -105,8 +185,10 @@ MAIN_CONCEPTS = {
         [["therapy", "therapist", "treatment", "rehab", "rehabilitation", "practice"]],
         [["better", "improved", "improving", "recovery", "progress", "recovering"]],
     ],
-    
 }
+
+# WAB sub-picture @G keywords that have their own concept list
+_WAB_MARKERS = {"window", "umbrella", "cat", "flood"}
 
 COMPLEX_DEPS = {"advcl", "relcl", "ccomp", "xcomp", "acl"}
 
@@ -122,28 +204,30 @@ CONTRACTION_MORPHEMES = [
 _TS_PATTERN = re.compile(r"\x15(\d+)_(\d+)\x15")
 
 _REPAIR_PATTERN = re.compile(
-    r"\[/\]"       
-    r"|\[//\]"      
-    r"|\+/\."       
+    r"\[/\]"
+    r"|\[//\]"
+    r"|\+/\."
 )
 
 _WPM_STRIP = re.compile(
-    r"\x15\d+_\d+\x15"         
-    r"|\[[-/]{1,2}\]"         
-    r"|\[\+[^\]]*\]"            
-    r"|\[[-=][^\]]*\]"          
-    r"|&=[a-zA-Z_]+"           
-    r"|&\+[a-zA-Z]+"         
-    r"|\+[<>!.,?]"              
-    r"|[<>]"                   
-    r"|\x14\d+\x14"            
-    r"|\[%[^\]]*\]"            
-    r"|\[=\?[^\]]*\]"           
-    r"|\[[^\]]*\]"              
-    r"|[.!?,;:]+\s*$"          
-    r"|www|xxx|yyy",            
+    r"\x15\d+_\d+\x15"
+    r"|\[[-/]{1,2}\]"
+    r"|\[\+[^\]]*\]"
+    r"|\[[-=][^\]]*\]"
+    r"|&=[a-zA-Z_]+"
+    r"|&\+[a-zA-Z]+"
+    r"|\+/\."           # trail-off-in-middle (was missing before)
+    r"|\+[<>!.,?]"
+    r"|[<>]"
+    r"|\x14\d+\x14"
+    r"|\[%[^\]]*\]"
+    r"|\[=\?[^\]]*\]"
+    r"|\[[^\]]*\]"
+    r"|[.!?,;:]+\s*$"
+    r"|www|xxx|yyy",
     re.VERBOSE,
 )
+
 
 @dataclass
 class DiscourseMetrics:
@@ -155,7 +239,7 @@ class DiscourseMetrics:
     n_utterances:         int
     n_words:              int
     wpm:                  float = 0.0
-    maze_rate:            float = 0.0   
+    maze_rate:            float = 0.0
     task:                 str   = "unknown"
 
     def to_array(self) -> np.ndarray:
@@ -163,8 +247,8 @@ class DiscourseMetrics:
             self.ciu_rate,
             self.mc_score,
             self.mlu_morphemes,
-            self.mattr,
             self.syntactic_complexity,
+            self.mattr,
         ], dtype=np.float32)
 
     def to_dict(self) -> dict:
@@ -187,111 +271,99 @@ class DiscourseMetricExtractor:
     FILLER_PATTERN = re.compile(r"^\b(uh|um|er|ah|hmm|well)\b$", re.IGNORECASE)
     NON_WORD       = re.compile(r"[^a-zA-Z\s'-]")
 
-    def __init__(self, task: str, duration_minutes: float = 0.0):
+    def __init__(
+        self,
+        task:             str,
+        duration_minutes: float         = 0.0,
+        marker:           Optional[str] = None,
+    ):
         self.task             = task
         self.duration_minutes = duration_minutes or 0.0
 
+        # Resolve which MAIN_CONCEPTS key to use.
+        # Priority: explicit WAB marker > task bucket name > "" (no concepts)
+        m = (marker or "").lower().strip()
+        if m in _WAB_MARKERS:
+            self._concepts_key = m
+        elif task in MAIN_CONCEPTS:
+            self._concepts_key = task
+        else:
+            self._concepts_key = ""
 
+    # ------------------------------------------------------------------
     def compute(
         self,
-        utterances:     List[str],
-        raw_utterances: Optional[List[str]] = None,
-    ) -> DiscourseMetrics:
+        utterances:        List[str],
+        raw_utterances:    Optional[List[str]] = None,
+        utterance_objects                      = None,
+    ) -> "DiscourseMetrics":
         utterances = [u.strip() for u in utterances if u.strip()]
         if not utterances:
-            return self._empty_metrics()
+            return self._empty()
 
-        duration = self._resolve_duration(raw_utterances, utterances)
-
-        ciu_rate  = self._compute_ciu_rate(utterances, duration)
-        mc_score  = self._compute_mc_score(utterances)
-        mlu       = self._compute_mlu(utterances)
-        mattr     = self._compute_ttr(utterances)
-        syn_comp  = self._compute_syntactic_complexity(utterances)
-        wpm       = self._compute_wpm(utterances, raw_utterances, duration)
-        maze_rate = self._compute_maze_rate(raw_utterances, len(utterances))
-
-        n_words = len(re.findall(r"[a-zA-Z]+(?:'[a-zA-Z]+)?", " ".join(utterances).lower()))
+        duration = self._resolve_duration(utterance_objects)
 
         return DiscourseMetrics(
-            ciu_rate=ciu_rate,
-            mc_score=mc_score,
-            mlu_morphemes=mlu,
-            mattr=mattr,
-            syntactic_complexity=syn_comp,
-            n_utterances=len(utterances),
-            n_words=n_words,
-            task=self.task,
-            wpm=wpm,
-            maze_rate=maze_rate,
+            ciu_rate             = self._ciu_rate(utterances, duration),
+            mc_score             = self._mc_score(utterances),
+            mlu_morphemes        = self._mlu(utterances),
+            mattr                = self._ttr(utterances),
+            syntactic_complexity = self._syn_comp(utterances),
+            n_utterances         = len(utterances),
+            n_words              = len(re.findall(
+                r"[a-zA-Z]+(?:'[a-zA-Z]+)?",
+                " ".join(utterances).lower()
+            )),
+            task                 = self.task,
+            wpm                  = self._wpm(utterances, raw_utterances, duration),
+            maze_rate            = self._maze_rate(raw_utterances, len(utterances)),
         )
 
-    def _resolve_duration(
-        self,
-        raw_utterances: Optional[List[str]],
-        clean_utterances: List[str],
-    ) -> float:
-        if self.duration_minutes and self.duration_minutes > 0:
+    # ------------------------------------------------------------------
+    def _resolve_duration(self, utterance_objects) -> float:
+        # Priority 1: explicit duration set at construction time
+        if self.duration_minutes > 0:
             return self.duration_minutes
 
-        if raw_utterances:
-            start_times = []
-            end_times   = []
-            for raw in raw_utterances:
-                for m in _TS_PATTERN.finditer(raw):
-                    start_times.append(int(m.group(1)))
-                    end_times.append(int(m.group(2)))
+        # Priority 2: timestamps from Utterance objects (set by parser)
+        # u.raw does NOT contain CLAN timestamp bytes after pylangacq
+        # processing, so raw-line scanning is unreliable — we rely
+        # exclusively on u.start_ms / u.end_ms here.
+        if utterance_objects:
+            starts = [u.start_ms for u in utterance_objects if u.start_ms > 0]
+            ends   = [u.end_ms   for u in utterance_objects if u.end_ms   > 0]
+            if starts and ends:
+                ms = max(ends) - min(starts)
+                if ms > 0:
+                    return ms / 60_000.0
 
-            if start_times and end_times:
-                duration_ms = max(end_times) - min(start_times)
-                if duration_ms > 0:
-                    return duration_ms / 60_000.0
+        # Priority 3: hardcoded fallback
+        fallback = TASK_DURATION_FALLBACK.get(self.task, 5.0)
+        logger.debug(f"[{self.task}] Using fallback duration: {fallback} min")
+        return fallback
 
-        return TASK_DURATION_FALLBACK.get(self.task, 5.0)
-
-    def _compute_ciu_rate(self, utterances: List[str], duration_minutes: float) -> float:
-        ciu_count = 0
+    # ------------------------------------------------------------------
+    def _ciu_rate(self, utterances: List[str], duration: float) -> float:
+        count = 0
         for utt in utterances:
-            words = utt.lower().split()
-            for w in words:
-                if len(w) <= 1:
-                    continue
-                if self.FILLER_PATTERN.match(w):
-                    continue
-                if self.NON_WORD.search(w):
-                    continue
-                ciu_count += 1
-        return round(ciu_count / max(duration_minutes, 0.01), 2)
+            for w in utt.lower().split():
+                if len(w) <= 1:                 continue
+                if self.FILLER_PATTERN.match(w): continue
+                if self.NON_WORD.search(w):     continue
+                count += 1
+        return round(count / max(duration, 0.01), 6)
 
-
-    def _compute_wpm(
-        self,
-        utterances:     List[str],
-        raw_utterances: Optional[List[str]],
-        duration_minutes: float,
-    ) -> float:
-        source = raw_utterances if raw_utterances else utterances
-
-        total_words = 0
-        for u in source:
-            stripped = _WPM_STRIP.sub(" ", u)
-            stripped = re.sub(r"^\*[A-Z]{2,3}:\s*", "", stripped)
-            total_words += len(re.findall(r"[a-zA-Z]+(?:'[a-zA-Z]+)?", stripped))
-
-        return round(total_words / max(duration_minutes, 0.01), 2)
-
-    def _compute_mc_score(self, utterances: List[str]) -> float:
-        concept_list = MAIN_CONCEPTS.get(self.task, [])
+    # ------------------------------------------------------------------
+    def _mc_score(self, utterances: List[str]) -> float:
+        if not self._concepts_key:
+            return 0.0
+        concept_list = MAIN_CONCEPTS.get(self._concepts_key, [])
         if not concept_list:
             return 0.0
 
         full_text = " ".join(utterances).lower()
-        total     = 0
+        total     = sum(self._score_concept(c, full_text) for c in concept_list)
         max_score = 2 * len(concept_list)
-
-        for concept in concept_list:
-            total += self._score_concept(concept, full_text)
-
         return round(total / max_score, 4) if max_score > 0 else 0.0
 
     @staticmethod
@@ -303,59 +375,52 @@ class DiscourseMetricExtractor:
                 group = [group]
             if any(kw in full_text for kw in group):
                 groups_hit += 1
-                any_hit = True
-        if groups_hit == len(concept):
-            return 2
-        elif any_hit:
-            return 1
+                any_hit     = True
+        if groups_hit == len(concept): return 2
+        elif any_hit:                  return 1
         return 0
 
-    def _compute_mlu(self, utterances: List[str]) -> float:
-        contraction_extras = []
-        for utt in utterances:
-            extra = sum(len(pat.findall(utt)) for pat, _ in CONTRACTION_MORPHEMES)
-            contraction_extras.append(extra)
+    # ------------------------------------------------------------------
+    def _mlu(self, utterances: List[str]) -> float:
+        extras = [
+            sum(len(p.findall(u)) for p, _ in CONTRACTION_MORPHEMES)
+            for u in utterances
+        ]
 
         nlp = get_stanza()
         if nlp:
             counts = []
-            for utt, extra in zip(utterances, contraction_extras):
-                if not utt.strip():
-                    continue
+            for utt, extra in zip(utterances, extras):
+                if not utt.strip(): continue
                 doc   = nlp(utt)
                 count = extra
                 for sent in doc.sentences:
                     for word in sent.words:
-                        if word.upos == "PUNCT":
-                            continue
+                        if word.upos == "PUNCT": continue
                         count += 1
-                        feats = word.feats or ""
+                        feats  = word.feats or ""
                         if "Tense=Past"   in feats: count += 1
                         if "Number=Plur"  in feats: count += 1
                         if "Aspect=Prog"  in feats: count += 1
-                        if (
-                            "Tense=Pres"   in feats
-                            and "Number=Sing" in feats
-                            and "Person=3"    in feats
-                        ):
+                        if ("Tense=Pres" in feats
+                                and "Number=Sing" in feats
+                                and "Person=3"    in feats):
                             count += 1
                 if count > 1:
                     counts.append(count)
             return round(float(np.mean(counts)), 2) if counts else 0.0
 
-        spacy_nlp = get_spacy()
-        if spacy_nlp:
+        sp = get_spacy()
+        if sp:
             counts = []
-            for utt, extra in zip(utterances, contraction_extras):
-                if not utt.strip():
-                    continue
-                doc   = spacy_nlp(utt)
+            for utt, extra in zip(utterances, extras):
+                if not utt.strip(): continue
+                doc   = sp(utt)
                 count = extra
                 for token in doc:
-                    if token.is_punct or token.is_space:
-                        continue
+                    if token.is_punct or token.is_space: continue
                     count += 1
-                    morph = str(token.morph)
+                    morph  = str(token.morph)
                     if "Tense=Past"  in morph: count += 1
                     if "Number=Plur" in morph: count += 1
                     if "Aspect=Prog" in morph: count += 1
@@ -364,39 +429,37 @@ class DiscourseMetricExtractor:
             return round(float(np.mean(counts)), 2) if counts else 0.0
 
         logger.warning("MLU: no NLP available, falling back to word count.")
-        word_counts = [
-            len(utt.split()) for utt in utterances
-            if utt.strip() and len(utt.split()) > 1
-        ]
-        return round(float(np.mean(word_counts)), 2) if word_counts else 0.0
+        wc = [len(u.split()) for u in utterances if u.strip() and len(u.split()) > 1]
+        return round(float(np.mean(wc)), 2) if wc else 0.0
 
+    # ------------------------------------------------------------------
     MATTR_WINDOW      = 50
     MATTR_MIN_WINDOWS = 2
     CONTENT_POS_STANZA = {"NOUN", "VERB", "ADJ", "ADV"}
     CONTENT_POS_SPACY  = {"NOUN", "VERB", "ADJ", "ADV"}
 
-    def _compute_ttr(self, utterances: List[str]) -> float:
+    def _ttr(self, utterances: List[str]) -> float:
         full_text = " ".join(utterances).lower()
 
         nlp = get_stanza()
         if nlp:
             doc    = nlp(full_text)
             lemmas = [
-                word.lemma.lower()
+                w.lemma.lower()
                 for sent in doc.sentences
-                for word in sent.words
-                if word.upos in self.CONTENT_POS_STANZA
+                for w in sent.words
+                if w.upos in self.CONTENT_POS_STANZA
             ]
             return self._mattr(lemmas)
 
-        spacy_nlp = get_spacy()
-        if spacy_nlp:
-            doc    = spacy_nlp(full_text)
+        sp = get_spacy()
+        if sp:
+            doc    = sp(full_text)
             lemmas = [
                 t.lemma_.lower()
                 for t in doc
                 if t.pos_ in self.CONTENT_POS_SPACY
-                and not t.is_punct and not t.is_space
+                   and not t.is_punct and not t.is_space
             ]
             return self._mattr(lemmas)
 
@@ -414,59 +477,70 @@ class DiscourseMetricExtractor:
         window = min(self.MATTR_WINDOW, max(1, n // self.MATTR_MIN_WINDOWS))
         if window >= n:
             return round(len(set(tokens)) / n, 4)
-        window_scores = [
-            len(set(tokens[i : i + window])) / window
+        scores = [
+            len(set(tokens[i: i + window])) / window
             for i in range(n - window + 1)
         ]
-        return round(float(np.mean(window_scores)), 4)
+        return round(float(np.mean(scores)), 4)
 
-    def _compute_syntactic_complexity(self, utterances: List[str]) -> float:
+    # ------------------------------------------------------------------
+    def _syn_comp(self, utterances: List[str]) -> float:
         if not utterances:
             return 0.0
 
         nlp = get_stanza()
         if nlp:
-            complex_count = 0
-            for utt in utterances:
-                if not utt.strip():
-                    continue
-                doc  = nlp(utt)
-                deps = {word.deprel for sent in doc.sentences for word in sent.words}
-                if deps & COMPLEX_DEPS:
-                    complex_count += 1
-            return round(complex_count / len(utterances), 4)
+            n_complex = sum(
+                1 for utt in utterances
+                if utt.strip()
+                and {w.deprel for s in nlp(utt).sentences for w in s.words} & COMPLEX_DEPS
+            )
+            return round(n_complex / len(utterances), 4)
 
-        spacy_nlp = get_spacy()
-        if spacy_nlp:
-            complex_count = 0
-            for utt in utterances:
-                if not utt.strip():
-                    continue
-                doc  = spacy_nlp(utt)
-                deps = {token.dep_ for token in doc}
-                if deps & COMPLEX_DEPS:
-                    complex_count += 1
-            return round(complex_count / len(utterances), 4)
+        sp = get_spacy()
+        if sp:
+            n_complex = sum(
+                1 for utt in utterances
+                if utt.strip()
+                and {t.dep_ for t in sp(utt)} & COMPLEX_DEPS
+            )
+            return round(n_complex / len(utterances), 4)
 
         logger.warning("SynComp: no NLP available, returning 0.0.")
         return 0.0
 
-    def _compute_maze_rate(
+    # ------------------------------------------------------------------
+    def _wpm(
+        self,
+        utterances:     List[str],
+        raw_utterances: Optional[List[str]],
+        duration:       float,
+    ) -> float:
+        source = raw_utterances if raw_utterances else utterances
+        total  = 0
+        for u in source:
+            stripped = _WPM_STRIP.sub(" ", u)
+            # Note: pylangacq tier content never contains the *PAR: prefix,
+            # so no prefix-strip is needed here.
+            total += len(re.findall(r"[a-zA-Z]+(?:'[a-zA-Z]+)?", stripped))
+        return round(total / max(duration, 0.01), 2)
+
+    # ------------------------------------------------------------------
+    def _maze_rate(
         self,
         raw_utterances: Optional[List[str]],
         n_clean:        int,
     ) -> float:
-
         if not raw_utterances:
             return 0.0
-
-        n_with_repair = sum(
+        n_repairs = sum(
             1 for raw in raw_utterances
             if _REPAIR_PATTERN.search(raw)
         )
-        return round(n_with_repair / max(n_clean, 1), 4)
+        return round(n_repairs / max(n_clean, 1), 4)
 
-    def _empty_metrics(self) -> DiscourseMetrics:
+    # ------------------------------------------------------------------
+    def _empty(self) -> "DiscourseMetrics":
         return DiscourseMetrics(
             ciu_rate=0.0, mc_score=0.0, mlu_morphemes=0.0,
             mattr=0.0, syntactic_complexity=0.0,
@@ -474,40 +548,33 @@ class DiscourseMetricExtractor:
             wpm=0.0, maze_rate=0.0,
         )
 
-    def _get_clean_production(self, utterances: List[str]) -> List[str]:
-        clean_utts = []
-        for utt in utterances:
-            temp = re.sub(r'\w+\s+\[/\]', '', utt)
-            temp = re.sub(r'\w+\s+\[//\]', '', temp)
-            temp = re.sub(r'\[.*?\]', '', temp)
-            temp = re.sub(r'\+\S+', '', temp)
-            clean_utts.append(temp.strip())
-        return [u for u in clean_utts if u]
 
+# ------------------------------------------------------------------
+# Module-level helpers (used by run_dae.py)
+# ------------------------------------------------------------------
 def compute_utt_length_std(utterances: List[str]) -> float:
-
     if len(utterances) < 2:
         return 0.0
     lengths = [len(u.split()) for u in utterances if u.strip()]
     return round(float(np.std(lengths)), 4) if lengths else 0.0
 
 
-def compute_mean_pause_ms(raw_utterances: List[str]) -> float:
-    if not raw_utterances:
+def compute_mean_pause_ms(utterance_objects) -> float:
+    """
+    Compute mean inter-utterance pause from Utterance.start_ms / end_ms.
+    The old raw-line scan is removed because pylangacq strips timestamp
+    bytes from tier content before we ever see u.raw.
+    """
+    timed = [
+        (u.start_ms, u.end_ms)
+        for u in utterance_objects
+        if u.start_ms > 0 and u.end_ms > 0
+    ]
+    if len(timed) < 2:
         return 0.0
-
-    timestamps = []
-    for raw in raw_utterances:
-        m = _TS_PATTERN.search(raw)
-        if m:
-            timestamps.append((int(m.group(1)), int(m.group(2))))
-
-    if len(timestamps) < 2:
-        return 0.0
-
     gaps = [
-        timestamps[i + 1][0] - timestamps[i][1]
-        for i in range(len(timestamps) - 1)
-        if timestamps[i + 1][0] > timestamps[i][1]
+        timed[i + 1][0] - timed[i][1]
+        for i in range(len(timed) - 1)
+        if timed[i + 1][0] > timed[i][1]
     ]
     return round(float(np.mean(gaps)), 2) if gaps else 0.0

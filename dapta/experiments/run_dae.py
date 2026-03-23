@@ -25,10 +25,11 @@ from dapta.utils.logger import get_logger
 
 logger = get_logger(__name__, log_file="logs/run_dae.log")
 
-def extract_metadata_from_transcript(transcript: PatientTranscript) -> dict:
 
-    meta = transcript.metadata
-    wab_aq = None
+# ======================================================================
+def extract_metadata_from_transcript(transcript: PatientTranscript) -> dict:
+    meta          = transcript.metadata
+    wab_aq        = None
     aphasia_subtype = "Other"
 
     if "diagnosis" in meta and meta["diagnosis"]:
@@ -60,32 +61,31 @@ def extract_metadata_from_transcript(transcript: PatientTranscript) -> dict:
         "participant_id":  transcript.participant_id,
         "session_id":      transcript.session_id,
         "aphasia_subtype": aphasia_subtype,
-        "wab_aq":          wab_aq
+        "wab_aq":          wab_aq,
     }
 
 
+# ======================================================================
 def find_longitudinal_participants(
     transcripts: List[PatientTranscript],
 ) -> Dict[str, List[str]]:
-
     pattern = re.compile(r"^(.+?)([a-z])$")
     groups: Dict[str, List[str]] = defaultdict(list)
-
     for t in transcripts:
         sid = t.session_id.lower()
-        m = pattern.match(sid)
+        m   = pattern.match(sid)
         base = m.group(1) if m else sid
         groups[base].append(t.session_id)
-
     return {k: sorted(v) for k, v in groups.items() if len(v) >= 2}
 
 
+# ======================================================================
 def split_participants(
-    all_ids: List[str],
+    all_ids:          List[str],
     longitudinal_ids: List[str],
-    seed: int = 42,
+    seed:             int = 42,
 ) -> Tuple[List[str], List[str], List[str]]:
-    rng = np.random.default_rng(seed)
+    rng    = np.random.default_rng(seed)
     single = [pid for pid in all_ids if pid not in longitudinal_ids]
     rng.shuffle(single)
 
@@ -94,8 +94,8 @@ def split_participants(
     n_val   = int(n * 0.15)
 
     train = longitudinal_ids + single[:n_train]
-    val   = single[n_train : n_train + n_val]
-    test  = single[n_train + n_val :]
+    val   = single[n_train: n_train + n_val]
+    test  = single[n_train + n_val:]
 
     logger.info(
         f"Split: {len(train)} train ({len(longitudinal_ids)} longitudinal), "
@@ -104,26 +104,31 @@ def split_participants(
     return train, val, test
 
 
+# ======================================================================
 def build_session_signals(
-    transcript: PatientTranscript,
+    transcript:   PatientTranscript,
     task_metrics: Dict[str, DiscourseMetrics],
 ) -> SessionSignals:
-   
     maze_rates = [m.maze_rate for m in task_metrics.values()]
     maze_rate  = float(np.mean(maze_rates)) if maze_rates else 0.0
+
     utt_length_std: Dict[str, float] = {}
     for task, utts in transcript.tasks.items():
         clean_texts = [u.text for u in utts if u.text.strip()]
         utt_length_std[task] = compute_utt_length_std(clean_texts)
-    all_raw = [u.raw for u in transcript.utterances if u.raw]
-    mean_pause_ms = compute_mean_pause_ms(all_raw)
+
+    # Pause computed directly from u.start_ms / u.end_ms.
+    # u.raw does NOT contain CLAN timestamps after pylangacq processing.
+    mean_pause_ms = compute_mean_pause_ms(transcript.utterances)
 
     return SessionSignals(
-        maze_rate=maze_rate,
-        utt_length_std=utt_length_std,
-        mean_pause_ms=mean_pause_ms,
+        maze_rate      = maze_rate,
+        utt_length_std = utt_length_std,
+        mean_pause_ms  = mean_pause_ms,
     )
 
+
+# ======================================================================
 def main(args) -> None:
     output_dir = Path("outputs/dae")
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -133,43 +138,57 @@ def main(args) -> None:
     logger.info("DAPTA Phase 1: Discourse Assessment Engine")
     logger.info("=" * 60)
     logger.info(f"Data directory: {args.data_dir}")
-   
+
+    # ------------------------------------------------------------------
     logger.info("\n[1/5] Parsing AphasiaBank transcripts...")
-    parser = CHATParser(participant_tier="PAR")
+    parser      = CHATParser(participant_tier="PAR")
     transcripts = parser.parse_directory(args.data_dir)
     if not transcripts:
-        logger.error(
-            f"No .cha files found in {args.data_dir}. Check your data_dir path."
-        )
+        logger.error(f"No .cha files found in {args.data_dir}.")
         return
-
     logger.info(f"Parsed {len(transcripts)} transcripts.")
 
     all_cha     = list(Path(args.data_dir).rglob("*.cha"))
     cha_by_stem = {f.stem.lower(): str(f) for f in all_cha}
     for t in transcripts:
         t.metadata["filepath"] = cha_by_stem.get(t.session_id.lower(), "")
-   
+
+    # ------------------------------------------------------------------
     logger.info("\n[2/5] Extracting discourse metrics...")
 
-    all_task_metrics: List[Dict[str, DiscourseMetrics]] = []
-    all_session_signals: List[SessionSignals] = []
-    all_session_ids:  List[str]  = []
-    failed: List[str] = []
+    all_task_metrics:    List[Dict[str, DiscourseMetrics]] = []
+    all_session_signals: List[SessionSignals]              = []
+    all_session_ids:     List[str]                         = []
+    failed:              List[str]                         = []
 
     for t in transcripts:
         try:
             task_dict: Dict[str, DiscourseMetrics] = {}
+
             for task in TASK_PRIORITY:
                 if not t.has_task(task):
                     continue
-                raw_utts   = [u.raw  for u in t.tasks[task] if u.text.strip()]
-                clean_utts = [u.text for u in t.tasks[task] if u.text.strip()]
+
+                task_utt_objects = [u for u in t.tasks[task] if u.text.strip()]
+                clean_utts       = [u.text     for u in task_utt_objects]
+                raw_utts         = [u.raw      for u in task_utt_objects]
+
                 if not clean_utts:
                     continue
-                ext = DiscourseMetricExtractor(task=task)
-        
-                task_dict[task] = ext.compute(clean_utts, raw_utterances=raw_utts)
+
+                # Derive the @G marker from the first utterance in this
+                # task group so WAB sub-pictures get the right mc_score
+                # concept list (window / umbrella / cat / flood).
+                first_utt  = task_utt_objects[0]
+                g_marker   = getattr(first_utt, "g_marker", "")
+
+                ext = DiscourseMetricExtractor(task=task, marker=g_marker)
+
+                task_dict[task] = ext.compute(
+                    clean_utts,
+                    raw_utterances    = raw_utts,
+                    utterance_objects = task_utt_objects,
+                )
 
             if not task_dict:
                 failed.append(t.session_id)
@@ -189,18 +208,18 @@ def main(args) -> None:
         f"Extracted metrics for {len(all_task_metrics)} transcripts. "
         f"Failed: {len(failed)}"
     )
-   
+
+    # ------------------------------------------------------------------
     if args.skip_roberta:
         logger.info("\n[3/5] Skipping RoBERTa (--skip_roberta flag set). Using zeros.")
         all_surprisals = [0.0] * len(all_task_metrics)
-
     else:
         logger.info("\n[3/5] Computing RoBERTa surprisal scores...")
 
         scorer = RoBERTaScorer(
-            model_name="distilroberta-base",
-            device=args.device,
-            checkpoint_path="outputs/dae/roberta_checkpoint",
+            model_name      = "distilroberta-base",
+            device          = args.device,
+            checkpoint_path = "outputs/dae/roberta_checkpoint",
         )
 
         train_texts: List[str] = []
@@ -215,22 +234,19 @@ def main(args) -> None:
 
         if train_sub and val_sub:
             scorer.fine_tune(
-                train_utterances=train_sub,
-                val_utterances=val_sub,
-                output_dir=None,
-                num_epochs=15,
-                batch_size=16,
-                learning_rate=2e-5,
-                mlm_probability=0.15,
-                warmup_ratio=0.06,
-                weight_decay=0.01,
-                early_stopping_patience=3,
+                train_utterances        = train_sub,
+                val_utterances          = val_sub,
+                output_dir              = None,
+                num_epochs              = 15,
+                batch_size              = 16,
+                learning_rate           = 2e-5,
+                mlm_probability         = 0.15,
+                warmup_ratio            = 0.06,
+                weight_decay            = 0.01,
+                early_stopping_patience = 3,
             )
         else:
-            logger.warning(
-                "Not enough utterances for fine-tuning. "
-                "Loading base model instead."
-            )
+            logger.warning("Not enough utterances for fine-tuning.")
 
         scorer.load(from_checkpoint=True)
 
@@ -238,7 +254,9 @@ def main(args) -> None:
         session_id_set = set(all_session_ids)
         try:
             from tqdm import tqdm
-            transcript_iter = tqdm(transcripts, desc="Scoring transcripts", unit="transcript")
+            transcript_iter = tqdm(
+                transcripts, desc="Scoring transcripts", unit="transcript"
+            )
         except ImportError:
             transcript_iter = transcripts
 
@@ -252,6 +270,8 @@ def main(args) -> None:
 
         all_surprisals = [surprisal_map.get(sid, 0.0) for sid in all_session_ids]
         logger.info(f"Surprisal scores computed. Mean: {np.mean(all_surprisals):.3f}")
+
+    # ------------------------------------------------------------------
     logger.info("\n[4/5] Building patient state vectors...")
 
     session_to_transcript = {t.session_id: t for t in transcripts}
@@ -264,68 +284,92 @@ def main(args) -> None:
         if t is None:
             continue
         meta = extract_metadata_from_transcript(t)
-
         profile = PatientProfile(
-            participant_id=meta["participant_id"],
-            aphasia_subtype=meta["aphasia_subtype"],
-            wab_aq=meta["wab_aq"]
+            participant_id  = meta["participant_id"],
+            aphasia_subtype = meta["aphasia_subtype"],
+            wab_aq          = meta["wab_aq"],
         )
         all_profiles.append(profile)
         profile_metadata.append(meta)
 
+    # ------------------------------------------------------------------
+    # Separate aphasia patients from controls.
+    # Controls are kept in `all_*` for RQ1 DAE validation output.
+    # The `rl_*` variables are used for everything RL-related:
+    #   scaler fitting, state vector building, splits, clustering, PES.
+    # ------------------------------------------------------------------
+    n_controls = sum(1 for p in all_profiles if p.is_control)
+    n_aphasia  = len(all_profiles) - n_controls
+    logger.info(
+        f"Participants: {n_aphasia} aphasia, {n_controls} controls "
+        f"(controls excluded from RL pipeline)"
+    )
 
+    aphasia_mask = [not p.is_control for p in all_profiles]
+
+    rl_task_metrics = [m for m, f in zip(all_task_metrics,    aphasia_mask) if f]
+    rl_surprisals   = [s for s, f in zip(all_surprisals,       aphasia_mask) if f]
+    rl_profiles     = [p for p, f in zip(all_profiles,         aphasia_mask) if f]
+    rl_signals      = [s for s, f in zip(all_session_signals,  aphasia_mask) if f]
+    rl_session_ids  = [s for s, f in zip(all_session_ids,      aphasia_mask) if f]
+    rl_metadata     = [m for m, f in zip(profile_metadata,     aphasia_mask) if f]
+
+    if not rl_task_metrics:
+        logger.error("No aphasia transcripts found after filtering controls. Exiting.")
+        return
+
+    # ------------------------------------------------------------------
     longitudinal          = find_longitudinal_participants(transcripts)
     longitudinal_base_ids = list(longitudinal.keys())
     logger.info(f"Found {len(longitudinal)} longitudinal participants (2+ sessions)")
 
-    unique_participants = list({p.participant_id for p in all_profiles})
+    unique_participants = list({p.participant_id for p in rl_profiles})
     train_ids, val_ids, test_ids = split_participants(
         unique_participants, longitudinal_base_ids
     )
 
-    train_mask = [p.participant_id in train_ids for p in all_profiles]
-    train_task_metrics  = [m for m, f in zip(all_task_metrics,    train_mask) if f]
-    train_surprisals    = [s for s, f in zip(all_surprisals,       train_mask) if f]
-    train_profiles      = [p for p, f in zip(all_profiles,         train_mask) if f]
-    train_signals       = [s for s, f in zip(all_session_signals,  train_mask) if f]
+    train_mask         = [p.participant_id in train_ids for p in rl_profiles]
+    train_task_metrics = [m for m, f in zip(rl_task_metrics, train_mask) if f]
+    train_surprisals   = [s for s, f in zip(rl_surprisals,   train_mask) if f]
+    train_profiles     = [p for p, f in zip(rl_profiles,     train_mask) if f]
+    train_signals      = [s for s, f in zip(rl_signals,      train_mask) if f]
 
     if not train_task_metrics:
-        logger.warning("No training metrics found — fitting scaler on all data.")
-        train_task_metrics = all_task_metrics
-        train_surprisals   = all_surprisals
-        train_profiles     = all_profiles
-        train_signals      = all_session_signals
+        logger.warning("No training metrics found — fitting scaler on all aphasia data.")
+        train_task_metrics = rl_task_metrics
+        train_surprisals   = rl_surprisals
+        train_profiles     = rl_profiles
+        train_signals      = rl_signals
 
     state_builder = PatientStateBuilder(scaler_path="outputs/dae/scaler.npz")
     state_builder.fit(
         train_task_metrics,
         train_surprisals,
         train_profiles,
-        all_signals=train_signals,
+        all_signals = train_signals,
     )
 
     state_vectors = state_builder.build_batch(
-        all_task_metrics,
-        all_surprisals,
-        all_profiles,
-        all_signals=all_session_signals,
+        rl_task_metrics,
+        rl_surprisals,
+        rl_profiles,
+        all_signals = rl_signals,
     )
 
-    logger.info(f"State vectors shape: {state_vectors.shape}")
+    logger.info(f"State vectors shape:  {state_vectors.shape}")
     logger.info(f"State dim: {state_vectors.shape[1]} (expected {state_builder.state_dim()})")
 
-   
-   
+    # ------------------------------------------------------------------
     logger.info("\n[5/5] Saving outputs...")
 
     np.savez(
         str(output_dir / "state_vectors.npz"),
-        state_vectors=state_vectors,
-        session_ids=np.array(all_session_ids),
+        state_vectors = state_vectors,
+        session_ids   = np.array(rl_session_ids),
     )
 
     with open(output_dir / "patient_profiles.json", "w") as f:
-        json.dump(profile_metadata, f, indent=2)
+        json.dump(rl_metadata, f, indent=2)
 
     with open(output_dir / "longitudinal.json", "w") as f:
         json.dump(longitudinal, f, indent=2)
@@ -335,25 +379,27 @@ def main(args) -> None:
         json.dump(splits, f, indent=2)
 
     metrics_summary = {
-        "n_transcripts":               len(all_task_metrics),
+        "n_transcripts_total":         len(all_task_metrics),
+        "n_transcripts_aphasia":        len(rl_task_metrics),
+        "n_transcripts_controls":       n_controls,
         "n_longitudinal_participants":  len(longitudinal),
-        "n_train":                     len(train_ids),
-        "n_val":                       len(val_ids),
-        "n_test":                      len(test_ids),
+        "n_train":                      len(train_ids),
+        "n_val":                        len(val_ids),
+        "n_test":                       len(test_ids),
         "mean_ciu_rate": float(np.mean([
             m.ciu_rate
-            for task_dict in all_task_metrics
+            for task_dict in rl_task_metrics
             for m in task_dict.values()
         ])),
         "mean_mlu": float(np.mean([
             m.mlu_morphemes
-            for task_dict in all_task_metrics
+            for task_dict in rl_task_metrics
             for m in task_dict.values()
         ])),
         "mean_maze_rate": float(np.mean([
-            sig.maze_rate for sig in all_session_signals
+            sig.maze_rate for sig in rl_signals
         ])),
-        "mean_surprisal":     float(np.mean(all_surprisals)),
+        "mean_surprisal":     float(np.mean(rl_surprisals)),
         "failed_transcripts": failed,
     }
     with open(output_dir / "metrics_report.json", "w") as f:
@@ -361,14 +407,17 @@ def main(args) -> None:
 
     logger.info("\n" + "=" * 60)
     logger.info("Phase 1 Complete.")
-    logger.info(f"  Transcripts processed : {len(all_task_metrics)}")
-    logger.info(f"  Longitudinal patients : {len(longitudinal)}")
-    logger.info(f"  State vector shape    : {state_vectors.shape}")
-    logger.info(f"  Outputs saved to      : {output_dir}/")
+    logger.info(f"  Transcripts processed (total)  : {len(all_task_metrics)}")
+    logger.info(f"  Aphasia only (RL pipeline)     : {len(rl_task_metrics)}")
+    logger.info(f"  Controls (excluded from RL)    : {n_controls}")
+    logger.info(f"  Longitudinal patients          : {len(longitudinal)}")
+    logger.info(f"  State vector shape             : {state_vectors.shape}")
+    logger.info(f"  Outputs saved to               : {output_dir}/")
     logger.info("=" * 60)
     logger.info("Next step: python experiments/run_pes.py")
 
 
+# ======================================================================
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DAPTA Phase 1: DAE Training")
     parser.add_argument(
