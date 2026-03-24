@@ -847,11 +847,12 @@ def main(args) -> None:
         dapta_disc = all_agent_results["DAPTA"]
 
         # Mean CIU gain across structured tasks (cookie_theft, cinderella, sandwich)
-        structured_ciu_gain = np.mean(
-            [dapta_disc[:, t * _N_METRICS_PER_TASK + 0]
-             for t in _STRUCTURED_TASK_INDICES],
-            axis=0,
-        )
+        # structured_ciu_gain = np.mean(
+        #     [dapta_disc[:, t * _N_METRICS_PER_TASK + 0]
+        #      for t in _STRUCTURED_TASK_INDICES],
+        #     axis=0,
+        # )
+        structured_ciu_gain = dapta_disc[:, 1 * _N_METRICS_PER_TASK + 0]
         # CIU gain on conversation task
         conversation_ciu_gain = dapta_disc[
             :, _CONVERSATION_TASK_INDEX * _N_METRICS_PER_TASK + 0

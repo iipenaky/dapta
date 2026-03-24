@@ -390,7 +390,7 @@ def print_report(summaries: List[dict], output_dir: Path) -> None:
     report = "\n".join(lines)
     print("\n" + report)
 
-    with open(output_dir / "sensitivity_report.txt", "w") as f:
+    with open(output_dir / "sensitivity_report.txt", "w", encoding="utf-8") as f:
         f.write(report + "\n")
     logger.info(f"Report saved to {output_dir}/sensitivity_report.txt")
 
