@@ -13,10 +13,7 @@ NON_APHASIA_SUBTYPES: Set[str] = {
     # Raw labels from AphasiaBank CHAT files (before _normalise_subtype)
     "control", "Control", "CONTROL",
     "NotAphasicByWAB", "NotAphasicByWab", "notaphasicbywab",
-    "not_aphasic", "healthy",
-    # Normalised fallback — in case state_builder ever maps these to Other
-    # We do NOT include "Other" here because Other is a valid aphasia subtype
-}
+    "not_aphasic", "healthy"}
 
 CONTROL_CLUSTER_ID = -1
 
@@ -31,31 +28,7 @@ class PatientClusterer:
         self._scaler     = StandardScaler()
         self.n_clusters: Optional[int] = None
 
-    def fit_predict(
-        self,
-        profiles:        List[PatientProfile],
-        state_vectors:   Optional[np.ndarray] = None,
-        min_k:           int = 6,
-        raw_subtypes:    Optional[List[str]] = None,
-    ) -> np.ndarray:
-        """
-        Cluster aphasia patients and return per-patient cluster labels.
-
-        Parameters
-        ----------
-        profiles : List[PatientProfile]
-            PatientProfile objects (subtypes already normalised by state_builder).
-        state_vectors : np.ndarray, optional
-            Full 47-dim state vectors aligned with profiles.
-        min_k : int
-            Minimum number of clusters to enforce.
-        raw_subtypes : List[str], optional
-            Raw subtype strings from patient_profiles.json, aligned with
-            profiles.  When provided, these are used for the aphasia mask
-            instead of the normalised PatientProfile.aphasia_subtype — this
-            correctly excludes controls whose raw label is "NotAphasicByWAB"
-            but whose normalised label is "Other".
-        """
+    def fit_predict(self,profiles:List[PatientProfile],state_vectors:Optional[np.ndarray] = None,min_k:int = 6,raw_subtypes:Optional[List[str]] = None) -> np.ndarray:
         aphasia_mask = self._aphasia_mask(profiles, raw_subtypes)
         n_aphasia    = int(aphasia_mask.sum())
         n_controls   = int((~aphasia_mask).sum())
@@ -99,12 +72,7 @@ class PatientClusterer:
 
         return full_labels
 
-    def predict(
-        self,
-        profiles:      List[PatientProfile],
-        state_vectors: Optional[np.ndarray] = None,
-        raw_subtypes:  Optional[List[str]]  = None,
-    ) -> np.ndarray:
+    def predict(self,profiles:      List[PatientProfile],state_vectors: Optional[np.ndarray] = None,raw_subtypes:  Optional[List[str]]  = None) -> np.ndarray:
         if self._kmeans is None:
             raise RuntimeError("Clusterer must be fitted before calling predict().")
 
@@ -208,16 +176,6 @@ class PatientClusterer:
         profiles:     List[PatientProfile],
         raw_subtypes: Optional[List[str]] = None,
     ) -> np.ndarray:
-        """
-        Build a boolean mask: True = aphasia patient, False = control.
-
-        If raw_subtypes is provided, uses those strings for the check —
-        this correctly catches controls whose raw label is "NotAphasicByWAB"
-        but whose normalised PatientProfile.aphasia_subtype is "Other".
-
-        If raw_subtypes is not provided, falls back to the normalised
-        PatientProfile.aphasia_subtype (legacy behaviour).
-        """
         if raw_subtypes is not None:
             if len(raw_subtypes) != len(profiles):
                 raise ValueError(

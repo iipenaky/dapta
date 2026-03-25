@@ -8,28 +8,7 @@ from dapta.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-_stanza_nlp = None
 _spacy_nlp  = None
-
-
-def get_stanza():
-    # global _stanza_nlp
-    # if _stanza_nlp is None:
-    #     try:
-    #         import stanza
-    #         _stanza_nlp = stanza.Pipeline(
-    #             "en",
-    #             processors    = "tokenize,mwt,pos,lemma,depparse",
-    #             verbose       = False,
-    #             download_method = None,
-    #         )
-    #         logger.info("Stanza pipeline loaded (cached).")
-    #     except Exception as e:
-    #         logger.warning(f"Stanza unavailable: {e}")
-    #         _stanza_nlp = False
-    # return _stanza_nlp if _stanza_nlp else None
-    return None  # Stanza is currently disabled due to loading time and memory usage
-
 
 def get_spacy():
     global _spacy_nlp
@@ -52,21 +31,8 @@ TASK_DURATION_FALLBACK = {
     "conversation":    10.0,
 }
 
-# ------------------------------------------------------------------
-# MAIN_CONCEPTS
-#
-# Keyed by the original @G marker keyword (u.g_marker), NOT by the
-# task bucket.  This lets WAB sub-pictures (window / umbrella / cat /
-# flood) score against their own concept lists instead of the BDAE
-# Cookie Theft list, which they do not match.
-#
-# For any utterances whose g_marker is absent or not listed here, the
-# task bucket name is used as a fallback key (covers cookie_theft on
-# BDAE files, cinderella, sandwich, stroke_narrative).
-# ------------------------------------------------------------------
 MAIN_CONCEPTS: Dict[str, List] = {
 
-    # --- BDAE Cookie Theft scene ---
     "cookie_theft": [
         [["woman", "lady", "she", "mother", "mom"],
          ["washing", "drying", "cleaning", "dishes", "sink"]],
@@ -84,7 +50,6 @@ MAIN_CONCEPTS: Dict[str, List] = {
         [["window", "curtains", "outside"]],
     ],
 
-    # --- WAB: Window / broken window picture ---
     "window": [
         [["boy", "he", "kid", "child"],
          ["kick", "kicked", "kicking", "soccer", "ball"]],
@@ -98,7 +63,6 @@ MAIN_CONCEPTS: Dict[str, List] = {
          ["window", "hit", "went", "through"]],
     ],
 
-    # --- WAB: Umbrella / rainy day picture ---
     "umbrella": [
         [["woman", "lady", "mother", "mom", "she"],
          ["umbrella", "give", "gives", "gave", "offer", "hand"]],
@@ -113,7 +77,6 @@ MAIN_CONCEPTS: Dict[str, List] = {
          ["put on", "opened", "use", "used", "took", "back"]],
     ],
 
-    # --- WAB: Cat / cat up a tree picture ---
     "cat": [
         [["cat"],
          ["tree", "stuck", "up", "trapped", "climb", "climbed"]],
@@ -131,7 +94,6 @@ MAIN_CONCEPTS: Dict[str, List] = {
          ["bark", "barking", "barked", "watch", "looking"]],
     ],
 
-    # --- WAB: Flood / rescue picture ---
     "flood": [
         [["girl", "woman", "she", "child"],
          ["water", "flood", "stuck", "trapped", "rising", "caught"]],
@@ -144,7 +106,6 @@ MAIN_CONCEPTS: Dict[str, List] = {
         [["rescue", "save", "saved", "pull", "pulled", "out"]],
     ],
 
-    # --- Cinderella ---
     "cinderella": [
         [["cinderella", "she", "girl"],
          ["poor", "mistreated", "servants", "maid", "work", "working"]],
@@ -169,7 +130,7 @@ MAIN_CONCEPTS: Dict[str, List] = {
         [["married", "marry", "wedding", "lived", "happily"]],
     ],
 
-    # --- Sandwich ---
+    
     "sandwich": [
         [["bread", "loaf", "slice", "slices"]],
         [["peanut", "butter", "jelly", "jam"]],
@@ -178,7 +139,6 @@ MAIN_CONCEPTS: Dict[str, List] = {
         [["cut", "cutting", "slice", "half"]],
     ],
 
-    # --- Stroke narrative ---
     "stroke_narrative": [
         [["stroke", "attack", "brain"]],
         [["hospital", "ambulance", "emergency", "doctor"]],
@@ -188,7 +148,6 @@ MAIN_CONCEPTS: Dict[str, List] = {
     ],
 }
 
-# WAB sub-picture @G keywords that have their own concept list
 _WAB_MARKERS = {"window", "umbrella", "cat", "flood"}
 
 COMPLEX_DEPS = {"advcl", "relcl", "ccomp", "xcomp", "acl"}
@@ -201,8 +160,6 @@ CONTRACTION_MORPHEMES = [
     (re.compile(r"\b\w+'re\b",  re.IGNORECASE), 1),
     (re.compile(r"\b\w+'m\b",   re.IGNORECASE), 1),
 ]
-
-_TS_PATTERN = re.compile(r"\x15(\d+)_(\d+)\x15")
 
 _REPAIR_PATTERN = re.compile(
     r"\[/\]"
@@ -217,7 +174,7 @@ _WPM_STRIP = re.compile(
     r"|\[[-=][^\]]*\]"
     r"|&=[a-zA-Z_]+"
     r"|&\+[a-zA-Z]+"
-    r"|\+/\."           # trail-off-in-middle (was missing before)
+    r"|\+/\."           
     r"|\+[<>!.,?]"
     r"|[<>]"
     r"|\x14\d+\x14"
@@ -232,16 +189,16 @@ _WPM_STRIP = re.compile(
 
 @dataclass
 class DiscourseMetrics:
-    ciu_rate:             float
-    mc_score:             float
-    mlu_morphemes:        float
-    mattr:                float
-    syntactic_complexity: float
-    n_utterances:         int
-    n_words:              int
-    wpm:                  float = 0.0
-    maze_rate:            float = 0.0
-    task:                 str   = "unknown"
+    ciu_rate:float
+    mc_score:float
+    mlu_morphemes:float
+    mattr:float
+    syntactic_complexity:float
+    n_utterances:int
+    n_words:int
+    wpm:float = 0.0
+    maze_rate:float = 0.0
+    task:str   = "unknown"
 
     def to_array(self) -> np.ndarray:
         return np.array([
@@ -272,17 +229,9 @@ class DiscourseMetricExtractor:
     FILLER_PATTERN = re.compile(r"^\b(uh|um|er|ah|hmm|well)\b$", re.IGNORECASE)
     NON_WORD       = re.compile(r"[^a-zA-Z\s'-]")
 
-    def __init__(
-        self,
-        task:             str,
-        duration_minutes: float         = 0.0,
-        marker:           Optional[str] = None,
-    ):
+    def __init__(self, task:str, duration_minutes:float= 0.0, marker:Optional[str] = None):
         self.task             = task
         self.duration_minutes = duration_minutes or 0.0
-
-        # Resolve which MAIN_CONCEPTS key to use.
-        # Priority: explicit WAB marker > task bucket name > "" (no concepts)
         m = (marker or "").lower().strip()
         if m in _WAB_MARKERS:
             self._concepts_key = m
@@ -291,13 +240,7 @@ class DiscourseMetricExtractor:
         else:
             self._concepts_key = ""
 
-    # ------------------------------------------------------------------
-    def compute(
-        self,
-        utterances:        List[str],
-        raw_utterances:    Optional[List[str]] = None,
-        utterance_objects                      = None,
-    ) -> "DiscourseMetrics":
+    def compute(self,utterances:List[str], raw_utterances:Optional[List[str]] = None, utterance_objects = None) -> "DiscourseMetrics":
         utterances = [u.strip() for u in utterances if u.strip()]
         if not utterances:
             return self._empty()
@@ -305,31 +248,22 @@ class DiscourseMetricExtractor:
         duration = self._resolve_duration(utterance_objects)
 
         return DiscourseMetrics(
-            ciu_rate             = self._ciu_rate(utterances, duration),
-            mc_score             = self._mc_score(utterances),
-            mlu_morphemes        = self._mlu(utterances),
-            mattr                = self._ttr(utterances),
+            ciu_rate =self._ciu_rate(utterances, duration),
+            mc_score = self._mc_score(utterances),
+            mlu_morphemes = self._mlu(utterances),
+            mattr= self._ttr(utterances),
             syntactic_complexity = self._syn_comp(utterances),
-            n_utterances         = len(utterances),
-            n_words              = len(re.findall(
-                r"[a-zA-Z]+(?:'[a-zA-Z]+)?",
-                " ".join(utterances).lower()
-            )),
-            task                 = self.task,
-            wpm                  = self._wpm(utterances, raw_utterances, duration),
-            maze_rate            = self._maze_rate(raw_utterances, len(utterances)),
+            n_utterances= len(utterances),
+            n_words= len(re.findall(r"[a-zA-Z]+(?:'[a-zA-Z]+)?"," ".join(utterances).lower())),
+            task = self.task,
+            wpm = self._wpm(utterances, raw_utterances, duration),
+            maze_rate = self._maze_rate(raw_utterances, len(utterances)),
         )
 
-    # ------------------------------------------------------------------
+
     def _resolve_duration(self, utterance_objects) -> float:
-        # Priority 1: explicit duration set at construction time
         if self.duration_minutes > 0:
             return self.duration_minutes
-
-        # Priority 2: timestamps from Utterance objects (set by parser)
-        # u.raw does NOT contain CLAN timestamp bytes after pylangacq
-        # processing, so raw-line scanning is unreliable — we rely
-        # exclusively on u.start_ms / u.end_ms here.
         if utterance_objects:
             starts = [u.start_ms for u in utterance_objects if u.start_ms > 0]
             ends   = [u.end_ms   for u in utterance_objects if u.end_ms   > 0]
@@ -337,24 +271,22 @@ class DiscourseMetricExtractor:
                 ms = max(ends) - min(starts)
                 if ms > 0:
                     return ms / 60_000.0
-
-        # Priority 3: hardcoded fallback
         fallback = TASK_DURATION_FALLBACK.get(self.task, 5.0)
         logger.debug(f"[{self.task}] Using fallback duration: {fallback} min")
         return fallback
 
-    # ------------------------------------------------------------------
+
     def _ciu_rate(self, utterances: List[str], duration: float) -> float:
         count = 0
         for utt in utterances:
             for w in utt.lower().split():
-                if len(w) <= 1:                 continue
+                if len(w) <= 1:continue
                 if self.FILLER_PATTERN.match(w): continue
-                if self.NON_WORD.search(w):     continue
+                if self.NON_WORD.search(w):continue
                 count += 1
         return round(count / max(duration, 0.01), 6)
 
-    # ------------------------------------------------------------------
+
     def _mc_score(self, utterances: List[str]) -> float:
         if not self._concepts_key:
             return 0.0
@@ -363,7 +295,7 @@ class DiscourseMetricExtractor:
             return 0.0
 
         full_text = " ".join(utterances).lower()
-        total     = sum(self._score_concept(c, full_text) for c in concept_list)
+        total = sum(self._score_concept(c, full_text) for c in concept_list)
         max_score = 2 * len(concept_list)
         return round(total / max_score, 4) if max_score > 0 else 0.0
 
@@ -378,39 +310,12 @@ class DiscourseMetricExtractor:
                 groups_hit += 1
                 any_hit     = True
         if groups_hit == len(concept): return 2
-        elif any_hit:                  return 1
+        elif any_hit: return 1
         return 0
 
-    # ------------------------------------------------------------------
+
     def _mlu(self, utterances: List[str]) -> float:
-        extras = [
-            sum(len(p.findall(u)) for p, _ in CONTRACTION_MORPHEMES)
-            for u in utterances
-        ]
-
-        nlp = get_stanza()
-        if nlp:
-            counts = []
-            for utt, extra in zip(utterances, extras):
-                if not utt.strip(): continue
-                doc   = nlp(utt)
-                count = extra
-                for sent in doc.sentences:
-                    for word in sent.words:
-                        if word.upos == "PUNCT": continue
-                        count += 1
-                        feats  = word.feats or ""
-                        if "Tense=Past"   in feats: count += 1
-                        if "Number=Plur"  in feats: count += 1
-                        if "Aspect=Prog"  in feats: count += 1
-                        if ("Tense=Pres" in feats
-                                and "Number=Sing" in feats
-                                and "Person=3"    in feats):
-                            count += 1
-                if count > 1:
-                    counts.append(count)
-            return round(float(np.mean(counts)), 2) if counts else 0.0
-
+        extras = [sum(len(p.findall(u)) for p, _ in CONTRACTION_MORPHEMES)for u in utterances]
         sp = get_spacy()
         if sp:
             counts = []
@@ -433,7 +338,7 @@ class DiscourseMetricExtractor:
         wc = [len(u.split()) for u in utterances if u.strip() and len(u.split()) > 1]
         return round(float(np.mean(wc)), 2) if wc else 0.0
 
-    # ------------------------------------------------------------------
+
     MATTR_WINDOW      = 50
     MATTR_MIN_WINDOWS = 2
     CONTENT_POS_STANZA = {"NOUN", "VERB", "ADJ", "ADV"}
@@ -441,18 +346,6 @@ class DiscourseMetricExtractor:
 
     def _ttr(self, utterances: List[str]) -> float:
         full_text = " ".join(utterances).lower()
-
-        nlp = get_stanza()
-        if nlp:
-            doc    = nlp(full_text)
-            lemmas = [
-                w.lemma.lower()
-                for sent in doc.sentences
-                for w in sent.words
-                if w.upos in self.CONTENT_POS_STANZA
-            ]
-            return self._mattr(lemmas)
-
         sp = get_spacy()
         if sp:
             doc    = sp(full_text)
@@ -484,20 +377,10 @@ class DiscourseMetricExtractor:
         ]
         return round(float(np.mean(scores)), 4)
 
-    # ------------------------------------------------------------------
+
     def _syn_comp(self, utterances: List[str]) -> float:
         if not utterances:
             return 0.0
-
-        nlp = get_stanza()
-        if nlp:
-            n_complex = sum(
-                1 for utt in utterances
-                if utt.strip()
-                and {w.deprel for s in nlp(utt).sentences for w in s.words} & COMPLEX_DEPS
-            )
-            return round(n_complex / len(utterances), 4)
-
         sp = get_spacy()
         if sp:
             n_complex = sum(
@@ -510,28 +393,17 @@ class DiscourseMetricExtractor:
         logger.warning("SynComp: no NLP available, returning 0.0.")
         return 0.0
 
-    # ------------------------------------------------------------------
-    def _wpm(
-        self,
-        utterances:     List[str],
-        raw_utterances: Optional[List[str]],
-        duration:       float,
-    ) -> float:
+
+    def _wpm(self, utterances:List[str],raw_utterances: Optional[List[str]],duration:float) -> float:
         source = raw_utterances if raw_utterances else utterances
         total  = 0
         for u in source:
             stripped = _WPM_STRIP.sub(" ", u)
-            # Note: pylangacq tier content never contains the *PAR: prefix,
-            # so no prefix-strip is needed here.
             total += len(re.findall(r"[a-zA-Z]+(?:'[a-zA-Z]+)?", stripped))
         return round(total / max(duration, 0.01), 2)
 
-    # ------------------------------------------------------------------
-    def _maze_rate(
-        self,
-        raw_utterances: Optional[List[str]],
-        n_clean:        int,
-    ) -> float:
+
+    def _maze_rate(self,raw_utterances: Optional[List[str]],n_clean:int) -> float:
         if not raw_utterances:
             return 0.0
         n_repairs = sum(
@@ -540,7 +412,7 @@ class DiscourseMetricExtractor:
         )
         return round(n_repairs / max(n_clean, 1), 4)
 
-    # ------------------------------------------------------------------
+
     def _empty(self) -> "DiscourseMetrics":
         return DiscourseMetrics(
             ciu_rate=0.0, mc_score=0.0, mlu_morphemes=0.0,
@@ -549,10 +421,6 @@ class DiscourseMetricExtractor:
             wpm=0.0, maze_rate=0.0,
         )
 
-
-# ------------------------------------------------------------------
-# Module-level helpers (used by run_dae.py)
-# ------------------------------------------------------------------
 def compute_utt_length_std(utterances: List[str]) -> float:
     if len(utterances) < 2:
         return 0.0
@@ -561,11 +429,6 @@ def compute_utt_length_std(utterances: List[str]) -> float:
 
 
 def compute_mean_pause_ms(utterance_objects) -> float:
-    """
-    Compute mean inter-utterance pause from Utterance.start_ms / end_ms.
-    The old raw-line scan is removed because pylangacq strips timestamp
-    bytes from tier content before we ever see u.raw.
-    """
     timed = [
         (u.start_ms, u.end_ms)
         for u in utterance_objects

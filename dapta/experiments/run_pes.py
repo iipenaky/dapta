@@ -1,4 +1,3 @@
-# does this have different enironments for test, val, test? 
 import argparse
 import json
 from pathlib import Path
@@ -43,8 +42,33 @@ def build_transition_triples_from_longitudinal(
     longitudinal:  Dict[str, List[str]],
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
+    # ── CHANGE 1: Diagnose ID format before silently failing ─────────
+    # NEW CODE — session-level overlap
+    # Flatten all session IDs inside longitudinal.json
+    long_session_ids = {s.lower() for sessions in longitudinal.values() for s in sessions}
+
+    # Compare with session_ids
+    session_id_set = {str(sid).lower() for sid in session_ids}
+    overlap = session_id_set & long_session_ids
+
+    logger.info(f"Session ID sample (normalised): {list(session_id_set)[:5]}")
+    logger.info(f"Longitudinal session sample (flattened): {list(long_session_ids)[:5]}")
+    logger.info(
+        f"Session overlap check: {len(overlap)} matches "
+        f"(out of {len(long_session_ids)} longitudinal sessions, "
+        f"{len(session_id_set)} total sessions)"
+    )
+    if len(overlap) == 0:
+        logger.error(
+            "ZERO overlap between session_ids and longitudinal keys after normalisation. "
+            "This means all ID formats differ — e.g. session_ids use 'p01_s1' "
+            "but longitudinal uses 'P01_Session1'. Fix the ID format in run_dae.py "
+            "or add a mapping here. Transition triples cannot be built."
+        )
+    # ────────────────────────────────────────────────────────────────
+
     session_to_vec = {
-        sid: state_vectors[i]
+        str(sid).lower(): state_vectors[i]
         for i, sid in enumerate(session_ids)
     }
 
@@ -54,13 +78,11 @@ def build_transition_triples_from_longitudinal(
         for i in range(len(session_list) - 1):
             s_id  = session_list[i].lower()
             ns_id = session_list[i + 1].lower()
+            if s_id == ns_id:
+                continue  # skip duplicate sessions
 
-            s_vec = ns_vec = None
-            for sid, vec in session_to_vec.items():
-                if sid.lower() == s_id:
-                    s_vec = vec
-                if sid.lower() == ns_id:
-                    ns_vec = vec
+            s_vec  = session_to_vec.get(s_id)
+            ns_vec = session_to_vec.get(ns_id)
 
             if s_vec is None or ns_vec is None:
                 continue
@@ -214,13 +236,28 @@ def main(args) -> None:
     # ── 2. Build transition triples (train only) ─────────────────────
     logger.info("\n[2/5] Building transition triples from longitudinal data...")
 
-    # Longitudinal triples are inherently train-only because longitudinal
-    # participants are assigned to train in run_dae.py splits.
     states, actions, next_states = build_transition_triples_from_longitudinal(
         state_vectors, session_ids, longitudinal
     )
-    n_real     = len(states)
-    real_split = int(n_real * 0.9)
+    n_real = len(states)
+
+    # ── CHANGE 2: Hard guard on triple count ─────────────────────────
+    if n_real < 10:
+        logger.error(
+            f"Only {n_real} real longitudinal triple(s) found. "
+            "A meaningful held-out validation set requires at least 10. "
+            "Check that session IDs in state_vectors.npz match keys in "
+            "longitudinal.json (see ID overlap log above). "
+            "Continuing with augmented-only training — validation will be skipped."
+        )
+        real_split = n_real   # val slice will be empty; handled explicitly below
+    else:
+        real_split = int(n_real * 0.9)
+        logger.info(
+            f"Real triples: {n_real} total → "
+            f"{real_split} train, {n_real - real_split} held-out val"
+        )
+    # ────────────────────────────────────────────────────────────────
 
     val_states_real  = states[real_split:]
     val_actions_real = actions[real_split:]
@@ -260,19 +297,30 @@ def main(args) -> None:
     logger.info("Transition model trained.")
 
     # ── 3b. Validate transition model ───────────────────────────────
-    logger.info("\n[3b/5] Validating transition model...")
+    logger.info("\n[3b/5] Validating transition model on held-out longitudinal data...")
 
     val_metrics_out = {
-        "val_mse":              None,
-        "mae_per_metric":       {},
-        "directional_accuracy": {},
-        "note":                 None,
+        "n_val_triples":              len(val_states_real),
+        "n_real_triples_total":       n_real,
+        "coverage_pct":               round(len(val_states_real) / max(n_real, 1) * 100, 1),
+        "val_mse":                    None,
+        "mae_per_metric":             {},
+        "directional_accuracy":       {},
+        "directional_accuracy_by_action": {},
+        "note":                       None,
     }
 
     if len(val_states_real) == 0:
-        logger.warning("No real longitudinal validation data. Skipping.")
+        logger.warning(
+            "No real longitudinal validation data available. "
+            "Held-out validation skipped. "
+            "See ID overlap diagnostics above for the likely cause."
+        )
         val_metrics_out["note"] = (
-            "Skipped: no held-out real longitudinal triples available."
+            "Skipped: no held-out real longitudinal triples available. "
+            f"Total real triples found: {n_real}. "
+            "Likely cause: session ID format mismatch between state_vectors.npz "
+            "and longitudinal.json."
         )
     else:
         val_deltas  = val_next_real - val_states_real
@@ -281,6 +329,7 @@ def main(args) -> None:
             for s, a in zip(val_states_real, val_actions_real)
         ])
         pred_deltas = pred_nexts - val_states_real
+
         mae_per_dim = np.mean(
             np.abs(pred_deltas[:, :5] - val_deltas[:, :5]), axis=0
         )
@@ -289,6 +338,7 @@ def main(args) -> None:
             np.sign(pred_deltas[:, :5]) == np.sign(val_deltas[:, :5]), axis=0
         )
 
+        logger.info(f"  Val triples used : {len(val_states_real)} (of {n_real} real)")
         logger.info(f"  Val MSE (overall): {mse_overall:.6f}")
         for i, m in enumerate(METRIC_NAMES_VAL):
             logger.info(
@@ -304,6 +354,22 @@ def main(args) -> None:
             m: round(float(dir_acc[i]), 3)
             for i, m in enumerate(METRIC_NAMES_VAL)
         }
+
+        # ── CHANGE 3: Per-action directional accuracy ────────────────
+        action_dir_acc = {}
+        for a in range(N_ACTIONS):
+            mask = val_actions_real == a
+            if mask.sum() >= 3:
+                da = float(np.mean(
+                    np.sign(pred_deltas[mask, :5]) == np.sign(val_deltas[mask, :5])
+                ))
+                action_dir_acc[int(a)] = round(da, 3)
+                logger.info(
+                    f"  Action {a:>2} ({mask.sum():>3} samples)  "
+                    f"DirAcc={da:.3f}"
+                )
+        val_metrics_out["directional_accuracy_by_action"] = action_dir_acc
+        # ────────────────────────────────────────────────────────────
 
     with open(output_dir / "transition_model_validation.json", "w") as f:
         json.dump(val_metrics_out, f, indent=2)
@@ -340,11 +406,6 @@ def main(args) -> None:
     # ── 5. Build TherapyEnv instances for ALL patients ───────────────
     logger.info("\n[5/5] Building TherapyEnv instances...")
 
-    # Build environments for every patient (train + val + test).
-    # The split_labels array saved below lets run_rl.py filter correctly:
-    #   - RL agent trains only on train environments
-    #   - Evaluation runs on test environments
-    # This way the transition model is trained once and shared across splits.
     envs = build_env_population(
         initial_states   = list(state_vectors),
         transition_model = transition_model,
@@ -360,7 +421,7 @@ def main(args) -> None:
     cluster_env_indices: Dict[int, List[int]] = {i: [] for i in range(n_clusters)}
     for i, sid in enumerate(session_ids):
         c = session_to_cluster.get(sid, -1)
-        if c >= 0 and split_labels[i] == "train":   # train only
+        if c >= 0 and split_labels[i] == "train":
             cluster_env_indices[c].append(i)
 
     # ── Save outputs ─────────────────────────────────────────────────
@@ -369,7 +430,7 @@ def main(args) -> None:
         initial_states = state_vectors,
         session_ids    = session_ids,
         cluster_labels = cluster_labels,
-        split_labels   = split_labels,   # "train" / "val" / "test" per session
+        split_labels   = split_labels,
     )
 
     with open(output_dir / "cluster_assignments.json", "w") as f:
@@ -385,35 +446,39 @@ def main(args) -> None:
             },
             f, indent=2,
         )
-    
+
     report = {
-        "n_transition_triples":  len(train_states),
-        "n_longitudinal_real":   real_split,
-        "n_augmented_synthetic": args.n_augment,
-        "n_clusters":            n_clusters,
+        "n_transition_triples":   len(train_states),
+        "n_longitudinal_real":    real_split,
+        "n_longitudinal_val":     len(val_states_real),
+        "n_augmented_synthetic":  args.n_augment,
+        "n_clusters":             n_clusters,
         "cluster_sizes": {
             str(k): len(v) for k, v in cluster_env_indices.items()
         },
-        "n_environments_total":  len(envs),
-        "n_environments_train":  int(train_mask.sum()),
-        "n_environments_val":    int(val_mask.sum()),
-        "n_environments_test":   int(test_mask.sum()),
-        "train_split_size":      len(splits["train"]),
-        "val_split_size":        len(splits["val"]),
-        "test_split_size":       len(splits["test"]),
+        "n_environments_total":   len(envs),
+        "n_environments_train":   int(train_mask.sum()),
+        "n_environments_val":     int(val_mask.sum()),
+        "n_environments_test":    int(test_mask.sum()),
+        "train_split_size":       len(splits["train"]),
+        "val_split_size":         len(splits["val"]),
+        "test_split_size":        len(splits["test"]),
+        "validation_skipped":     len(val_states_real) == 0,
     }
     with open(output_dir / "pes_report.json", "w") as f:
         json.dump(report, f, indent=2)
 
     logger.info("\n" + "=" * 60)
     logger.info("Phase 2a Complete.")
-    logger.info(f"  Transition triples      : {len(train_states)}")
-    logger.info(f"  Patient clusters        : {n_clusters}")
-    logger.info(f"  Environments (total)    : {len(envs)}")
-    logger.info(f"  Environments (train)    : {train_mask.sum()}")
-    logger.info(f"  Environments (val)      : {val_mask.sum()}")
-    logger.info(f"  Environments (test)     : {test_mask.sum()}")
-    logger.info(f"  Outputs saved to        : {output_dir}/")
+    logger.info(f"  Transition triples (train) : {len(train_states)}")
+    logger.info(f"  Real longitudinal (train)  : {real_split}")
+    logger.info(f"  Real longitudinal (val)    : {len(val_states_real)}")
+    logger.info(f"  Patient clusters           : {n_clusters}")
+    logger.info(f"  Environments (total)       : {len(envs)}")
+    logger.info(f"  Environments (train)       : {train_mask.sum()}")
+    logger.info(f"  Environments (val)         : {val_mask.sum()}")
+    logger.info(f"  Environments (test)        : {test_mask.sum()}")
+    logger.info(f"  Outputs saved to           : {output_dir}/")
     logger.info("=" * 60)
     logger.info("Next step: python experiments/run_rl.py")
 

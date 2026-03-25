@@ -8,25 +8,13 @@ from typing import Dict, List, Tuple
 import numpy as np
 
 from dapta.dae.parser import CHATParser, PatientTranscript
-from dapta.dae.metrics import (
-    DiscourseMetricExtractor,
-    DiscourseMetrics,
-    compute_utt_length_std,
-    compute_mean_pause_ms,
-)
+from dapta.dae.metrics import (DiscourseMetricExtractor,DiscourseMetrics,compute_utt_length_std,compute_mean_pause_ms,)
 from dapta.dae.roberta_scorer import RoBERTaScorer
-from dapta.dae.state_builder import (
-    PatientStateBuilder,
-    PatientProfile,
-    SessionSignals,
-    TASKS as TASK_PRIORITY,
-)
+from dapta.dae.state_builder import (PatientStateBuilder,PatientProfile,SessionSignals, TASKS as TASK_PRIORITY,)
 from dapta.utils.logger import get_logger
 
 logger = get_logger(__name__, log_file="logs/run_dae.log")
 
-
-# ======================================================================
 def extract_metadata_from_transcript(transcript: PatientTranscript) -> dict:
     meta          = transcript.metadata
     wab_aq        = None
@@ -65,10 +53,8 @@ def extract_metadata_from_transcript(transcript: PatientTranscript) -> dict:
     }
 
 
-# ======================================================================
-def find_longitudinal_participants(
-    transcripts: List[PatientTranscript],
-) -> Dict[str, List[str]]:
+
+def find_longitudinal_participants(transcripts: List[PatientTranscript],) -> Dict[str, List[str]]:
     pattern = re.compile(r"^(.+?)([a-z])$")
     groups: Dict[str, List[str]] = defaultdict(list)
     for t in transcripts:
@@ -79,12 +65,8 @@ def find_longitudinal_participants(
     return {k: sorted(v) for k, v in groups.items() if len(v) >= 2}
 
 
-# ======================================================================
-def split_participants(
-    all_ids:          List[str],
-    longitudinal_ids: List[str],
-    seed:             int = 42,
-) -> Tuple[List[str], List[str], List[str]]:
+
+def split_participants(all_ids:List[str], longitudinal_ids: List[str], seed:int = 42) -> Tuple[List[str], List[str], List[str]]:
     rng    = np.random.default_rng(seed)
     single = [pid for pid in all_ids if pid not in longitudinal_ids]
     rng.shuffle(single)
@@ -104,11 +86,8 @@ def split_participants(
     return train, val, test
 
 
-# ======================================================================
-def build_session_signals(
-    transcript:   PatientTranscript,
-    task_metrics: Dict[str, DiscourseMetrics],
-) -> SessionSignals:
+
+def build_session_signals(transcript:   PatientTranscript,task_metrics: Dict[str, DiscourseMetrics]) -> SessionSignals:
     maze_rates = [m.maze_rate for m in task_metrics.values()]
     maze_rate  = float(np.mean(maze_rates)) if maze_rates else 0.0
 
@@ -116,9 +95,6 @@ def build_session_signals(
     for task, utts in transcript.tasks.items():
         clean_texts = [u.text for u in utts if u.text.strip()]
         utt_length_std[task] = compute_utt_length_std(clean_texts)
-
-    # Pause computed directly from u.start_ms / u.end_ms.
-    # u.raw does NOT contain CLAN timestamps after pylangacq processing.
     mean_pause_ms = compute_mean_pause_ms(transcript.utterances)
 
     return SessionSignals(
@@ -128,7 +104,7 @@ def build_session_signals(
     )
 
 
-# ======================================================================
+
 def main(args) -> None:
     output_dir = Path("outputs/dae")
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -139,7 +115,7 @@ def main(args) -> None:
     logger.info("=" * 60)
     logger.info(f"Data directory: {args.data_dir}")
 
-    # ------------------------------------------------------------------
+    
     logger.info("\n[1/5] Parsing AphasiaBank transcripts...")
     parser      = CHATParser(participant_tier="PAR")
     transcripts = parser.parse_directory(args.data_dir)
@@ -153,7 +129,7 @@ def main(args) -> None:
     for t in transcripts:
         t.metadata["filepath"] = cha_by_stem.get(t.session_id.lower(), "")
 
-    # ------------------------------------------------------------------
+    
     from tqdm import tqdm
     logger.info("\n[2/5] Extracting discourse metrics...")
 
@@ -177,10 +153,6 @@ def main(args) -> None:
 
                 if not clean_utts:
                     continue
-
-                # Derive the @G marker from the first utterance in this
-                # task group so WAB sub-pictures get the right mc_score
-                # concept list (window / umbrella / cat / flood).
                 first_utt  = task_utt_objects[0]
                 g_marker   = getattr(first_utt, "g_marker", "")
 
@@ -211,7 +183,7 @@ def main(args) -> None:
         f"Failed: {len(failed)}"
     )
 
-    # ------------------------------------------------------------------
+    
     if args.skip_roberta:
         logger.info("\n[3/5] Skipping RoBERTa (--skip_roberta flag set). Using zeros.")
         all_surprisals = [0.0] * len(all_task_metrics)
@@ -273,7 +245,7 @@ def main(args) -> None:
         all_surprisals = [surprisal_map.get(sid, 0.0) for sid in all_session_ids]
         logger.info(f"Surprisal scores computed. Mean: {np.mean(all_surprisals):.3f}")
 
-    # ------------------------------------------------------------------
+    
     logger.info("\n[4/5] Building patient state vectors...")
 
     session_to_transcript = {t.session_id: t for t in transcripts}
@@ -293,13 +265,7 @@ def main(args) -> None:
         )
         all_profiles.append(profile)
         profile_metadata.append(meta)
-
-    # ------------------------------------------------------------------
-    # Separate aphasia patients from controls.
-    # Controls are kept in `all_*` for RQ1 DAE validation output.
-    # The `rl_*` variables are used for everything RL-related:
-    #   scaler fitting, state vector building, splits, clustering, PES.
-    # ------------------------------------------------------------------
+    
     n_controls = sum(1 for p in all_profiles if p.is_control)
     n_aphasia  = len(all_profiles) - n_controls
     logger.info(
@@ -320,7 +286,7 @@ def main(args) -> None:
         logger.error("No aphasia transcripts found after filtering controls. Exiting.")
         return
 
-    # ------------------------------------------------------------------
+    
     longitudinal          = find_longitudinal_participants(transcripts)
     longitudinal_base_ids = list(longitudinal.keys())
     logger.info(f"Found {len(longitudinal)} longitudinal participants (2+ sessions)")
@@ -361,7 +327,7 @@ def main(args) -> None:
     logger.info(f"State vectors shape:  {state_vectors.shape}")
     logger.info(f"State dim: {state_vectors.shape[1]} (expected {state_builder.state_dim()})")
 
-    # ------------------------------------------------------------------
+    
     logger.info("\n[5/5] Saving outputs...")
 
     np.savez(
@@ -419,7 +385,7 @@ def main(args) -> None:
     logger.info("Next step: python experiments/run_pes.py")
 
 
-# ======================================================================
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="DAPTA Phase 1: DAE Training")
     parser.add_argument(
