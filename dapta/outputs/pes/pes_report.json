@@ -1,0 +1,21 @@
+{
+  "n_transition_triples": 630,
+  "n_longitudinal_real": 130,
+  "n_augmented_synthetic": 500,
+  "n_clusters": 6,
+  "cluster_sizes": {
+    "0": 104,
+    "1": 173,
+    "2": 92,
+    "3": 62,
+    "4": 89,
+    "5": 139
+  },
+  "n_environments_total": 942,
+  "n_environments_train": 659,
+  "n_environments_val": 142,
+  "n_environments_test": 141,
+  "train_split_size": 768,
+  "val_split_size": 139,
+  "test_split_size": 140
+}

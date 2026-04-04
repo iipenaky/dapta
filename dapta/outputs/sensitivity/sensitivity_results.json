@@ -1,0 +1,100 @@
+{
+  "summaries": [
+    {
+      "noise_label": "low",
+      "noise_std": 0.001,
+      "n_patients": 141,
+      "rq2": {
+        "dapta_ciu_mean": 0.544,
+        "rbde_ciu_mean": 0.5087,
+        "cohens_d_dapta_vs_rbde": 0.525,
+        "effect_size": "medium",
+        "wilcoxon_p": 0.0,
+        "significant": true,
+        "n_metrics_clin": 5,
+        "rq2_answered_positively": true,
+        "dapta_beats_rbde": true,
+        "dapta_beats_rts": true
+      },
+      "rq4": {
+        "dapta_ciu_mean": 0.544,
+        "gddqn_ciu_mean": 0.544,
+        "cohens_d_dapta_vs_gddqn": -0.001,
+        "effect_size": "negligible",
+        "wilcoxon_p": 0.5617,
+        "significant": false,
+        "personalisation_beneficial": false
+      },
+      "rq3": {
+        "spearman_r": 0.166,
+        "p_value": 0.0492,
+        "significant": true,
+        "rq3_answered_positively": false
+      }
+    },
+    {
+      "noise_label": "medium",
+      "noise_std": 0.005,
+      "n_patients": 141,
+      "rq2": {
+        "dapta_ciu_mean": 0.5457,
+        "rbde_ciu_mean": 0.5049,
+        "cohens_d_dapta_vs_rbde": 0.535,
+        "effect_size": "medium",
+        "wilcoxon_p": 0.0,
+        "significant": true,
+        "n_metrics_clin": 5,
+        "rq2_answered_positively": true,
+        "dapta_beats_rbde": true,
+        "dapta_beats_rts": true
+      },
+      "rq4": {
+        "dapta_ciu_mean": 0.5457,
+        "gddqn_ciu_mean": 0.5445,
+        "cohens_d_dapta_vs_gddqn": 0.014,
+        "effect_size": "negligible",
+        "wilcoxon_p": 0.5497,
+        "significant": false,
+        "personalisation_beneficial": false
+      },
+      "rq3": {
+        "spearman_r": 0.205,
+        "p_value": 0.0149,
+        "significant": true,
+        "rq3_answered_positively": true
+      }
+    },
+    {
+      "noise_label": "high",
+      "noise_std": 0.01,
+      "n_patients": 141,
+      "rq2": {
+        "dapta_ciu_mean": 0.5474,
+        "rbde_ciu_mean": 0.5015,
+        "cohens_d_dapta_vs_rbde": 0.51,
+        "effect_size": "medium",
+        "wilcoxon_p": 0.0,
+        "significant": true,
+        "n_metrics_clin": 5,
+        "rq2_answered_positively": true,
+        "dapta_beats_rbde": true,
+        "dapta_beats_rts": true
+      },
+      "rq4": {
+        "dapta_ciu_mean": 0.5474,
+        "gddqn_ciu_mean": 0.5409,
+        "cohens_d_dapta_vs_gddqn": 0.064,
+        "effect_size": "negligible",
+        "wilcoxon_p": 0.2958,
+        "significant": false,
+        "personalisation_beneficial": false
+      },
+      "rq3": {
+        "spearman_r": 0.159,
+        "p_value": 0.0593,
+        "significant": false,
+        "rq3_answered_positively": false
+      }
+    }
+  ]
+}

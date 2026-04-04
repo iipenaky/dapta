@@ -1,0 +1,208 @@
+{
+  "per_agent_summary": {
+    "DAPTA": {
+      "ciu_rate": {
+        "mean": 0.5451,
+        "cohens_d_vs_rbde": 0.557,
+        "effect_size": "medium"
+      },
+      "mc_score": {
+        "mean": 0.3367,
+        "cohens_d_vs_rbde": 0.6,
+        "effect_size": "medium"
+      },
+      "mlu_morphemes": {
+        "mean": 0.6035,
+        "cohens_d_vs_rbde": 0.642,
+        "effect_size": "medium"
+      },
+      "mattr": {
+        "mean": 0.2374,
+        "cohens_d_vs_rbde": 0.569,
+        "effect_size": "medium"
+      },
+      "syntactic_complexity": {
+        "mean": -0.005,
+        "cohens_d_vs_rbde": 0.931,
+        "effect_size": "large"
+      },
+      "ciu_cohens_d_vs_rbde": 0.557
+    },
+    "G_DDQN": {
+      "ciu_rate": {
+        "mean": 0.5446,
+        "cohens_d_vs_rbde": 0.802,
+        "effect_size": "large"
+      },
+      "mc_score": {
+        "mean": 0.3118,
+        "cohens_d_vs_rbde": 0.52,
+        "effect_size": "medium"
+      },
+      "mlu_morphemes": {
+        "mean": 0.5861,
+        "cohens_d_vs_rbde": 0.613,
+        "effect_size": "medium"
+      },
+      "mattr": {
+        "mean": 0.1207,
+        "cohens_d_vs_rbde": -0.517,
+        "effect_size": "medium"
+      },
+      "syntactic_complexity": {
+        "mean": -0.0723,
+        "cohens_d_vs_rbde": 0.583,
+        "effect_size": "medium"
+      },
+      "ciu_cohens_d_vs_rbde": 0.802
+    },
+    "NO_GRU_DAPTA": {
+      "ciu_rate": {
+        "mean": 0.5434,
+        "cohens_d_vs_rbde": 0.464,
+        "effect_size": "small"
+      },
+      "mc_score": {
+        "mean": 0.3565,
+        "cohens_d_vs_rbde": 0.744,
+        "effect_size": "medium"
+      },
+      "mlu_morphemes": {
+        "mean": 0.5935,
+        "cohens_d_vs_rbde": 0.584,
+        "effect_size": "medium"
+      },
+      "mattr": {
+        "mean": 0.2325,
+        "cohens_d_vs_rbde": 0.5,
+        "effect_size": "small"
+      },
+      "syntactic_complexity": {
+        "mean": 0.0026,
+        "cohens_d_vs_rbde": 1.052,
+        "effect_size": "large"
+      },
+      "ciu_cohens_d_vs_rbde": 0.464
+    },
+    "NO_GRU_G_DDQN": {
+      "ciu_rate": {
+        "mean": 0.5315,
+        "cohens_d_vs_rbde": 0.494,
+        "effect_size": "small"
+      },
+      "mc_score": {
+        "mean": 0.2981,
+        "cohens_d_vs_rbde": 0.483,
+        "effect_size": "small"
+      },
+      "mlu_morphemes": {
+        "mean": 0.5814,
+        "cohens_d_vs_rbde": 0.57,
+        "effect_size": "medium"
+      },
+      "mattr": {
+        "mean": 0.1222,
+        "cohens_d_vs_rbde": -0.513,
+        "effect_size": "medium"
+      },
+      "syntactic_complexity": {
+        "mean": -0.0706,
+        "cohens_d_vs_rbde": 0.625,
+        "effect_size": "medium"
+      },
+      "ciu_cohens_d_vs_rbde": 0.494
+    },
+    "PPO_GENERALISED": {
+      "ciu_rate": {
+        "mean": 0.5309,
+        "cohens_d_vs_rbde": 0.403,
+        "effect_size": "small"
+      },
+      "mc_score": {
+        "mean": 0.4039,
+        "cohens_d_vs_rbde": 1.011,
+        "effect_size": "large"
+      },
+      "mlu_morphemes": {
+        "mean": 0.6399,
+        "cohens_d_vs_rbde": 0.958,
+        "effect_size": "large"
+      },
+      "mattr": {
+        "mean": 0.3835,
+        "cohens_d_vs_rbde": 2.156,
+        "effect_size": "large"
+      },
+      "syntactic_complexity": {
+        "mean": 0.0396,
+        "cohens_d_vs_rbde": 1.316,
+        "effect_size": "large"
+      },
+      "ciu_cohens_d_vs_rbde": 0.403
+    },
+    "PPO_PERSONALISED": {
+      "ciu_rate": {
+        "mean": 0.5363,
+        "cohens_d_vs_rbde": 0.464,
+        "effect_size": "small"
+      },
+      "mc_score": {
+        "mean": 0.3722,
+        "cohens_d_vs_rbde": 0.908,
+        "effect_size": "large"
+      },
+      "mlu_morphemes": {
+        "mean": 0.6271,
+        "cohens_d_vs_rbde": 0.932,
+        "effect_size": "large"
+      },
+      "mattr": {
+        "mean": 0.3131,
+        "cohens_d_vs_rbde": 1.439,
+        "effect_size": "large"
+      },
+      "syntactic_complexity": {
+        "mean": 0.0475,
+        "cohens_d_vs_rbde": 1.69,
+        "effect_size": "large"
+      },
+      "ciu_cohens_d_vs_rbde": 0.464
+    }
+  },
+  "gru_benefit_personalised": {
+    "cohens_d": 0.027,
+    "wilcoxon_p": 0.4701,
+    "significant": false,
+    "gru_helps": false,
+    "interpretation": "GRU does not meaningfully improve performance"
+  },
+  "gru_benefit_generalised": {
+    "cohens_d": 0.357,
+    "wilcoxon_p": 0.0,
+    "significant": true,
+    "gru_helps": true
+  },
+  "algorithm_effect_generalised": {
+    "ppo_vs_gddqn_cohens_d": -0.198,
+    "wilcoxon_p": 0.9805,
+    "significant": false,
+    "ppo_wins": false,
+    "interpretation": "No significant difference between PPO and DDQN"
+  },
+  "algorithm_effect_personalised": {
+    "ppo_vs_dapta_cohens_d": -0.08,
+    "ppo_wins": false
+  },
+  "recommended_configuration": {
+    "agent": "DAPTA",
+    "ciu_rate_mean": 0.5451,
+    "all_ciu_means": {
+      "DAPTA": 0.5451,
+      "G_DDQN": 0.5446,
+      "NO_GRU_DAPTA": 0.5434,
+      "NO_GRU_G_DDQN": 0.5315,
+      "PPO_GENERALISED": 0.5309,
+      "PPO_PERSONALISED": 0.5363
+    }
+  }
+}

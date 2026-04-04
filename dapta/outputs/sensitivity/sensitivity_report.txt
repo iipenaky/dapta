@@ -1,0 +1,23 @@
+========================================================================
+DAPTA SENSITIVITY ANALYSIS — TRANSITION MODEL NOISE
+========================================================================
+Conclusion stability: do RQ2/RQ3/RQ4 conclusions hold across noise levels?
+
+  Noise    std     | RQ2 d   RQ2 sig  RQ2 ans  | RQ4 d   RQ4 sig  Pers?  | RQ3 r   RQ3 sig 
+  --------------------------------------------------------------------
+  low      0.001   |   0.525      yes      yes  |  -0.001       no     no  |   0.166      yes
+  medium   0.005   |   0.535      yes      yes  |   0.014       no     no  |   0.205      yes
+  high     0.010   |    0.51      yes      yes  |   0.064       no     no  |   0.159       no
+
+Consistency across noise levels:
+  RQ2 (DAPTA beats RBDE):          STABLE ✓
+  RQ4 (personalisation beneficial): STABLE ✓
+  RQ3 (cross-task transfer):        UNSTABLE ✗
+
+OVERALL: Some conclusions are noise-sensitive. Report which RQs are
+affected and discuss as a limitation. Stable conclusions can still
+be reported with confidence.
+
+Full results: outputs\sensitivity/sensitivity_results.json
+CSV table:    outputs\sensitivity/sensitivity_summary.csv
+========================================================================

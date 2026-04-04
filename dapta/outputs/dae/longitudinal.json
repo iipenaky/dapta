@@ -1,0 +1,556 @@
+{
+  "fridriksson01": [
+    "fridriksson01a",
+    "fridriksson01a"
+  ],
+  "fridriksson10": [
+    "fridriksson10a",
+    "fridriksson10a",
+    "fridriksson10b"
+  ],
+  "fridriksson13": [
+    "fridriksson13a",
+    "fridriksson13a"
+  ],
+  "tucson14": [
+    "tucson14a",
+    "tucson14a"
+  ],
+  "tucson15": [
+    "tucson15a",
+    "tucson15a",
+    "tucson15b"
+  ],
+  "williamson21": [
+    "williamson21a",
+    "williamson21a"
+  ],
+  "cmu01": [
+    "cmu01a",
+    "cmu01b"
+  ],
+  "cmu02": [
+    "cmu02a",
+    "cmu02b"
+  ],
+  "fridriksson03": [
+    "fridriksson03a",
+    "fridriksson03b"
+  ],
+  "fridriksson06": [
+    "fridriksson06a",
+    "fridriksson06b"
+  ],
+  "fridriksson09": [
+    "fridriksson09a",
+    "fridriksson09b"
+  ],
+  "kurland01": [
+    "kurland01a",
+    "kurland01b",
+    "kurland01c",
+    "kurland01d",
+    "kurland01e",
+    "kurland01f"
+  ],
+  "kurland02": [
+    "kurland02a",
+    "kurland02b",
+    "kurland02c",
+    "kurland02d",
+    "kurland02e",
+    "kurland02f",
+    "kurland02g"
+  ],
+  "kurland03": [
+    "kurland03a",
+    "kurland03b"
+  ],
+  "kurland04": [
+    "kurland04a",
+    "kurland04b"
+  ],
+  "kurland05": [
+    "kurland05a",
+    "kurland05b"
+  ],
+  "kurland06": [
+    "kurland06a",
+    "kurland06b"
+  ],
+  "kurland07": [
+    "kurland07a",
+    "kurland07b",
+    "kurland07c",
+    "kurland07d"
+  ],
+  "kurland08": [
+    "kurland08a",
+    "kurland08b",
+    "kurland08c"
+  ],
+  "kurland09": [
+    "kurland09a",
+    "kurland09b",
+    "kurland09c",
+    "kurland09d"
+  ],
+  "kurland10": [
+    "kurland10a",
+    "kurland10b"
+  ],
+  "kurland12": [
+    "kurland12a",
+    "kurland12b",
+    "kurland12c",
+    "kurland12d"
+  ],
+  "kurland13": [
+    "kurland13a",
+    "kurland13b",
+    "kurland13c",
+    "kurland13d"
+  ],
+  "kurland14": [
+    "kurland14a",
+    "kurland14b"
+  ],
+  "kurland15": [
+    "kurland15a",
+    "kurland15b",
+    "kurland15c",
+    "kurland15d",
+    "kurland15e"
+  ],
+  "kurland16": [
+    "kurland16a",
+    "kurland16b",
+    "kurland16c",
+    "kurland16d"
+  ],
+  "kurland17": [
+    "kurland17a",
+    "kurland17b",
+    "kurland17c",
+    "kurland17d",
+    "kurland17e"
+  ],
+  "kurland18": [
+    "kurland18a",
+    "kurland18b",
+    "kurland18c",
+    "kurland18d"
+  ],
+  "kurland19": [
+    "kurland19a",
+    "kurland19b",
+    "kurland19c",
+    "kurland19d",
+    "kurland19e"
+  ],
+  "kurland21": [
+    "kurland21a",
+    "kurland21b",
+    "kurland21c",
+    "kurland21d",
+    "kurland21e"
+  ],
+  "kurland22": [
+    "kurland22a",
+    "kurland22b",
+    "kurland22c",
+    "kurland22d",
+    "kurland22e"
+  ],
+  "kurland23": [
+    "kurland23a",
+    "kurland23b",
+    "kurland23c",
+    "kurland23d",
+    "kurland23e"
+  ],
+  "kurland24": [
+    "kurland24a",
+    "kurland24b",
+    "kurland24c",
+    "kurland24d",
+    "kurland24e"
+  ],
+  "kurland25": [
+    "kurland25a",
+    "kurland25b",
+    "kurland25c",
+    "kurland25d",
+    "kurland25e"
+  ],
+  "kurland26": [
+    "kurland26a",
+    "kurland26b",
+    "kurland26c",
+    "kurland26d",
+    "kurland26e"
+  ],
+  "kurland27": [
+    "kurland27a",
+    "kurland27b",
+    "kurland27c",
+    "kurland27d",
+    "kurland27e"
+  ],
+  "kurland28": [
+    "kurland28a",
+    "kurland28b",
+    "kurland28c",
+    "kurland28d"
+  ],
+  "kurland29": [
+    "kurland29a",
+    "kurland29b",
+    "kurland29c",
+    "kurland29d",
+    "kurland29e"
+  ],
+  "msuc01": [
+    "MSUC01a",
+    "MSUC01b"
+  ],
+  "msuc02": [
+    "MSUC02a",
+    "MSUC02b"
+  ],
+  "msuc03": [
+    "MSUC03a",
+    "MSUC03b"
+  ],
+  "msuc04": [
+    "MSUC04a",
+    "MSUC04b"
+  ],
+  "msuc05": [
+    "MSUC05a",
+    "MSUC05b"
+  ],
+  "msuc06": [
+    "MSUC06a",
+    "MSUC06b"
+  ],
+  "msuc07": [
+    "MSUC07a",
+    "MSUC07b"
+  ],
+  "msuc08": [
+    "MSUC08a",
+    "MSUC08b"
+  ],
+  "msuc09": [
+    "MSUC09a",
+    "MSUC09b"
+  ],
+  "msu01": [
+    "MSU01a",
+    "MSU01b"
+  ],
+  "msu02": [
+    "MSU02a",
+    "MSU02b"
+  ],
+  "msu03": [
+    "MSU03a",
+    "MSU03b"
+  ],
+  "msu04": [
+    "MSU04a",
+    "MSU04b"
+  ],
+  "msu05": [
+    "MSU05a",
+    "MSU05b"
+  ],
+  "msu06": [
+    "MSU06a",
+    "MSU06b"
+  ],
+  "msu07": [
+    "MSU07a",
+    "MSU07b"
+  ],
+  "msu08": [
+    "MSU08a",
+    "MSU08b"
+  ],
+  "19-1": [
+    "19-1",
+    "19-1"
+  ],
+  "19-2": [
+    "19-2",
+    "19-2"
+  ],
+  "8-1": [
+    "8-1",
+    "8-1"
+  ],
+  "8-2": [
+    "8-2",
+    "8-2"
+  ],
+  "45-1": [
+    "45-1",
+    "45-1"
+  ],
+  "45-2": [
+    "45-2",
+    "45-2"
+  ],
+  "64-1": [
+    "64-1",
+    "64-1"
+  ],
+  "64-2": [
+    "64-2",
+    "64-2"
+  ],
+  "65-1": [
+    "65-1",
+    "65-1"
+  ],
+  "65-2": [
+    "65-2",
+    "65-2"
+  ],
+  "68-1": [
+    "68-1",
+    "68-1"
+  ],
+  "68-2": [
+    "68-2",
+    "68-2"
+  ],
+  "74-1": [
+    "74-1",
+    "74-1"
+  ],
+  "74-2": [
+    "74-2",
+    "74-2"
+  ],
+  "richardson17": [
+    "richardson17",
+    "richardson17a"
+  ],
+  "richardson19": [
+    "richardson19",
+    "richardson19a"
+  ],
+  "richardson20": [
+    "richardson20",
+    "richardson20a"
+  ],
+  "richardson21": [
+    "richardson21",
+    "richardson21a"
+  ],
+  "richardson23": [
+    "richardson23",
+    "richardson23a"
+  ],
+  "richardson24": [
+    "richardson24",
+    "richardson24a"
+  ],
+  "richardson25": [
+    "richardson25",
+    "richardson25a"
+  ],
+  "scale02": [
+    "scale02a",
+    "scale02b"
+  ],
+  "scale05": [
+    "scale05a",
+    "scale05b",
+    "scale05c"
+  ],
+  "scale06": [
+    "scale06a",
+    "scale06b",
+    "scale06c",
+    "scale06d"
+  ],
+  "scale11": [
+    "scale11a",
+    "scale11b"
+  ],
+  "scale12": [
+    "scale12a",
+    "scale12b",
+    "scale12c",
+    "scale12d"
+  ],
+  "scale14": [
+    "scale14a",
+    "scale14c"
+  ],
+  "scale15": [
+    "scale15a",
+    "scale15b",
+    "scale15c",
+    "scale15d"
+  ],
+  "scale17": [
+    "scale17a",
+    "scale17c"
+  ],
+  "scale18": [
+    "scale18a",
+    "scale18b",
+    "scale18c",
+    "scale18d"
+  ],
+  "scale30": [
+    "scale30a",
+    "scale30b"
+  ],
+  "thompson07": [
+    "thompson07a",
+    "thompson07b",
+    "thompson07c"
+  ],
+  "tucson06": [
+    "tucson06a",
+    "tucson06b"
+  ],
+  "tucson08": [
+    "tucson08a",
+    "tucson08b"
+  ],
+  "umd01": [
+    "UMD01",
+    "UMD01"
+  ],
+  "umd02": [
+    "UMD02",
+    "UMD02"
+  ],
+  "umd03": [
+    "UMD03",
+    "UMD03"
+  ],
+  "umd04": [
+    "UMD04",
+    "UMD04"
+  ],
+  "umd05": [
+    "UMD05",
+    "UMD05"
+  ],
+  "umd06": [
+    "UMD06",
+    "UMD06"
+  ],
+  "umd09": [
+    "UMD09",
+    "UMD09"
+  ],
+  "umd12": [
+    "UMD12",
+    "UMD12"
+  ],
+  "umd13": [
+    "UMD13",
+    "UMD13"
+  ],
+  "umd14": [
+    "UMD14",
+    "UMD14"
+  ],
+  "umd15": [
+    "UMD15",
+    "UMD15"
+  ],
+  "umd18": [
+    "UMD18",
+    "UMD18"
+  ],
+  "umd19": [
+    "UMD19",
+    "UMD19"
+  ],
+  "umd20": [
+    "UMD20",
+    "UMD20"
+  ],
+  "umd21": [
+    "UMD21",
+    "UMD21"
+  ],
+  "umd22": [
+    "UMD22",
+    "UMD22"
+  ],
+  "unh01": [
+    "UNH01a",
+    "UNH01b",
+    "UNH01c"
+  ],
+  "unh02": [
+    "UNH02a",
+    "UNH02b"
+  ],
+  "unh03": [
+    "UNH03a",
+    "UNH03b",
+    "UNH03c"
+  ],
+  "unh04": [
+    "UNH04a",
+    "UNH04b"
+  ],
+  "unh05": [
+    "UNH05a",
+    "UNH05b",
+    "UNH05c"
+  ],
+  "unh07": [
+    "UNH07a",
+    "UNH07b"
+  ],
+  "unh09": [
+    "UNH09a",
+    "UNH09b",
+    "UNH09c",
+    "UNH09d"
+  ],
+  "unh10": [
+    "UNH10a",
+    "UNH10b",
+    "UNH10c",
+    "UNH10d"
+  ],
+  "unh11": [
+    "UNH11a",
+    "UNH11b",
+    "UNH11c"
+  ],
+  "unh14": [
+    "UNH14a",
+    "UNH14b"
+  ],
+  "unh16": [
+    "UNH16a",
+    "UNH16b",
+    "UNH16c"
+  ],
+  "williamson09": [
+    "williamson09a",
+    "williamson09b"
+  ],
+  "williamson12": [
+    "williamson12a",
+    "williamson12b"
+  ],
+  "williamson14": [
+    "williamson14a",
+    "williamson14b"
+  ]
+}

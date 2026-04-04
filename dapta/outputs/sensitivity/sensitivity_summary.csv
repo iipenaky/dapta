@@ -1,0 +1,4 @@
+noise_label,noise_std,n_patients,rq2_dapta_ciu,rq2_rbde_ciu,rq2_cohens_d,rq2_effect,rq2_p,rq2_significant,rq2_n_clin,rq2_answered,rq2_beats_rbde,rq4_dapta_ciu,rq4_gddqn_ciu,rq4_cohens_d,rq4_effect,rq4_p,rq4_significant,rq4_pers_beneficial,rq3_spearman_r,rq3_p,rq3_significant,rq3_answered
+low,0.001,141,0.544,0.5087,0.525,medium,0.0,True,5,True,True,0.544,0.544,-0.001,negligible,0.5617,False,False,0.166,0.0492,True,False
+medium,0.005,141,0.5457,0.5049,0.535,medium,0.0,True,5,True,True,0.5457,0.5445,0.014,negligible,0.5497,False,False,0.205,0.0149,True,True
+high,0.01,141,0.5474,0.5015,0.51,medium,0.0,True,5,True,True,0.5474,0.5409,0.064,negligible,0.2958,False,False,0.159,0.0593,False,False

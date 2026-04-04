@@ -1,0 +1,1010 @@
+{
+  "DAPTA": {
+    "DAPTA_vs_RBDE": {
+      "ciu_rate": {
+        "agent_mean": 0.5451,
+        "baseline_mean": 0.5059,
+        "cohens_d": 0.557,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7754.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0281,
+          0.0508
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.3367,
+        "baseline_mean": 0.2513,
+        "cohens_d": 0.6,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 6969.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0614,
+          0.1082
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.6035,
+        "baseline_mean": 0.5504,
+        "cohens_d": 0.642,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8153.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0396,
+          0.0667
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.2374,
+        "baseline_mean": 0.1667,
+        "cohens_d": 0.569,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7717.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0515,
+          0.0902
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "syntactic_complexity": {
+        "agent_mean": -0.005,
+        "baseline_mean": -0.1178,
+        "cohens_d": 0.931,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9219.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0923,
+          0.1325
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "DAPTA_vs_RTS": {
+      "ciu_rate": {
+        "agent_mean": 0.5451,
+        "baseline_mean": 0.5085,
+        "cohens_d": 0.476,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7456.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0243,
+          0.0486
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.3367,
+        "baseline_mean": 0.2534,
+        "cohens_d": 0.591,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7229.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0603,
+          0.1065
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.6035,
+        "baseline_mean": 0.554,
+        "cohens_d": 0.617,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8048.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0367,
+          0.0631
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.2374,
+        "baseline_mean": 0.1652,
+        "cohens_d": 0.543,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7699.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0512,
+          0.0921
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "syntactic_complexity": {
+        "agent_mean": -0.005,
+        "baseline_mean": -0.1095,
+        "cohens_d": 0.842,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8985.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0834,
+          0.1247
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "summary": {
+      "DAPTA_vs_RBDE": {
+        "n_significant": 5,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      },
+      "DAPTA_vs_RTS": {
+        "n_significant": 5,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      }
+    }
+  },
+  "G_DDQN": {
+    "G_DDQN_vs_RBDE": {
+      "ciu_rate": {
+        "agent_mean": 0.5446,
+        "baseline_mean": 0.5059,
+        "cohens_d": 0.802,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8692.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0306,
+          0.0464
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.3118,
+        "baseline_mean": 0.2513,
+        "cohens_d": 0.52,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 6506.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0413,
+          0.0783
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.5861,
+        "baseline_mean": 0.5504,
+        "cohens_d": 0.613,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8115.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0267,
+          0.0456
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.1207,
+        "baseline_mean": 0.1667,
+        "cohens_d": -0.517,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 2338.0,
+        "p_raw": 1.0,
+        "ci_95": [
+          -0.0602,
+          -0.0312
+        ],
+        "p_corrected": 1.0,
+        "significant": false
+      },
+      "syntactic_complexity": {
+        "agent_mean": -0.0723,
+        "baseline_mean": -0.1178,
+        "cohens_d": 0.583,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7813.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0325,
+          0.0579
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "G_DDQN_vs_RTS": {
+      "ciu_rate": {
+        "agent_mean": 0.5446,
+        "baseline_mean": 0.5085,
+        "cohens_d": 0.681,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8298.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0272,
+          0.0444
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.3118,
+        "baseline_mean": 0.2534,
+        "cohens_d": 0.495,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 6114.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0394,
+          0.0771
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.5861,
+        "baseline_mean": 0.554,
+        "cohens_d": 0.515,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7359.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0229,
+          0.0427
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.1207,
+        "baseline_mean": 0.1652,
+        "cohens_d": -0.473,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 2557.0,
+        "p_raw": 1.0,
+        "ci_95": [
+          -0.0608,
+          -0.0282
+        ],
+        "p_corrected": 1.0,
+        "significant": false
+      },
+      "syntactic_complexity": {
+        "agent_mean": -0.0723,
+        "baseline_mean": -0.1095,
+        "cohens_d": 0.413,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7171.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0231,
+          0.0511
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "summary": {
+      "G_DDQN_vs_RBDE": {
+        "n_significant": 4,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      },
+      "G_DDQN_vs_RTS": {
+        "n_significant": 4,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      }
+    }
+  },
+  "NO_GRU_DAPTA": {
+    "NO_GRU_DAPTA_vs_RBDE": {
+      "ciu_rate": {
+        "agent_mean": 0.5434,
+        "baseline_mean": 0.5059,
+        "cohens_d": 0.464,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7249.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0243,
+          0.0506
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.3565,
+        "baseline_mean": 0.2513,
+        "cohens_d": 0.744,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7879.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0831,
+          0.1295
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.5935,
+        "baseline_mean": 0.5504,
+        "cohens_d": 0.584,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8093.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0308,
+          0.0551
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.2325,
+        "baseline_mean": 0.1667,
+        "cohens_d": 0.5,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7257.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0449,
+          0.089
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "syntactic_complexity": {
+        "agent_mean": 0.0026,
+        "baseline_mean": -0.1178,
+        "cohens_d": 1.052,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9394.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1012,
+          0.1389
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "NO_GRU_DAPTA_vs_RTS": {
+      "ciu_rate": {
+        "agent_mean": 0.5434,
+        "baseline_mean": 0.5085,
+        "cohens_d": 0.403,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 6995.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0204,
+          0.0482
+        ],
+        "p_corrected": 0.0001,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.3565,
+        "baseline_mean": 0.2534,
+        "cohens_d": 0.739,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7570.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0811,
+          0.1281
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.5935,
+        "baseline_mean": 0.554,
+        "cohens_d": 0.537,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7431.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0278,
+          0.0519
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.2325,
+        "baseline_mean": 0.1652,
+        "cohens_d": 0.471,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7179.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0451,
+          0.092
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "syntactic_complexity": {
+        "agent_mean": 0.0026,
+        "baseline_mean": -0.1095,
+        "cohens_d": 0.925,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9034.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0923,
+          0.1335
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "summary": {
+      "NO_GRU_DAPTA_vs_RBDE": {
+        "n_significant": 5,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      },
+      "NO_GRU_DAPTA_vs_RTS": {
+        "n_significant": 5,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      }
+    }
+  },
+  "NO_GRU_G_DDQN": {
+    "NO_GRU_G_DDQN_vs_RBDE": {
+      "ciu_rate": {
+        "agent_mean": 0.5315,
+        "baseline_mean": 0.5059,
+        "cohens_d": 0.494,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7552.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0167,
+          0.0336
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.2981,
+        "baseline_mean": 0.2513,
+        "cohens_d": 0.483,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 6723.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0303,
+          0.0619
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.5814,
+        "baseline_mean": 0.5504,
+        "cohens_d": 0.57,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7956.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0222,
+          0.0406
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.1222,
+        "baseline_mean": 0.1667,
+        "cohens_d": -0.513,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 2276.0,
+        "p_raw": 1.0,
+        "ci_95": [
+          -0.0594,
+          -0.0303
+        ],
+        "p_corrected": 1.0,
+        "significant": false
+      },
+      "syntactic_complexity": {
+        "agent_mean": -0.0706,
+        "baseline_mean": -0.1178,
+        "cohens_d": 0.625,
+        "effect_size": "medium",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7987.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0349,
+          0.0585
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "NO_GRU_G_DDQN_vs_RTS": {
+      "ciu_rate": {
+        "agent_mean": 0.5315,
+        "baseline_mean": 0.5085,
+        "cohens_d": 0.415,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7343.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0134,
+          0.0311
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.2981,
+        "baseline_mean": 0.2534,
+        "cohens_d": 0.44,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 6332.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0287,
+          0.0608
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.5814,
+        "baseline_mean": 0.554,
+        "cohens_d": 0.462,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 6854.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0179,
+          0.0379
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.1222,
+        "baseline_mean": 0.1652,
+        "cohens_d": -0.462,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 2495.0,
+        "p_raw": 1.0,
+        "ci_95": [
+          -0.0589,
+          -0.0273
+        ],
+        "p_corrected": 1.0,
+        "significant": false
+      },
+      "syntactic_complexity": {
+        "agent_mean": -0.0706,
+        "baseline_mean": -0.1095,
+        "cohens_d": 0.418,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7267.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.024,
+          0.0545
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "summary": {
+      "NO_GRU_G_DDQN_vs_RBDE": {
+        "n_significant": 4,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      },
+      "NO_GRU_G_DDQN_vs_RTS": {
+        "n_significant": 4,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      }
+    }
+  },
+  "PPO_GENERALISED": {
+    "PPO_GENERALISED_vs_RBDE": {
+      "ciu_rate": {
+        "agent_mean": 0.5309,
+        "baseline_mean": 0.5059,
+        "cohens_d": 0.403,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7231.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0149,
+          0.0356
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.4039,
+        "baseline_mean": 0.2513,
+        "cohens_d": 1.011,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8017.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1302,
+          0.1792
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.6399,
+        "baseline_mean": 0.5504,
+        "cohens_d": 0.958,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8981.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0743,
+          0.1047
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.3835,
+        "baseline_mean": 0.1667,
+        "cohens_d": 2.156,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9978.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1996,
+          0.2324
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "syntactic_complexity": {
+        "agent_mean": 0.0396,
+        "baseline_mean": -0.1178,
+        "cohens_d": 1.316,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9575.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1372,
+          0.1774
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "PPO_GENERALISED_vs_RTS": {
+      "ciu_rate": {
+        "agent_mean": 0.5309,
+        "baseline_mean": 0.5085,
+        "cohens_d": 0.352,
+        "effect_size": "small",
+        "clinically_meaningful": false,
+        "wilcoxon_stat": 6910.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0121,
+          0.0331
+        ],
+        "p_corrected": 0.0002,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.4039,
+        "baseline_mean": 0.2534,
+        "cohens_d": 1.007,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7894.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1277,
+          0.1768
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.6399,
+        "baseline_mean": 0.554,
+        "cohens_d": 0.905,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8716.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0705,
+          0.1011
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.3835,
+        "baseline_mean": 0.1652,
+        "cohens_d": 2.148,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9851.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1997,
+          0.2345
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "syntactic_complexity": {
+        "agent_mean": 0.0396,
+        "baseline_mean": -0.1095,
+        "cohens_d": 1.269,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9758.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1304,
+          0.1698
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "summary": {
+      "PPO_GENERALISED_vs_RBDE": {
+        "n_significant": 5,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      },
+      "PPO_GENERALISED_vs_RTS": {
+        "n_significant": 5,
+        "n_clinically_meaningful": 4,
+        "rq2_answered_positively": true
+      }
+    }
+  },
+  "PPO_PERSONALISED": {
+    "PPO_PERSONALISED_vs_RBDE": {
+      "ciu_rate": {
+        "agent_mean": 0.5363,
+        "baseline_mean": 0.5059,
+        "cohens_d": 0.464,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7435.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0199,
+          0.0417
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.3722,
+        "baseline_mean": 0.2513,
+        "cohens_d": 0.908,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8367.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1003,
+          0.1436
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.6271,
+        "baseline_mean": 0.5504,
+        "cohens_d": 0.932,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9108.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0635,
+          0.0901
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.3131,
+        "baseline_mean": 0.1667,
+        "cohens_d": 1.439,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9608.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1296,
+          0.1624
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "syntactic_complexity": {
+        "agent_mean": 0.0475,
+        "baseline_mean": -0.1178,
+        "cohens_d": 1.69,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9826.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1486,
+          0.1803
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "PPO_PERSONALISED_vs_RTS": {
+      "ciu_rate": {
+        "agent_mean": 0.5363,
+        "baseline_mean": 0.5085,
+        "cohens_d": 0.436,
+        "effect_size": "small",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7329.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0172,
+          0.0388
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mc_score": {
+        "agent_mean": 0.3722,
+        "baseline_mean": 0.2534,
+        "cohens_d": 0.902,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 7797.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0995,
+          0.142
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mlu_morphemes": {
+        "agent_mean": 0.6271,
+        "baseline_mean": 0.554,
+        "cohens_d": 0.928,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 8921.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.0608,
+          0.0856
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "mattr": {
+        "agent_mean": 0.3131,
+        "baseline_mean": 0.1652,
+        "cohens_d": 1.371,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9664.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1302,
+          0.1656
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      },
+      "syntactic_complexity": {
+        "agent_mean": 0.0475,
+        "baseline_mean": -0.1095,
+        "cohens_d": 1.479,
+        "effect_size": "large",
+        "clinically_meaningful": true,
+        "wilcoxon_stat": 9782.0,
+        "p_raw": 0.0,
+        "ci_95": [
+          0.1406,
+          0.1733
+        ],
+        "p_corrected": 0.0,
+        "significant": true
+      }
+    },
+    "summary": {
+      "PPO_PERSONALISED_vs_RBDE": {
+        "n_significant": 5,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      },
+      "PPO_PERSONALISED_vs_RTS": {
+        "n_significant": 5,
+        "n_clinically_meaningful": 5,
+        "rq2_answered_positively": true
+      }
+    }
+  }
+}

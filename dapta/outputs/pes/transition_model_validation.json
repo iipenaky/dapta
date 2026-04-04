@@ -1,0 +1,18 @@
+{
+  "val_mse": 0.031499,
+  "mae_per_metric": {
+    "ciu_rate": 0.0986,
+    "mc_score": 0.1743,
+    "mlu_morphemes": 0.0606,
+    "mattr": 0.0985,
+    "syntactic_complexity": 0.0713
+  },
+  "directional_accuracy": {
+    "ciu_rate": 0.4,
+    "mc_score": 0.933,
+    "mlu_morphemes": 0.467,
+    "mattr": 0.533,
+    "syntactic_complexity": 0.533
+  },
+  "note": null
+}

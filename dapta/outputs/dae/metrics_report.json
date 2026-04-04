@@ -1,0 +1,24 @@
+{
+  "n_transcripts_total": 1586,
+  "n_transcripts_aphasia": 942,
+  "n_transcripts_controls": 644,
+  "n_longitudinal_participants": 119,
+  "n_train": 768,
+  "n_val": 139,
+  "n_test": 140,
+  "mean_ciu_rate": 73.61602171849648,
+  "mean_mlu": 9.02257977285019,
+  "mean_maze_rate": 0.29552018931351737,
+  "mean_surprisal": 0.0,
+  "failed_transcripts": [
+    "1053-2",
+    "1053-3",
+    "1053-4",
+    "1053-6",
+    "1056-6",
+    "1070-2",
+    "1106-4",
+    "1106-5",
+    "1106-POLAR"
+  ]
+}

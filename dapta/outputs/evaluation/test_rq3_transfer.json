@@ -1,0 +1,14 @@
+{
+  "method": "rl_episode_gain_transfer_spearman",
+  "n_test_patients": 141,
+  "spearman_r": 0.218,
+  "p_value": 0.0095,
+  "significant": true,
+  "ci_95_gain_diff": [
+    -0.0147,
+    0.045
+  ],
+  "rq3_answered_positively": true,
+  "interpretation": "structured task RL gains transfer to naturalistic conversation",
+  "note": "Transfer measured as Spearman correlation between mean structured-task CIU gain (cookie_theft, cinderella, sandwich) and conversation CIU gain across test patients within the simulated RL environment."
+}

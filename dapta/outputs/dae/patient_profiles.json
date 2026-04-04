@@ -1,0 +1,5654 @@
+[
+  {
+    "participant_id": "ACWT01a",
+    "session_id": "ACWT01a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.9
+  },
+  {
+    "participant_id": "ACWT02a",
+    "session_id": "ACWT02a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 74.6
+  },
+  {
+    "participant_id": "ACWT03a",
+    "session_id": "ACWT03a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 69.3
+  },
+  {
+    "participant_id": "ACWT05a",
+    "session_id": "ACWT05a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.7
+  },
+  {
+    "participant_id": "ACWT08a",
+    "session_id": "ACWT08a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 40.5
+  },
+  {
+    "participant_id": "ACWT09a",
+    "session_id": "ACWT09a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 80.1
+  },
+  {
+    "participant_id": "ACWT10a",
+    "session_id": "ACWT10a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 57.4
+  },
+  {
+    "participant_id": "ACWT11a",
+    "session_id": "ACWT11a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 48.9
+  },
+  {
+    "participant_id": "ACWT12a",
+    "session_id": "ACWT12a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 79.5
+  },
+  {
+    "participant_id": "adler01a",
+    "session_id": "adler01a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.8
+  },
+  {
+    "participant_id": "adler02a",
+    "session_id": "adler02a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 74.9
+  },
+  {
+    "participant_id": "adler04a",
+    "session_id": "adler04a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 72.6
+  },
+  {
+    "participant_id": "adler05a",
+    "session_id": "adler05a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 65.5
+  },
+  {
+    "participant_id": "adler06a",
+    "session_id": "adler06a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 28.2
+  },
+  {
+    "participant_id": "adler08a",
+    "session_id": "adler08a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 78.5
+  },
+  {
+    "participant_id": "adler09a",
+    "session_id": "adler09a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.8
+  },
+  {
+    "participant_id": "adler10a",
+    "session_id": "adler10a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 51.2
+  },
+  {
+    "participant_id": "adler11a",
+    "session_id": "adler11a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 17.0
+  },
+  {
+    "participant_id": "adler12a",
+    "session_id": "adler12a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 87.2
+  },
+  {
+    "participant_id": "adler13a",
+    "session_id": "adler13a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 55.8
+  },
+  {
+    "participant_id": "adler14a",
+    "session_id": "adler14a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 83.0
+  },
+  {
+    "participant_id": "adler15a",
+    "session_id": "adler15a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.3
+  },
+  {
+    "participant_id": "adler16a",
+    "session_id": "adler16a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.2
+  },
+  {
+    "participant_id": "adler17a",
+    "session_id": "adler17a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.8
+  },
+  {
+    "participant_id": "adler18a",
+    "session_id": "adler18a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 59.8
+  },
+  {
+    "participant_id": "adler19a",
+    "session_id": "adler19a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 19.7
+  },
+  {
+    "participant_id": "adler20a",
+    "session_id": "adler20a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 79.1
+  },
+  {
+    "participant_id": "adler21a",
+    "session_id": "adler21a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.0
+  },
+  {
+    "participant_id": "adler23a",
+    "session_id": "adler23a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 46.8
+  },
+  {
+    "participant_id": "adler24a",
+    "session_id": "adler24a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 75.8
+  },
+  {
+    "participant_id": "adler25a",
+    "session_id": "adler25a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 77.6
+  },
+  {
+    "participant_id": "2256_T4",
+    "session_id": "2256_T4",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2265_T4",
+    "session_id": "2265_T4",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2312_T4",
+    "session_id": "2312_T4",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2334_T4",
+    "session_id": "2334_T4",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2364_NA",
+    "session_id": "2364_NA",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2399_T3",
+    "session_id": "2399_T3",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2399_T4",
+    "session_id": "2399_T4",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2407_T3",
+    "session_id": "2407_T3",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2416_T3",
+    "session_id": "2416_T3",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2416_T4",
+    "session_id": "2416_T4",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2420_T3",
+    "session_id": "2420_T3",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2420_T4",
+    "session_id": "2420_T4",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2427_NA",
+    "session_id": "2427_NA",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2432_T2",
+    "session_id": "2432_T2",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2432_T3",
+    "session_id": "2432_T3",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2432_T4",
+    "session_id": "2432_T4",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2434_T3",
+    "session_id": "2434_T3",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2440_T2",
+    "session_id": "2440_T2",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2440_T3",
+    "session_id": "2440_T3",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2440_T4",
+    "session_id": "2440_T4",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2441_T2",
+    "session_id": "2441_T2",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "2463_T2",
+    "session_id": "2463_T2",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "aprocsa1554a",
+    "session_id": "aprocsa1554a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "aprocsa1713a",
+    "session_id": "aprocsa1713a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "aprocsa1731a",
+    "session_id": "aprocsa1731a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "aprocsa1738a",
+    "session_id": "aprocsa1738a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "aprocsa1833a",
+    "session_id": "aprocsa1833a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "aprocsa1944a",
+    "session_id": "aprocsa1944a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "Baycrest10450a",
+    "session_id": "Baycrest10450a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "Baycrest10634a",
+    "session_id": "Baycrest10634a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": 80.0
+  },
+  {
+    "participant_id": "Baycrest11254a",
+    "session_id": "Baycrest11254a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": 58.3
+  },
+  {
+    "participant_id": "Baycrest11458a",
+    "session_id": "Baycrest11458a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": 45.0
+  },
+  {
+    "participant_id": "Baycrest12072a",
+    "session_id": "Baycrest12072a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": 52.5
+  },
+  {
+    "participant_id": "Baycrest12207a",
+    "session_id": "Baycrest12207a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": 25.0
+  },
+  {
+    "participant_id": "Baycrest12288a",
+    "session_id": "Baycrest12288a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": 59.9
+  },
+  {
+    "participant_id": "Baycrest12308a",
+    "session_id": "Baycrest12308a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": 75.0
+  },
+  {
+    "participant_id": "Baycrest12331a",
+    "session_id": "Baycrest12331a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": 90.8
+  },
+  {
+    "participant_id": "Baycrest9336a",
+    "session_id": "Baycrest9336a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": 78.3
+  },
+  {
+    "participant_id": "BU01a",
+    "session_id": "BU01a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.7
+  },
+  {
+    "participant_id": "BU02a",
+    "session_id": "BU02a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 63.5
+  },
+  {
+    "participant_id": "BU03a",
+    "session_id": "BU03a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 77.9
+  },
+  {
+    "participant_id": "BU04a",
+    "session_id": "BU04a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.1
+  },
+  {
+    "participant_id": "BU05a",
+    "session_id": "BU05a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 79.6
+  },
+  {
+    "participant_id": "BU06a",
+    "session_id": "BU06a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.6
+  },
+  {
+    "participant_id": "BU07a",
+    "session_id": "BU07a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 51.5
+  },
+  {
+    "participant_id": "BU08a",
+    "session_id": "BU08a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 39.7
+  },
+  {
+    "participant_id": "BU09a",
+    "session_id": "BU09a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 65.3
+  },
+  {
+    "participant_id": "BU10a",
+    "session_id": "BU10a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 65.1
+  },
+  {
+    "participant_id": "BU11a",
+    "session_id": "BU11a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "BU12a",
+    "session_id": "BU12a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.2
+  },
+  {
+    "participant_id": "fridriksson01a",
+    "session_id": "fridriksson01a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.6
+  },
+  {
+    "participant_id": "fridriksson10a",
+    "session_id": "fridriksson10a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 61.2
+  },
+  {
+    "participant_id": "fridriksson13a",
+    "session_id": "fridriksson13a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.6
+  },
+  {
+    "participant_id": "tucson14a",
+    "session_id": "tucson14a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 40.9
+  },
+  {
+    "participant_id": "tucson15a",
+    "session_id": "tucson15a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 43.1
+  },
+  {
+    "participant_id": "williamson21a",
+    "session_id": "williamson21a",
+    "aphasia_subtype": "Global",
+    "wab_aq": 17.1
+  },
+  {
+    "participant_id": "cmu01a",
+    "session_id": "cmu01a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "cmu01b",
+    "session_id": "cmu01b",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "cmu02a",
+    "session_id": "cmu02a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "cmu02b",
+    "session_id": "cmu02b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 59.6
+  },
+  {
+    "participant_id": "cmu03a",
+    "session_id": "cmu03a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.3
+  },
+  {
+    "participant_id": "fridriksson01a",
+    "session_id": "fridriksson01a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.6
+  },
+  {
+    "participant_id": "fridriksson02a",
+    "session_id": "fridriksson02a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 87.9
+  },
+  {
+    "participant_id": "fridriksson03a",
+    "session_id": "fridriksson03a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 46.2
+  },
+  {
+    "participant_id": "fridriksson03b",
+    "session_id": "fridriksson03b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 29.2
+  },
+  {
+    "participant_id": "fridriksson04a",
+    "session_id": "fridriksson04a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 84.2
+  },
+  {
+    "participant_id": "fridriksson05a",
+    "session_id": "fridriksson05a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.7
+  },
+  {
+    "participant_id": "fridriksson06a",
+    "session_id": "fridriksson06a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 49.0
+  },
+  {
+    "participant_id": "fridriksson06b",
+    "session_id": "fridriksson06b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 59.4
+  },
+  {
+    "participant_id": "fridriksson08b",
+    "session_id": "fridriksson08b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 22.1
+  },
+  {
+    "participant_id": "fridriksson09a",
+    "session_id": "fridriksson09a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.2
+  },
+  {
+    "participant_id": "fridriksson09b",
+    "session_id": "fridriksson09b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.2
+  },
+  {
+    "participant_id": "fridriksson10a",
+    "session_id": "fridriksson10a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 61.2
+  },
+  {
+    "participant_id": "fridriksson10b",
+    "session_id": "fridriksson10b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 66.4
+  },
+  {
+    "participant_id": "fridriksson12a",
+    "session_id": "fridriksson12a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.5
+  },
+  {
+    "participant_id": "fridriksson13a",
+    "session_id": "fridriksson13a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.6
+  },
+  {
+    "participant_id": "1003-1",
+    "session_id": "1003-1",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 33.9
+  },
+  {
+    "participant_id": "1003-2",
+    "session_id": "1003-2",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 33.9
+  },
+  {
+    "participant_id": "1003-3",
+    "session_id": "1003-3",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 33.9
+  },
+  {
+    "participant_id": "1003-4",
+    "session_id": "1003-4",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 33.9
+  },
+  {
+    "participant_id": "1003-5",
+    "session_id": "1003-5",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 33.9
+  },
+  {
+    "participant_id": "1003-6",
+    "session_id": "1003-6",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 33.9
+  },
+  {
+    "participant_id": "1003-LARC",
+    "session_id": "1003-LARC",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 33.9
+  },
+  {
+    "participant_id": "1006-1",
+    "session_id": "1006-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 45.9
+  },
+  {
+    "participant_id": "1006-2",
+    "session_id": "1006-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 45.9
+  },
+  {
+    "participant_id": "1006-3",
+    "session_id": "1006-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 45.9
+  },
+  {
+    "participant_id": "1006-4",
+    "session_id": "1006-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 45.9
+  },
+  {
+    "participant_id": "1006-5",
+    "session_id": "1006-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 45.9
+  },
+  {
+    "participant_id": "1006-6",
+    "session_id": "1006-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 45.9
+  },
+  {
+    "participant_id": "1006-LARC",
+    "session_id": "1006-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 45.9
+  },
+  {
+    "participant_id": "1008-1",
+    "session_id": "1008-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 37.6
+  },
+  {
+    "participant_id": "1008-2",
+    "session_id": "1008-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 37.6
+  },
+  {
+    "participant_id": "1008-3",
+    "session_id": "1008-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 37.6
+  },
+  {
+    "participant_id": "1008-4",
+    "session_id": "1008-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 37.6
+  },
+  {
+    "participant_id": "1008-5",
+    "session_id": "1008-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 37.6
+  },
+  {
+    "participant_id": "1008-6",
+    "session_id": "1008-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 37.6
+  },
+  {
+    "participant_id": "1008-LARC",
+    "session_id": "1008-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 37.6
+  },
+  {
+    "participant_id": "1010-1",
+    "session_id": "1010-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.6
+  },
+  {
+    "participant_id": "1010-2",
+    "session_id": "1010-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.6
+  },
+  {
+    "participant_id": "1010-3",
+    "session_id": "1010-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.6
+  },
+  {
+    "participant_id": "1010-4",
+    "session_id": "1010-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.6
+  },
+  {
+    "participant_id": "1010-5",
+    "session_id": "1010-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.6
+  },
+  {
+    "participant_id": "1010-6",
+    "session_id": "1010-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.6
+  },
+  {
+    "participant_id": "1010-LARC",
+    "session_id": "1010-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.6
+  },
+  {
+    "participant_id": "1012-1",
+    "session_id": "1012-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 40.6
+  },
+  {
+    "participant_id": "1012-2",
+    "session_id": "1012-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 40.6
+  },
+  {
+    "participant_id": "1012-3",
+    "session_id": "1012-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 40.6
+  },
+  {
+    "participant_id": "1012-4",
+    "session_id": "1012-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 40.6
+  },
+  {
+    "participant_id": "1012-5",
+    "session_id": "1012-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 40.6
+  },
+  {
+    "participant_id": "1012-6",
+    "session_id": "1012-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 40.6
+  },
+  {
+    "participant_id": "1014-1",
+    "session_id": "1014-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.8
+  },
+  {
+    "participant_id": "1014-2",
+    "session_id": "1014-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.8
+  },
+  {
+    "participant_id": "1014-3",
+    "session_id": "1014-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.8
+  },
+  {
+    "participant_id": "1014-4",
+    "session_id": "1014-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.8
+  },
+  {
+    "participant_id": "1014-5",
+    "session_id": "1014-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.8
+  },
+  {
+    "participant_id": "1014-6",
+    "session_id": "1014-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.8
+  },
+  {
+    "participant_id": "1014-LARC",
+    "session_id": "1014-LARC",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.8
+  },
+  {
+    "participant_id": "1015-1",
+    "session_id": "1015-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.9
+  },
+  {
+    "participant_id": "1015-2",
+    "session_id": "1015-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.9
+  },
+  {
+    "participant_id": "1015-3",
+    "session_id": "1015-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.9
+  },
+  {
+    "participant_id": "1015-4",
+    "session_id": "1015-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.9
+  },
+  {
+    "participant_id": "1015-5",
+    "session_id": "1015-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.9
+  },
+  {
+    "participant_id": "1015-6",
+    "session_id": "1015-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.9
+  },
+  {
+    "participant_id": "1015-LARC",
+    "session_id": "1015-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.9
+  },
+  {
+    "participant_id": "1016-1",
+    "session_id": "1016-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 36.3
+  },
+  {
+    "participant_id": "1016-2",
+    "session_id": "1016-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 36.3
+  },
+  {
+    "participant_id": "1016-3",
+    "session_id": "1016-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 36.3
+  },
+  {
+    "participant_id": "1016-4",
+    "session_id": "1016-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 36.3
+  },
+  {
+    "participant_id": "1016-5",
+    "session_id": "1016-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 36.3
+  },
+  {
+    "participant_id": "1016-6",
+    "session_id": "1016-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 36.3
+  },
+  {
+    "participant_id": "1016-LARC",
+    "session_id": "1016-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 36.3
+  },
+  {
+    "participant_id": "1026-1",
+    "session_id": "1026-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.8
+  },
+  {
+    "participant_id": "1026-2",
+    "session_id": "1026-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.8
+  },
+  {
+    "participant_id": "1026-3",
+    "session_id": "1026-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.8
+  },
+  {
+    "participant_id": "1026-4",
+    "session_id": "1026-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.8
+  },
+  {
+    "participant_id": "1026-5",
+    "session_id": "1026-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.8
+  },
+  {
+    "participant_id": "1026-6",
+    "session_id": "1026-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.8
+  },
+  {
+    "participant_id": "1029-1",
+    "session_id": "1029-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 77.2
+  },
+  {
+    "participant_id": "1029-2",
+    "session_id": "1029-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 77.2
+  },
+  {
+    "participant_id": "1029-3",
+    "session_id": "1029-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 77.2
+  },
+  {
+    "participant_id": "1029-4",
+    "session_id": "1029-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 77.2
+  },
+  {
+    "participant_id": "1029-5",
+    "session_id": "1029-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 77.2
+  },
+  {
+    "participant_id": "1029-6",
+    "session_id": "1029-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 77.2
+  },
+  {
+    "participant_id": "1030-1",
+    "session_id": "1030-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 73.9
+  },
+  {
+    "participant_id": "1030-2",
+    "session_id": "1030-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 73.9
+  },
+  {
+    "participant_id": "1030-3",
+    "session_id": "1030-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 73.9
+  },
+  {
+    "participant_id": "1030-4",
+    "session_id": "1030-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 73.9
+  },
+  {
+    "participant_id": "1030-5",
+    "session_id": "1030-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 73.9
+  },
+  {
+    "participant_id": "1030-6",
+    "session_id": "1030-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 73.9
+  },
+  {
+    "participant_id": "1030-LARC",
+    "session_id": "1030-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 73.9
+  },
+  {
+    "participant_id": "1033-1",
+    "session_id": "1033-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.3
+  },
+  {
+    "participant_id": "1033-2",
+    "session_id": "1033-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.3
+  },
+  {
+    "participant_id": "1033-3",
+    "session_id": "1033-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.3
+  },
+  {
+    "participant_id": "1033-4",
+    "session_id": "1033-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.3
+  },
+  {
+    "participant_id": "1033-5",
+    "session_id": "1033-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.3
+  },
+  {
+    "participant_id": "1033-6",
+    "session_id": "1033-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.3
+  },
+  {
+    "participant_id": "1033-LARC",
+    "session_id": "1033-LARC",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.3
+  },
+  {
+    "participant_id": "1034-1",
+    "session_id": "1034-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "1034-2",
+    "session_id": "1034-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "1034-3",
+    "session_id": "1034-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "1034-4",
+    "session_id": "1034-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "1034-5",
+    "session_id": "1034-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "1034-6",
+    "session_id": "1034-6",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "1034-LARC",
+    "session_id": "1034-LARC",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "1035-1",
+    "session_id": "1035-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.8
+  },
+  {
+    "participant_id": "1035-2",
+    "session_id": "1035-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.8
+  },
+  {
+    "participant_id": "1035-3",
+    "session_id": "1035-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.8
+  },
+  {
+    "participant_id": "1035-4",
+    "session_id": "1035-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.8
+  },
+  {
+    "participant_id": "1035-5",
+    "session_id": "1035-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.8
+  },
+  {
+    "participant_id": "1035-6",
+    "session_id": "1035-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.8
+  },
+  {
+    "participant_id": "1035-LARC",
+    "session_id": "1035-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.8
+  },
+  {
+    "participant_id": "1036-2",
+    "session_id": "1036-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 53.0
+  },
+  {
+    "participant_id": "1036-3",
+    "session_id": "1036-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 53.0
+  },
+  {
+    "participant_id": "1036-4",
+    "session_id": "1036-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 53.0
+  },
+  {
+    "participant_id": "1036-5",
+    "session_id": "1036-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 53.0
+  },
+  {
+    "participant_id": "1036-6",
+    "session_id": "1036-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 53.0
+  },
+  {
+    "participant_id": "1036-LARC",
+    "session_id": "1036-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 53.0
+  },
+  {
+    "participant_id": "1039-1",
+    "session_id": "1039-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.3
+  },
+  {
+    "participant_id": "1039-2",
+    "session_id": "1039-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.3
+  },
+  {
+    "participant_id": "1039-3",
+    "session_id": "1039-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.3
+  },
+  {
+    "participant_id": "1039-4",
+    "session_id": "1039-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.3
+  },
+  {
+    "participant_id": "1039-5",
+    "session_id": "1039-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.3
+  },
+  {
+    "participant_id": "1039-6",
+    "session_id": "1039-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.3
+  },
+  {
+    "participant_id": "1039-LARC",
+    "session_id": "1039-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.3
+  },
+  {
+    "participant_id": "1040-1",
+    "session_id": "1040-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 65.5
+  },
+  {
+    "participant_id": "1040-2",
+    "session_id": "1040-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 65.5
+  },
+  {
+    "participant_id": "1040-3",
+    "session_id": "1040-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 65.5
+  },
+  {
+    "participant_id": "1040-4",
+    "session_id": "1040-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 65.5
+  },
+  {
+    "participant_id": "1040-5",
+    "session_id": "1040-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 65.5
+  },
+  {
+    "participant_id": "1040-6",
+    "session_id": "1040-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 65.5
+  },
+  {
+    "participant_id": "1040-LARC",
+    "session_id": "1040-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 65.5
+  },
+  {
+    "participant_id": "1041-1",
+    "session_id": "1041-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.5
+  },
+  {
+    "participant_id": "1041-2",
+    "session_id": "1041-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.5
+  },
+  {
+    "participant_id": "1041-3",
+    "session_id": "1041-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.5
+  },
+  {
+    "participant_id": "1041-4",
+    "session_id": "1041-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.5
+  },
+  {
+    "participant_id": "1041-5",
+    "session_id": "1041-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.5
+  },
+  {
+    "participant_id": "1041-6",
+    "session_id": "1041-6",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.5
+  },
+  {
+    "participant_id": "1041-LARC",
+    "session_id": "1041-LARC",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.5
+  },
+  {
+    "participant_id": "1045-1",
+    "session_id": "1045-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 86.0
+  },
+  {
+    "participant_id": "1045-2",
+    "session_id": "1045-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 86.0
+  },
+  {
+    "participant_id": "1045-3",
+    "session_id": "1045-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 86.0
+  },
+  {
+    "participant_id": "1045-4",
+    "session_id": "1045-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 86.0
+  },
+  {
+    "participant_id": "1045-5",
+    "session_id": "1045-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 86.0
+  },
+  {
+    "participant_id": "1045-6",
+    "session_id": "1045-6",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 86.0
+  },
+  {
+    "participant_id": "1045-LARC",
+    "session_id": "1045-LARC",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 86.0
+  },
+  {
+    "participant_id": "1046-1",
+    "session_id": "1046-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.3
+  },
+  {
+    "participant_id": "1046-2",
+    "session_id": "1046-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.3
+  },
+  {
+    "participant_id": "1046-3",
+    "session_id": "1046-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.3
+  },
+  {
+    "participant_id": "1046-4",
+    "session_id": "1046-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.3
+  },
+  {
+    "participant_id": "1046-5",
+    "session_id": "1046-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.3
+  },
+  {
+    "participant_id": "1046-6",
+    "session_id": "1046-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.3
+  },
+  {
+    "participant_id": "1046-LARC",
+    "session_id": "1046-LARC",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.3
+  },
+  {
+    "participant_id": "1047-1",
+    "session_id": "1047-1",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 30.3
+  },
+  {
+    "participant_id": "1047-2",
+    "session_id": "1047-2",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 30.3
+  },
+  {
+    "participant_id": "1047-3",
+    "session_id": "1047-3",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 30.3
+  },
+  {
+    "participant_id": "1047-4",
+    "session_id": "1047-4",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 30.3
+  },
+  {
+    "participant_id": "1047-5",
+    "session_id": "1047-5",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 30.3
+  },
+  {
+    "participant_id": "1047-6",
+    "session_id": "1047-6",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 30.3
+  },
+  {
+    "participant_id": "1047-LARC",
+    "session_id": "1047-LARC",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 30.3
+  },
+  {
+    "participant_id": "1049-1",
+    "session_id": "1049-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.7
+  },
+  {
+    "participant_id": "1049-2",
+    "session_id": "1049-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.7
+  },
+  {
+    "participant_id": "1049-3",
+    "session_id": "1049-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.7
+  },
+  {
+    "participant_id": "1049-4",
+    "session_id": "1049-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.7
+  },
+  {
+    "participant_id": "1049-5",
+    "session_id": "1049-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.7
+  },
+  {
+    "participant_id": "1049-6",
+    "session_id": "1049-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.7
+  },
+  {
+    "participant_id": "1050-1",
+    "session_id": "1050-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 27.7
+  },
+  {
+    "participant_id": "1050-2",
+    "session_id": "1050-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 27.7
+  },
+  {
+    "participant_id": "1050-3",
+    "session_id": "1050-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 27.7
+  },
+  {
+    "participant_id": "1050-4",
+    "session_id": "1050-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 27.7
+  },
+  {
+    "participant_id": "1050-5",
+    "session_id": "1050-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 27.7
+  },
+  {
+    "participant_id": "1050-6",
+    "session_id": "1050-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 27.7
+  },
+  {
+    "participant_id": "1050-LARC",
+    "session_id": "1050-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 27.7
+  },
+  {
+    "participant_id": "1053-1",
+    "session_id": "1053-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 31.4
+  },
+  {
+    "participant_id": "1053-5",
+    "session_id": "1053-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 31.4
+  },
+  {
+    "participant_id": "1053-LARC",
+    "session_id": "1053-LARC",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 31.4
+  },
+  {
+    "participant_id": "1056-2",
+    "session_id": "1056-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.1
+  },
+  {
+    "participant_id": "1056-3",
+    "session_id": "1056-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.1
+  },
+  {
+    "participant_id": "1056-4",
+    "session_id": "1056-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.1
+  },
+  {
+    "participant_id": "1056-5",
+    "session_id": "1056-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.1
+  },
+  {
+    "participant_id": "1056-LARC",
+    "session_id": "1056-LARC",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.1
+  },
+  {
+    "participant_id": "1058-1",
+    "session_id": "1058-1",
+    "aphasia_subtype": "Global",
+    "wab_aq": 14.5
+  },
+  {
+    "participant_id": "1058-2",
+    "session_id": "1058-2",
+    "aphasia_subtype": "Global",
+    "wab_aq": 14.5
+  },
+  {
+    "participant_id": "1058-3",
+    "session_id": "1058-3",
+    "aphasia_subtype": "Global",
+    "wab_aq": 14.5
+  },
+  {
+    "participant_id": "1058-4",
+    "session_id": "1058-4",
+    "aphasia_subtype": "Global",
+    "wab_aq": 14.5
+  },
+  {
+    "participant_id": "1058-5",
+    "session_id": "1058-5",
+    "aphasia_subtype": "Global",
+    "wab_aq": 14.5
+  },
+  {
+    "participant_id": "1058-6",
+    "session_id": "1058-6",
+    "aphasia_subtype": "Global",
+    "wab_aq": 14.5
+  },
+  {
+    "participant_id": "1059-1",
+    "session_id": "1059-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.3
+  },
+  {
+    "participant_id": "1059-2",
+    "session_id": "1059-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.3
+  },
+  {
+    "participant_id": "1059-3",
+    "session_id": "1059-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.3
+  },
+  {
+    "participant_id": "1059-4",
+    "session_id": "1059-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.3
+  },
+  {
+    "participant_id": "1059-5",
+    "session_id": "1059-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.3
+  },
+  {
+    "participant_id": "1059-6",
+    "session_id": "1059-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.3
+  },
+  {
+    "participant_id": "1059-LARC",
+    "session_id": "1059-LARC",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.3
+  },
+  {
+    "participant_id": "1060-1",
+    "session_id": "1060-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 63.1
+  },
+  {
+    "participant_id": "1060-2",
+    "session_id": "1060-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 63.1
+  },
+  {
+    "participant_id": "1060-3",
+    "session_id": "1060-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 63.1
+  },
+  {
+    "participant_id": "1060-4",
+    "session_id": "1060-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 63.1
+  },
+  {
+    "participant_id": "1060-5",
+    "session_id": "1060-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 63.1
+  },
+  {
+    "participant_id": "1060-6",
+    "session_id": "1060-6",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 63.1
+  },
+  {
+    "participant_id": "1062-1",
+    "session_id": "1062-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 64.0
+  },
+  {
+    "participant_id": "1062-2",
+    "session_id": "1062-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 64.0
+  },
+  {
+    "participant_id": "1062-3",
+    "session_id": "1062-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 64.0
+  },
+  {
+    "participant_id": "1062-4",
+    "session_id": "1062-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 64.0
+  },
+  {
+    "participant_id": "1062-5",
+    "session_id": "1062-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 64.0
+  },
+  {
+    "participant_id": "1062-6",
+    "session_id": "1062-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 64.0
+  },
+  {
+    "participant_id": "1063-1",
+    "session_id": "1063-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 25.4
+  },
+  {
+    "participant_id": "1063-2",
+    "session_id": "1063-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 25.4
+  },
+  {
+    "participant_id": "1063-3",
+    "session_id": "1063-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 25.4
+  },
+  {
+    "participant_id": "1063-4",
+    "session_id": "1063-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 25.4
+  },
+  {
+    "participant_id": "1063-5",
+    "session_id": "1063-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 25.4
+  },
+  {
+    "participant_id": "1063-6",
+    "session_id": "1063-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 25.4
+  },
+  {
+    "participant_id": "1064-1",
+    "session_id": "1064-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.9
+  },
+  {
+    "participant_id": "1064-2",
+    "session_id": "1064-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.9
+  },
+  {
+    "participant_id": "1064-3",
+    "session_id": "1064-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.9
+  },
+  {
+    "participant_id": "1064-4",
+    "session_id": "1064-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.9
+  },
+  {
+    "participant_id": "1064-5",
+    "session_id": "1064-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.9
+  },
+  {
+    "participant_id": "1064-6",
+    "session_id": "1064-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.9
+  },
+  {
+    "participant_id": "1065-1",
+    "session_id": "1065-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.0
+  },
+  {
+    "participant_id": "1065-2",
+    "session_id": "1065-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.0
+  },
+  {
+    "participant_id": "1065-3",
+    "session_id": "1065-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.0
+  },
+  {
+    "participant_id": "1067-1",
+    "session_id": "1067-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 23.1
+  },
+  {
+    "participant_id": "1067-2",
+    "session_id": "1067-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 23.1
+  },
+  {
+    "participant_id": "1067-3",
+    "session_id": "1067-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 23.1
+  },
+  {
+    "participant_id": "1069-1",
+    "session_id": "1069-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.6
+  },
+  {
+    "participant_id": "1069-2",
+    "session_id": "1069-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.6
+  },
+  {
+    "participant_id": "1069-3",
+    "session_id": "1069-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.6
+  },
+  {
+    "participant_id": "1069-4",
+    "session_id": "1069-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.6
+  },
+  {
+    "participant_id": "1069-5",
+    "session_id": "1069-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.6
+  },
+  {
+    "participant_id": "1069-6",
+    "session_id": "1069-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.6
+  },
+  {
+    "participant_id": "1070-1",
+    "session_id": "1070-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 22.8
+  },
+  {
+    "participant_id": "1070-3",
+    "session_id": "1070-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 22.8
+  },
+  {
+    "participant_id": "1070-4",
+    "session_id": "1070-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 22.8
+  },
+  {
+    "participant_id": "1070-5",
+    "session_id": "1070-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 22.8
+  },
+  {
+    "participant_id": "1070-6",
+    "session_id": "1070-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 22.8
+  },
+  {
+    "participant_id": "1072-1",
+    "session_id": "1072-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.0
+  },
+  {
+    "participant_id": "1072-2",
+    "session_id": "1072-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.0
+  },
+  {
+    "participant_id": "1072-3",
+    "session_id": "1072-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.0
+  },
+  {
+    "participant_id": "1072-4",
+    "session_id": "1072-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.0
+  },
+  {
+    "participant_id": "1072-5",
+    "session_id": "1072-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.0
+  },
+  {
+    "participant_id": "1072-6",
+    "session_id": "1072-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.0
+  },
+  {
+    "participant_id": "1077-1",
+    "session_id": "1077-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 57.7
+  },
+  {
+    "participant_id": "1077-2",
+    "session_id": "1077-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 57.7
+  },
+  {
+    "participant_id": "1077-3",
+    "session_id": "1077-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 57.7
+  },
+  {
+    "participant_id": "1077-4",
+    "session_id": "1077-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 57.7
+  },
+  {
+    "participant_id": "1077-5",
+    "session_id": "1077-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 57.7
+  },
+  {
+    "participant_id": "1077-6",
+    "session_id": "1077-6",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 57.7
+  },
+  {
+    "participant_id": "1079-1",
+    "session_id": "1079-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 83.4
+  },
+  {
+    "participant_id": "1079-2",
+    "session_id": "1079-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 83.4
+  },
+  {
+    "participant_id": "1079-3",
+    "session_id": "1079-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 83.4
+  },
+  {
+    "participant_id": "1079-4",
+    "session_id": "1079-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 83.4
+  },
+  {
+    "participant_id": "1079-5",
+    "session_id": "1079-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 83.4
+  },
+  {
+    "participant_id": "1079-6",
+    "session_id": "1079-6",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 83.4
+  },
+  {
+    "participant_id": "1080-1",
+    "session_id": "1080-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.4
+  },
+  {
+    "participant_id": "1080-2",
+    "session_id": "1080-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.4
+  },
+  {
+    "participant_id": "1080-3",
+    "session_id": "1080-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.4
+  },
+  {
+    "participant_id": "1080-4",
+    "session_id": "1080-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.4
+  },
+  {
+    "participant_id": "1080-5",
+    "session_id": "1080-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.4
+  },
+  {
+    "participant_id": "1080-6",
+    "session_id": "1080-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.4
+  },
+  {
+    "participant_id": "1082-1",
+    "session_id": "1082-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.7
+  },
+  {
+    "participant_id": "1082-2",
+    "session_id": "1082-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.7
+  },
+  {
+    "participant_id": "1082-3",
+    "session_id": "1082-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.7
+  },
+  {
+    "participant_id": "1082-4",
+    "session_id": "1082-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.7
+  },
+  {
+    "participant_id": "1082-5",
+    "session_id": "1082-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.7
+  },
+  {
+    "participant_id": "1082-6",
+    "session_id": "1082-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.7
+  },
+  {
+    "participant_id": "1084-1",
+    "session_id": "1084-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.2
+  },
+  {
+    "participant_id": "1084-2",
+    "session_id": "1084-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.2
+  },
+  {
+    "participant_id": "1084-3",
+    "session_id": "1084-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.2
+  },
+  {
+    "participant_id": "1084-4",
+    "session_id": "1084-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.2
+  },
+  {
+    "participant_id": "1084-5",
+    "session_id": "1084-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.2
+  },
+  {
+    "participant_id": "1084-6",
+    "session_id": "1084-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.2
+  },
+  {
+    "participant_id": "1087-1",
+    "session_id": "1087-1",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 78.2
+  },
+  {
+    "participant_id": "1087-2",
+    "session_id": "1087-2",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 78.2
+  },
+  {
+    "participant_id": "1087-3",
+    "session_id": "1087-3",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 78.2
+  },
+  {
+    "participant_id": "1087-4",
+    "session_id": "1087-4",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 78.2
+  },
+  {
+    "participant_id": "1087-5",
+    "session_id": "1087-5",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 78.2
+  },
+  {
+    "participant_id": "1087-6",
+    "session_id": "1087-6",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 78.2
+  },
+  {
+    "participant_id": "1089-1",
+    "session_id": "1089-1",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 69.2
+  },
+  {
+    "participant_id": "1089-2",
+    "session_id": "1089-2",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 69.2
+  },
+  {
+    "participant_id": "1089-3",
+    "session_id": "1089-3",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 69.2
+  },
+  {
+    "participant_id": "1089-4",
+    "session_id": "1089-4",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 69.2
+  },
+  {
+    "participant_id": "1089-5",
+    "session_id": "1089-5",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 69.2
+  },
+  {
+    "participant_id": "1089-6",
+    "session_id": "1089-6",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 69.2
+  },
+  {
+    "participant_id": "1092-1",
+    "session_id": "1092-1",
+    "aphasia_subtype": "Global",
+    "wab_aq": 19.9
+  },
+  {
+    "participant_id": "1092-2",
+    "session_id": "1092-2",
+    "aphasia_subtype": "Global",
+    "wab_aq": 19.9
+  },
+  {
+    "participant_id": "1092-3",
+    "session_id": "1092-3",
+    "aphasia_subtype": "Global",
+    "wab_aq": 19.9
+  },
+  {
+    "participant_id": "1092-4",
+    "session_id": "1092-4",
+    "aphasia_subtype": "Global",
+    "wab_aq": 19.9
+  },
+  {
+    "participant_id": "1092-5",
+    "session_id": "1092-5",
+    "aphasia_subtype": "Global",
+    "wab_aq": 19.9
+  },
+  {
+    "participant_id": "1092-6",
+    "session_id": "1092-6",
+    "aphasia_subtype": "Global",
+    "wab_aq": 19.9
+  },
+  {
+    "participant_id": "1093-2",
+    "session_id": "1093-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "1093-3",
+    "session_id": "1093-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "1093-4",
+    "session_id": "1093-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "1093-5",
+    "session_id": "1093-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "1093-6",
+    "session_id": "1093-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "1095-1",
+    "session_id": "1095-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.3
+  },
+  {
+    "participant_id": "1095-2",
+    "session_id": "1095-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.3
+  },
+  {
+    "participant_id": "1095-3",
+    "session_id": "1095-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.3
+  },
+  {
+    "participant_id": "1095-4",
+    "session_id": "1095-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.3
+  },
+  {
+    "participant_id": "1095-5",
+    "session_id": "1095-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.3
+  },
+  {
+    "participant_id": "1095-6",
+    "session_id": "1095-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.3
+  },
+  {
+    "participant_id": "1096-1",
+    "session_id": "1096-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "1096-2",
+    "session_id": "1096-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "1096-3",
+    "session_id": "1096-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "1096-4",
+    "session_id": "1096-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "1096-5",
+    "session_id": "1096-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "1096-6",
+    "session_id": "1096-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "1101-1",
+    "session_id": "1101-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.2
+  },
+  {
+    "participant_id": "1101-2",
+    "session_id": "1101-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.2
+  },
+  {
+    "participant_id": "1101-3",
+    "session_id": "1101-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.2
+  },
+  {
+    "participant_id": "1101-4",
+    "session_id": "1101-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.2
+  },
+  {
+    "participant_id": "1101-5",
+    "session_id": "1101-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.2
+  },
+  {
+    "participant_id": "1101-6",
+    "session_id": "1101-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.2
+  },
+  {
+    "participant_id": "1102-1",
+    "session_id": "1102-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 44.5
+  },
+  {
+    "participant_id": "1102-2",
+    "session_id": "1102-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 44.5
+  },
+  {
+    "participant_id": "1102-3",
+    "session_id": "1102-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 44.5
+  },
+  {
+    "participant_id": "1102-4",
+    "session_id": "1102-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 44.5
+  },
+  {
+    "participant_id": "1102-5",
+    "session_id": "1102-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 44.5
+  },
+  {
+    "participant_id": "1102-6",
+    "session_id": "1102-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 44.5
+  },
+  {
+    "participant_id": "1104-1",
+    "session_id": "1104-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.2
+  },
+  {
+    "participant_id": "1104-2",
+    "session_id": "1104-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.2
+  },
+  {
+    "participant_id": "1104-3",
+    "session_id": "1104-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.2
+  },
+  {
+    "participant_id": "1104-4",
+    "session_id": "1104-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.2
+  },
+  {
+    "participant_id": "1104-5",
+    "session_id": "1104-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.2
+  },
+  {
+    "participant_id": "1104-6",
+    "session_id": "1104-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.2
+  },
+  {
+    "participant_id": "1105-1",
+    "session_id": "1105-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.9
+  },
+  {
+    "participant_id": "1106-1",
+    "session_id": "1106-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 32.4
+  },
+  {
+    "participant_id": "1106-2",
+    "session_id": "1106-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 32.4
+  },
+  {
+    "participant_id": "1106-3",
+    "session_id": "1106-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 32.4
+  },
+  {
+    "participant_id": "1106-6",
+    "session_id": "1106-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 32.4
+  },
+  {
+    "participant_id": "1108-1",
+    "session_id": "1108-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.9
+  },
+  {
+    "participant_id": "1108-2",
+    "session_id": "1108-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.9
+  },
+  {
+    "participant_id": "1108-3",
+    "session_id": "1108-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.9
+  },
+  {
+    "participant_id": "1108-4",
+    "session_id": "1108-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.9
+  },
+  {
+    "participant_id": "1108-5",
+    "session_id": "1108-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.9
+  },
+  {
+    "participant_id": "1108-6",
+    "session_id": "1108-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.9
+  },
+  {
+    "participant_id": "1109-1",
+    "session_id": "1109-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.9
+  },
+  {
+    "participant_id": "1109-2",
+    "session_id": "1109-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.9
+  },
+  {
+    "participant_id": "1109-3",
+    "session_id": "1109-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.9
+  },
+  {
+    "participant_id": "1109-4",
+    "session_id": "1109-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.9
+  },
+  {
+    "participant_id": "1109-5",
+    "session_id": "1109-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.9
+  },
+  {
+    "participant_id": "1109-6",
+    "session_id": "1109-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.9
+  },
+  {
+    "participant_id": "1110-1",
+    "session_id": "1110-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 62.3
+  },
+  {
+    "participant_id": "1110-2",
+    "session_id": "1110-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 62.3
+  },
+  {
+    "participant_id": "1110-3",
+    "session_id": "1110-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 62.3
+  },
+  {
+    "participant_id": "1110-4",
+    "session_id": "1110-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 62.3
+  },
+  {
+    "participant_id": "1110-5",
+    "session_id": "1110-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 62.3
+  },
+  {
+    "participant_id": "1110-6",
+    "session_id": "1110-6",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 62.3
+  },
+  {
+    "participant_id": "1112-1",
+    "session_id": "1112-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.0
+  },
+  {
+    "participant_id": "1112-2",
+    "session_id": "1112-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.0
+  },
+  {
+    "participant_id": "1112-3",
+    "session_id": "1112-3",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.0
+  },
+  {
+    "participant_id": "1112-4",
+    "session_id": "1112-4",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.0
+  },
+  {
+    "participant_id": "1112-5",
+    "session_id": "1112-5",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.0
+  },
+  {
+    "participant_id": "1112-6",
+    "session_id": "1112-6",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.0
+  },
+  {
+    "participant_id": "1113-1",
+    "session_id": "1113-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.4
+  },
+  {
+    "participant_id": "1113-2",
+    "session_id": "1113-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.4
+  },
+  {
+    "participant_id": "1113-3",
+    "session_id": "1113-3",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.4
+  },
+  {
+    "participant_id": "1113-4",
+    "session_id": "1113-4",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.4
+  },
+  {
+    "participant_id": "1113-5",
+    "session_id": "1113-5",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.4
+  },
+  {
+    "participant_id": "1113-6",
+    "session_id": "1113-6",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.4
+  },
+  {
+    "participant_id": "1114-1",
+    "session_id": "1114-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.9
+  },
+  {
+    "participant_id": "1114-2",
+    "session_id": "1114-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.9
+  },
+  {
+    "participant_id": "1114-3",
+    "session_id": "1114-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.9
+  },
+  {
+    "participant_id": "1114-4",
+    "session_id": "1114-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.9
+  },
+  {
+    "participant_id": "1114-5",
+    "session_id": "1114-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.9
+  },
+  {
+    "participant_id": "1114-6",
+    "session_id": "1114-6",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 51.9
+  },
+  {
+    "participant_id": "1116-1",
+    "session_id": "1116-1",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 29.8
+  },
+  {
+    "participant_id": "1116-2",
+    "session_id": "1116-2",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 29.8
+  },
+  {
+    "participant_id": "1116-3",
+    "session_id": "1116-3",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 29.8
+  },
+  {
+    "participant_id": "1116-4",
+    "session_id": "1116-4",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 29.8
+  },
+  {
+    "participant_id": "1116-5",
+    "session_id": "1116-5",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 29.8
+  },
+  {
+    "participant_id": "1116-6",
+    "session_id": "1116-6",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 29.8
+  },
+  {
+    "participant_id": "1117-1",
+    "session_id": "1117-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.9
+  },
+  {
+    "participant_id": "1117-2",
+    "session_id": "1117-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.9
+  },
+  {
+    "participant_id": "1117-3",
+    "session_id": "1117-3",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.9
+  },
+  {
+    "participant_id": "1117-4",
+    "session_id": "1117-4",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.9
+  },
+  {
+    "participant_id": "1117-5",
+    "session_id": "1117-5",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.9
+  },
+  {
+    "participant_id": "1117-6",
+    "session_id": "1117-6",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.9
+  },
+  {
+    "participant_id": "garrett01a",
+    "session_id": "garrett01a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 52.4
+  },
+  {
+    "participant_id": "garrett02a",
+    "session_id": "garrett02a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.5
+  },
+  {
+    "participant_id": "kansas01a",
+    "session_id": "kansas01a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 21.5
+  },
+  {
+    "participant_id": "kansas02a",
+    "session_id": "kansas02a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 24.5
+  },
+  {
+    "participant_id": "kansas05a",
+    "session_id": "kansas05a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 33.4
+  },
+  {
+    "participant_id": "kansas06a",
+    "session_id": "kansas06a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 20.2
+  },
+  {
+    "participant_id": "kansas08a",
+    "session_id": "kansas08a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 16.8
+  },
+  {
+    "participant_id": "kansas09a",
+    "session_id": "kansas09a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 60.0
+  },
+  {
+    "participant_id": "kansas10a",
+    "session_id": "kansas10a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 61.4
+  },
+  {
+    "participant_id": "kansas11a",
+    "session_id": "kansas11a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 87.8
+  },
+  {
+    "participant_id": "kansas12a",
+    "session_id": "kansas12a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 46.2
+  },
+  {
+    "participant_id": "kansas13a",
+    "session_id": "kansas13a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 70.4
+  },
+  {
+    "participant_id": "kansas14a",
+    "session_id": "kansas14a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 67.4
+  },
+  {
+    "participant_id": "kansas15a",
+    "session_id": "kansas15a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.5
+  },
+  {
+    "participant_id": "kansas16a",
+    "session_id": "kansas16a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 32.4
+  },
+  {
+    "participant_id": "kansas17a",
+    "session_id": "kansas17a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 71.9
+  },
+  {
+    "participant_id": "kansas18a",
+    "session_id": "kansas18a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.0
+  },
+  {
+    "participant_id": "kansas19a",
+    "session_id": "kansas19a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.7
+  },
+  {
+    "participant_id": "kansas20a",
+    "session_id": "kansas20a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 61.6
+  },
+  {
+    "participant_id": "kansas21a",
+    "session_id": "kansas21a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 77.2
+  },
+  {
+    "participant_id": "kansas22a",
+    "session_id": "kansas22a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 67.5
+  },
+  {
+    "participant_id": "kansas23a",
+    "session_id": "kansas23a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 54.7
+  },
+  {
+    "participant_id": "kempler02a",
+    "session_id": "kempler02a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 78.5
+  },
+  {
+    "participant_id": "kempler03a",
+    "session_id": "kempler03a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 60.7
+  },
+  {
+    "participant_id": "kempler04a",
+    "session_id": "kempler04a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.6
+  },
+  {
+    "participant_id": "kurland01a",
+    "session_id": "kurland01a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland01b",
+    "session_id": "kurland01b",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland01c",
+    "session_id": "kurland01c",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 55.7
+  },
+  {
+    "participant_id": "kurland01d",
+    "session_id": "kurland01d",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 55.7
+  },
+  {
+    "participant_id": "kurland01e",
+    "session_id": "kurland01e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland01f",
+    "session_id": "kurland01f",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland02a",
+    "session_id": "kurland02a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 73.7
+  },
+  {
+    "participant_id": "kurland02b",
+    "session_id": "kurland02b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 73.7
+  },
+  {
+    "participant_id": "kurland02c",
+    "session_id": "kurland02c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 75.5
+  },
+  {
+    "participant_id": "kurland02d",
+    "session_id": "kurland02d",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 75.5
+  },
+  {
+    "participant_id": "kurland02e",
+    "session_id": "kurland02e",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 75.5
+  },
+  {
+    "participant_id": "kurland02f",
+    "session_id": "kurland02f",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland02g",
+    "session_id": "kurland02g",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland03a",
+    "session_id": "kurland03a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 83.6
+  },
+  {
+    "participant_id": "kurland03b",
+    "session_id": "kurland03b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 83.6
+  },
+  {
+    "participant_id": "kurland07a",
+    "session_id": "kurland07a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 83.0
+  },
+  {
+    "participant_id": "kurland07b",
+    "session_id": "kurland07b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 83.0
+  },
+  {
+    "participant_id": "kurland07c",
+    "session_id": "kurland07c",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland07d",
+    "session_id": "kurland07d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland08a",
+    "session_id": "kurland08a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.2
+  },
+  {
+    "participant_id": "kurland08b",
+    "session_id": "kurland08b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.2
+  },
+  {
+    "participant_id": "kurland08c",
+    "session_id": "kurland08c",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland09a",
+    "session_id": "kurland09a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 79.9
+  },
+  {
+    "participant_id": "kurland09b",
+    "session_id": "kurland09b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 79.9
+  },
+  {
+    "participant_id": "kurland09c",
+    "session_id": "kurland09c",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland09d",
+    "session_id": "kurland09d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland10a",
+    "session_id": "kurland10a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.1
+  },
+  {
+    "participant_id": "kurland10b",
+    "session_id": "kurland10b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.1
+  },
+  {
+    "participant_id": "kurland12a",
+    "session_id": "kurland12a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.1
+  },
+  {
+    "participant_id": "kurland12b",
+    "session_id": "kurland12b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.1
+  },
+  {
+    "participant_id": "kurland12c",
+    "session_id": "kurland12c",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland12d",
+    "session_id": "kurland12d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland13a",
+    "session_id": "kurland13a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.0
+  },
+  {
+    "participant_id": "kurland13b",
+    "session_id": "kurland13b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.0
+  },
+  {
+    "participant_id": "kurland13c",
+    "session_id": "kurland13c",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland13d",
+    "session_id": "kurland13d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland14a",
+    "session_id": "kurland14a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 75.5
+  },
+  {
+    "participant_id": "kurland14b",
+    "session_id": "kurland14b",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 75.5
+  },
+  {
+    "participant_id": "kurland15a",
+    "session_id": "kurland15a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 10.8
+  },
+  {
+    "participant_id": "kurland15b",
+    "session_id": "kurland15b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 10.8
+  },
+  {
+    "participant_id": "kurland15c",
+    "session_id": "kurland15c",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 10.8
+  },
+  {
+    "participant_id": "kurland15d",
+    "session_id": "kurland15d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland15e",
+    "session_id": "kurland15e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland16a",
+    "session_id": "kurland16a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 37.1
+  },
+  {
+    "participant_id": "kurland16b",
+    "session_id": "kurland16b",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 37.1
+  },
+  {
+    "participant_id": "kurland16c",
+    "session_id": "kurland16c",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland16d",
+    "session_id": "kurland16d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland17a",
+    "session_id": "kurland17a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.2
+  },
+  {
+    "participant_id": "kurland17b",
+    "session_id": "kurland17b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.2
+  },
+  {
+    "participant_id": "kurland17c",
+    "session_id": "kurland17c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.2
+  },
+  {
+    "participant_id": "kurland17d",
+    "session_id": "kurland17d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland17e",
+    "session_id": "kurland17e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland18a",
+    "session_id": "kurland18a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 44.0
+  },
+  {
+    "participant_id": "kurland18b",
+    "session_id": "kurland18b",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 44.0
+  },
+  {
+    "participant_id": "kurland18c",
+    "session_id": "kurland18c",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland18d",
+    "session_id": "kurland18d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland19a",
+    "session_id": "kurland19a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.2
+  },
+  {
+    "participant_id": "kurland19b",
+    "session_id": "kurland19b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.2
+  },
+  {
+    "participant_id": "kurland19c",
+    "session_id": "kurland19c",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.2
+  },
+  {
+    "participant_id": "kurland19d",
+    "session_id": "kurland19d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland19e",
+    "session_id": "kurland19e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland20a",
+    "session_id": "kurland20a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 67.0
+  },
+  {
+    "participant_id": "kurland21a",
+    "session_id": "kurland21a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 81.8
+  },
+  {
+    "participant_id": "kurland21b",
+    "session_id": "kurland21b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 81.8
+  },
+  {
+    "participant_id": "kurland21c",
+    "session_id": "kurland21c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 81.8
+  },
+  {
+    "participant_id": "kurland21d",
+    "session_id": "kurland21d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland21e",
+    "session_id": "kurland21e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland22a",
+    "session_id": "kurland22a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 36.2
+  },
+  {
+    "participant_id": "kurland22b",
+    "session_id": "kurland22b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 36.2
+  },
+  {
+    "participant_id": "kurland22c",
+    "session_id": "kurland22c",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland22d",
+    "session_id": "kurland22d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland22e",
+    "session_id": "kurland22e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland23a",
+    "session_id": "kurland23a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "kurland23b",
+    "session_id": "kurland23b",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "kurland23c",
+    "session_id": "kurland23c",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "kurland23d",
+    "session_id": "kurland23d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland23e",
+    "session_id": "kurland23e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland24a",
+    "session_id": "kurland24a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 51.5
+  },
+  {
+    "participant_id": "kurland24b",
+    "session_id": "kurland24b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 51.5
+  },
+  {
+    "participant_id": "kurland24c",
+    "session_id": "kurland24c",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 51.5
+  },
+  {
+    "participant_id": "kurland24d",
+    "session_id": "kurland24d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland24e",
+    "session_id": "kurland24e",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland25a",
+    "session_id": "kurland25a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 81.4
+  },
+  {
+    "participant_id": "kurland25b",
+    "session_id": "kurland25b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 81.4
+  },
+  {
+    "participant_id": "kurland25c",
+    "session_id": "kurland25c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 81.4
+  },
+  {
+    "participant_id": "kurland25d",
+    "session_id": "kurland25d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland25e",
+    "session_id": "kurland25e",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland26a",
+    "session_id": "kurland26a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.0
+  },
+  {
+    "participant_id": "kurland26b",
+    "session_id": "kurland26b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.0
+  },
+  {
+    "participant_id": "kurland26c",
+    "session_id": "kurland26c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.0
+  },
+  {
+    "participant_id": "kurland26d",
+    "session_id": "kurland26d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland26e",
+    "session_id": "kurland26e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland27a",
+    "session_id": "kurland27a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 74.9
+  },
+  {
+    "participant_id": "kurland27b",
+    "session_id": "kurland27b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 74.9
+  },
+  {
+    "participant_id": "kurland27c",
+    "session_id": "kurland27c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 74.9
+  },
+  {
+    "participant_id": "kurland27d",
+    "session_id": "kurland27d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland27e",
+    "session_id": "kurland27e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland28a",
+    "session_id": "kurland28a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 78.7
+  },
+  {
+    "participant_id": "kurland28b",
+    "session_id": "kurland28b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 78.7
+  },
+  {
+    "participant_id": "kurland28c",
+    "session_id": "kurland28c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 78.7
+  },
+  {
+    "participant_id": "kurland28d",
+    "session_id": "kurland28d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland29a",
+    "session_id": "kurland29a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 58.2
+  },
+  {
+    "participant_id": "kurland29b",
+    "session_id": "kurland29b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 58.2
+  },
+  {
+    "participant_id": "kurland29c",
+    "session_id": "kurland29c",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 58.2
+  },
+  {
+    "participant_id": "kurland29d",
+    "session_id": "kurland29d",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "kurland29e",
+    "session_id": "kurland29e",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "MSU01a",
+    "session_id": "MSU01a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.6
+  },
+  {
+    "participant_id": "MSU01b",
+    "session_id": "MSU01b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.6
+  },
+  {
+    "participant_id": "MSU03a",
+    "session_id": "MSU03a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.4
+  },
+  {
+    "participant_id": "MSU03b",
+    "session_id": "MSU03b",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.4
+  },
+  {
+    "participant_id": "MSU04a",
+    "session_id": "MSU04a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "MSU04b",
+    "session_id": "MSU04b",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 77.4
+  },
+  {
+    "participant_id": "MSU05a",
+    "session_id": "MSU05a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 68.2
+  },
+  {
+    "participant_id": "MSU05b",
+    "session_id": "MSU05b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 68.2
+  },
+  {
+    "participant_id": "MSU06a",
+    "session_id": "MSU06a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.0
+  },
+  {
+    "participant_id": "MSU06b",
+    "session_id": "MSU06b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.0
+  },
+  {
+    "participant_id": "MSU07a",
+    "session_id": "MSU07a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 61.4
+  },
+  {
+    "participant_id": "MSU07b",
+    "session_id": "MSU07b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 61.4
+  },
+  {
+    "participant_id": "MSU08a",
+    "session_id": "MSU08a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.5
+  },
+  {
+    "participant_id": "MSU08b",
+    "session_id": "MSU08b",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.5
+  },
+  {
+    "participant_id": "42-1",
+    "session_id": "42-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "42-2",
+    "session_id": "42-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "46-1",
+    "session_id": "46-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "46-2",
+    "session_id": "46-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "47-1",
+    "session_id": "47-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "47-2",
+    "session_id": "47-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "48-1",
+    "session_id": "48-1",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "49-1",
+    "session_id": "49-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "49-2",
+    "session_id": "49-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "50-1",
+    "session_id": "50-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "50-2",
+    "session_id": "50-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "54-1",
+    "session_id": "54-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "54-2",
+    "session_id": "54-2",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "55-1",
+    "session_id": "55-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "57-1",
+    "session_id": "57-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "57-2",
+    "session_id": "57-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "58-1",
+    "session_id": "58-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "58-2",
+    "session_id": "58-2",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "61-1",
+    "session_id": "61-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "61-2",
+    "session_id": "61-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "67-1",
+    "session_id": "67-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "67-2",
+    "session_id": "67-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "68-1",
+    "session_id": "68-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.8
+  },
+  {
+    "participant_id": "68-2",
+    "session_id": "68-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.8
+  },
+  {
+    "participant_id": "70-1",
+    "session_id": "70-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "70-2",
+    "session_id": "70-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "73-1",
+    "session_id": "73-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "73-2",
+    "session_id": "73-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "74-1",
+    "session_id": "74-1",
+    "aphasia_subtype": "Global",
+    "wab_aq": 0.2
+  },
+  {
+    "participant_id": "74-2",
+    "session_id": "74-2",
+    "aphasia_subtype": "Global",
+    "wab_aq": 0.2
+  },
+  {
+    "participant_id": "75-1",
+    "session_id": "75-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "75-2",
+    "session_id": "75-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "77-1",
+    "session_id": "77-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "77-2",
+    "session_id": "77-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "359-1",
+    "session_id": "359-1",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "359-2",
+    "session_id": "359-2",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "100-1",
+    "session_id": "100-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 79.7
+  },
+  {
+    "participant_id": "100-2",
+    "session_id": "100-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 79.7
+  },
+  {
+    "participant_id": "101-1",
+    "session_id": "101-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.5
+  },
+  {
+    "participant_id": "101-2",
+    "session_id": "101-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.5
+  },
+  {
+    "participant_id": "104-1",
+    "session_id": "104-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.6
+  },
+  {
+    "participant_id": "104-2",
+    "session_id": "104-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.6
+  },
+  {
+    "participant_id": "105-1",
+    "session_id": "105-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.6
+  },
+  {
+    "participant_id": "105-2",
+    "session_id": "105-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.6
+  },
+  {
+    "participant_id": "110-1",
+    "session_id": "110-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 76.8
+  },
+  {
+    "participant_id": "110-2",
+    "session_id": "110-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 76.8
+  },
+  {
+    "participant_id": "123-1",
+    "session_id": "123-1",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 62.8
+  },
+  {
+    "participant_id": "123-2",
+    "session_id": "123-2",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 62.8
+  },
+  {
+    "participant_id": "127-1",
+    "session_id": "127-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.0
+  },
+  {
+    "participant_id": "127-2",
+    "session_id": "127-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.0
+  },
+  {
+    "participant_id": "133-1",
+    "session_id": "133-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 76.8
+  },
+  {
+    "participant_id": "133-2",
+    "session_id": "133-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 76.8
+  },
+  {
+    "participant_id": "179-1",
+    "session_id": "179-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.5
+  },
+  {
+    "participant_id": "179-2",
+    "session_id": "179-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.5
+  },
+  {
+    "participant_id": "197-1",
+    "session_id": "197-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.0
+  },
+  {
+    "participant_id": "197-2",
+    "session_id": "197-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.0
+  },
+  {
+    "participant_id": "199-1",
+    "session_id": "199-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 83.1
+  },
+  {
+    "participant_id": "199-2",
+    "session_id": "199-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 83.1
+  },
+  {
+    "participant_id": "200-1",
+    "session_id": "200-1",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 42.9
+  },
+  {
+    "participant_id": "200-2",
+    "session_id": "200-2",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 42.9
+  },
+  {
+    "participant_id": "202-1",
+    "session_id": "202-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.5
+  },
+  {
+    "participant_id": "202-2",
+    "session_id": "202-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.5
+  },
+  {
+    "participant_id": "203-1",
+    "session_id": "203-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.8
+  },
+  {
+    "participant_id": "203-2",
+    "session_id": "203-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.8
+  },
+  {
+    "participant_id": "205-1",
+    "session_id": "205-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.7
+  },
+  {
+    "participant_id": "205-2",
+    "session_id": "205-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.7
+  },
+  {
+    "participant_id": "206-1",
+    "session_id": "206-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.4
+  },
+  {
+    "participant_id": "206-2",
+    "session_id": "206-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.4
+  },
+  {
+    "participant_id": "208-1",
+    "session_id": "208-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 87.9
+  },
+  {
+    "participant_id": "208-2",
+    "session_id": "208-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 87.9
+  },
+  {
+    "participant_id": "228-1",
+    "session_id": "228-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 46.7
+  },
+  {
+    "participant_id": "228-2",
+    "session_id": "228-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 46.7
+  },
+  {
+    "participant_id": "230-1",
+    "session_id": "230-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 37.4
+  },
+  {
+    "participant_id": "230-2",
+    "session_id": "230-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 37.4
+  },
+  {
+    "participant_id": "234-1",
+    "session_id": "234-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.6
+  },
+  {
+    "participant_id": "234-2",
+    "session_id": "234-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.6
+  },
+  {
+    "participant_id": "236-1",
+    "session_id": "236-1",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 76.7
+  },
+  {
+    "participant_id": "236-2",
+    "session_id": "236-2",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 76.7
+  },
+  {
+    "participant_id": "254-1",
+    "session_id": "254-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 21.8
+  },
+  {
+    "participant_id": "254-2",
+    "session_id": "254-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 21.8
+  },
+  {
+    "participant_id": "270-1",
+    "session_id": "270-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.2
+  },
+  {
+    "participant_id": "270-2",
+    "session_id": "270-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.2
+  },
+  {
+    "participant_id": "271-1",
+    "session_id": "271-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "271-2",
+    "session_id": "271-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "273-1",
+    "session_id": "273-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.3
+  },
+  {
+    "participant_id": "273-2",
+    "session_id": "273-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.3
+  },
+  {
+    "participant_id": "287-1",
+    "session_id": "287-1",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 78.2
+  },
+  {
+    "participant_id": "287-2",
+    "session_id": "287-2",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 78.2
+  },
+  {
+    "participant_id": "307-1",
+    "session_id": "307-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 67.6
+  },
+  {
+    "participant_id": "307-2",
+    "session_id": "307-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 67.6
+  },
+  {
+    "participant_id": "312-1",
+    "session_id": "312-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 74.2
+  },
+  {
+    "participant_id": "312-2",
+    "session_id": "312-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 74.2
+  },
+  {
+    "participant_id": "347-1",
+    "session_id": "347-1",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 32.4
+  },
+  {
+    "participant_id": "347-2",
+    "session_id": "347-2",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 32.4
+  },
+  {
+    "participant_id": "353-1",
+    "session_id": "353-1",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.5
+  },
+  {
+    "participant_id": "353-2",
+    "session_id": "353-2",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.5
+  },
+  {
+    "participant_id": "355-1",
+    "session_id": "355-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.9
+  },
+  {
+    "participant_id": "355-2",
+    "session_id": "355-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.9
+  },
+  {
+    "participant_id": "68-1",
+    "session_id": "68-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.8
+  },
+  {
+    "participant_id": "68-2",
+    "session_id": "68-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.8
+  },
+  {
+    "participant_id": "69-1",
+    "session_id": "69-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.2
+  },
+  {
+    "participant_id": "69-2",
+    "session_id": "69-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.2
+  },
+  {
+    "participant_id": "72-1",
+    "session_id": "72-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "72-2",
+    "session_id": "72-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "74-1",
+    "session_id": "74-1",
+    "aphasia_subtype": "Global",
+    "wab_aq": 0.2
+  },
+  {
+    "participant_id": "74-2",
+    "session_id": "74-2",
+    "aphasia_subtype": "Global",
+    "wab_aq": 0.2
+  },
+  {
+    "participant_id": "83-1",
+    "session_id": "83-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.5
+  },
+  {
+    "participant_id": "83-2",
+    "session_id": "83-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.5
+  },
+  {
+    "participant_id": "88-1",
+    "session_id": "88-1",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "88-2",
+    "session_id": "88-2",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "90-1",
+    "session_id": "90-1",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 71.3
+  },
+  {
+    "participant_id": "90-2",
+    "session_id": "90-2",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 71.3
+  },
+  {
+    "participant_id": "96-1",
+    "session_id": "96-1",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.4
+  },
+  {
+    "participant_id": "96-2",
+    "session_id": "96-2",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.4
+  },
+  {
+    "participant_id": "richardson08a",
+    "session_id": "richardson08a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.6
+  },
+  {
+    "participant_id": "richardson09a",
+    "session_id": "richardson09a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 61.0
+  },
+  {
+    "participant_id": "richardson11a",
+    "session_id": "richardson11a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.8
+  },
+  {
+    "participant_id": "richardson13a",
+    "session_id": "richardson13a",
+    "aphasia_subtype": "Isolation",
+    "wab_aq": 32.3
+  },
+  {
+    "participant_id": "richardson14a",
+    "session_id": "richardson14a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 68.8
+  },
+  {
+    "participant_id": "richardson15a",
+    "session_id": "richardson15a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.5
+  },
+  {
+    "participant_id": "richardson16a",
+    "session_id": "richardson16a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.2
+  },
+  {
+    "participant_id": "richardson17a",
+    "session_id": "richardson17a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.6
+  },
+  {
+    "participant_id": "richardson23a",
+    "session_id": "richardson23a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 47.1
+  },
+  {
+    "participant_id": "richardson24a",
+    "session_id": "richardson24a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 61.0
+  },
+  {
+    "participant_id": "richardson25a",
+    "session_id": "richardson25a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 39.2
+  },
+  {
+    "participant_id": "richardson26a",
+    "session_id": "richardson26a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 84.6
+  },
+  {
+    "participant_id": "richardson27a",
+    "session_id": "richardson27a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 73.9
+  },
+  {
+    "participant_id": "richardson29a",
+    "session_id": "richardson29a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.1
+  },
+  {
+    "participant_id": "richardson30a",
+    "session_id": "richardson30a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 36.8
+  },
+  {
+    "participant_id": "richardson33a",
+    "session_id": "richardson33a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 83.1
+  },
+  {
+    "participant_id": "scale01a",
+    "session_id": "scale01a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 52.5
+  },
+  {
+    "participant_id": "scale02a",
+    "session_id": "scale02a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 70.6
+  },
+  {
+    "participant_id": "scale02b",
+    "session_id": "scale02b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 78.6
+  },
+  {
+    "participant_id": "scale03a",
+    "session_id": "scale03a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 28.1
+  },
+  {
+    "participant_id": "scale04a",
+    "session_id": "scale04a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 72.8
+  },
+  {
+    "participant_id": "scale05a",
+    "session_id": "scale05a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 73.2
+  },
+  {
+    "participant_id": "scale05b",
+    "session_id": "scale05b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 72.7
+  },
+  {
+    "participant_id": "scale05c",
+    "session_id": "scale05c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 80.5
+  },
+  {
+    "participant_id": "scale06a",
+    "session_id": "scale06a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 82.3
+  },
+  {
+    "participant_id": "scale06b",
+    "session_id": "scale06b",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 83.5
+  },
+  {
+    "participant_id": "scale06c",
+    "session_id": "scale06c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.1
+  },
+  {
+    "participant_id": "scale06d",
+    "session_id": "scale06d",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 83.3
+  },
+  {
+    "participant_id": "scale07a",
+    "session_id": "scale07a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 16.1
+  },
+  {
+    "participant_id": "scale08a",
+    "session_id": "scale08a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 87.9
+  },
+  {
+    "participant_id": "scale09a",
+    "session_id": "scale09a",
+    "aphasia_subtype": "Global",
+    "wab_aq": 20.3
+  },
+  {
+    "participant_id": "scale10a",
+    "session_id": "scale10a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 63.5
+  },
+  {
+    "participant_id": "scale11a",
+    "session_id": "scale11a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 65.9
+  },
+  {
+    "participant_id": "scale11b",
+    "session_id": "scale11b",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 57.1
+  },
+  {
+    "participant_id": "scale12a",
+    "session_id": "scale12a",
+    "aphasia_subtype": "TransSensory",
+    "wab_aq": 54.1
+  },
+  {
+    "participant_id": "scale12b",
+    "session_id": "scale12b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.1
+  },
+  {
+    "participant_id": "scale12c",
+    "session_id": "scale12c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.1
+  },
+  {
+    "participant_id": "scale12d",
+    "session_id": "scale12d",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 76.5
+  },
+  {
+    "participant_id": "scale13a",
+    "session_id": "scale13a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 70.1
+  },
+  {
+    "participant_id": "scale14a",
+    "session_id": "scale14a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 67.6
+  },
+  {
+    "participant_id": "scale14c",
+    "session_id": "scale14c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 70.0
+  },
+  {
+    "participant_id": "scale15a",
+    "session_id": "scale15a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.3
+  },
+  {
+    "participant_id": "scale15b",
+    "session_id": "scale15b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.0
+  },
+  {
+    "participant_id": "scale15c",
+    "session_id": "scale15c",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 68.2
+  },
+  {
+    "participant_id": "scale15d",
+    "session_id": "scale15d",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 76.6
+  },
+  {
+    "participant_id": "scale17a",
+    "session_id": "scale17a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.8
+  },
+  {
+    "participant_id": "scale17c",
+    "session_id": "scale17c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "scale18a",
+    "session_id": "scale18a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 60.9
+  },
+  {
+    "participant_id": "scale18b",
+    "session_id": "scale18b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 68.9
+  },
+  {
+    "participant_id": "scale18c",
+    "session_id": "scale18c",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 67.5
+  },
+  {
+    "participant_id": "scale18d",
+    "session_id": "scale18d",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 78.4
+  },
+  {
+    "participant_id": "scale19a",
+    "session_id": "scale19a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 67.8
+  },
+  {
+    "participant_id": "scale22a",
+    "session_id": "scale22a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "scale23a",
+    "session_id": "scale23a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 64.5
+  },
+  {
+    "participant_id": "scale24a",
+    "session_id": "scale24a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 40.2
+  },
+  {
+    "participant_id": "scale25a",
+    "session_id": "scale25a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 42.7
+  },
+  {
+    "participant_id": "scale26a",
+    "session_id": "scale26a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 64.8
+  },
+  {
+    "participant_id": "scale27a",
+    "session_id": "scale27a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 43.3
+  },
+  {
+    "participant_id": "scale28a",
+    "session_id": "scale28a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 46.2
+  },
+  {
+    "participant_id": "scale30a",
+    "session_id": "scale30a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 68.5
+  },
+  {
+    "participant_id": "scale30b",
+    "session_id": "scale30b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 70.9
+  },
+  {
+    "participant_id": "scale31a",
+    "session_id": "scale31a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 51.5
+  },
+  {
+    "participant_id": "scale32a",
+    "session_id": "scale32a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 82.8
+  },
+  {
+    "participant_id": "scale33a",
+    "session_id": "scale33a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 71.1
+  },
+  {
+    "participant_id": "scale34a",
+    "session_id": "scale34a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.4
+  },
+  {
+    "participant_id": "scale35a",
+    "session_id": "scale35a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 84.1
+  },
+  {
+    "participant_id": "scale36a",
+    "session_id": "scale36a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 66.3
+  },
+  {
+    "participant_id": "scale38a",
+    "session_id": "scale38a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 63.8
+  },
+  {
+    "participant_id": "tap01a",
+    "session_id": "tap01a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.3
+  },
+  {
+    "participant_id": "tap02a",
+    "session_id": "tap02a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 61.6
+  },
+  {
+    "participant_id": "tap03a",
+    "session_id": "tap03a",
+    "aphasia_subtype": "Global",
+    "wab_aq": 30.9
+  },
+  {
+    "participant_id": "tap04a",
+    "session_id": "tap04a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.2
+  },
+  {
+    "participant_id": "tap05a",
+    "session_id": "tap05a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 79.4
+  },
+  {
+    "participant_id": "tap06a",
+    "session_id": "tap06a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 38.2
+  },
+  {
+    "participant_id": "tap07a",
+    "session_id": "tap07a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 79.3
+  },
+  {
+    "participant_id": "tap08a",
+    "session_id": "tap08a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 68.7
+  },
+  {
+    "participant_id": "tap09a",
+    "session_id": "tap09a",
+    "aphasia_subtype": "Global",
+    "wab_aq": 20.5
+  },
+  {
+    "participant_id": "tap10a",
+    "session_id": "tap10a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 67.8
+  },
+  {
+    "participant_id": "tap11a",
+    "session_id": "tap11a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 58.1
+  },
+  {
+    "participant_id": "tap12a",
+    "session_id": "tap12a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 78.5
+  },
+  {
+    "participant_id": "tap13a",
+    "session_id": "tap13a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 44.4
+  },
+  {
+    "participant_id": "tap14a",
+    "session_id": "tap14a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 60.2
+  },
+  {
+    "participant_id": "tap15a",
+    "session_id": "tap15a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 71.5
+  },
+  {
+    "participant_id": "tap16a",
+    "session_id": "tap16a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.7
+  },
+  {
+    "participant_id": "tap17a",
+    "session_id": "tap17a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 59.5
+  },
+  {
+    "participant_id": "tap18a",
+    "session_id": "tap18a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.3
+  },
+  {
+    "participant_id": "tap19a",
+    "session_id": "tap19a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 59.4
+  },
+  {
+    "participant_id": "thompson01a",
+    "session_id": "thompson01a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.0
+  },
+  {
+    "participant_id": "thompson02a",
+    "session_id": "thompson02a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.5
+  },
+  {
+    "participant_id": "thompson03a",
+    "session_id": "thompson03a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 72.6
+  },
+  {
+    "participant_id": "thompson04a",
+    "session_id": "thompson04a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 74.4
+  },
+  {
+    "participant_id": "thompson05a",
+    "session_id": "thompson05a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 58.5
+  },
+  {
+    "participant_id": "thompson06a",
+    "session_id": "thompson06a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.6
+  },
+  {
+    "participant_id": "thompson07a",
+    "session_id": "thompson07a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.4
+  },
+  {
+    "participant_id": "thompson07b",
+    "session_id": "thompson07b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.9
+  },
+  {
+    "participant_id": "thompson07c",
+    "session_id": "thompson07c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.7
+  },
+  {
+    "participant_id": "thompson08a",
+    "session_id": "thompson08a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 79.9
+  },
+  {
+    "participant_id": "thompson09a",
+    "session_id": "thompson09a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 79.3
+  },
+  {
+    "participant_id": "thompson10a",
+    "session_id": "thompson10a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.7
+  },
+  {
+    "participant_id": "thompson11a",
+    "session_id": "thompson11a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 81.4
+  },
+  {
+    "participant_id": "thompson12a",
+    "session_id": "thompson12a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.0
+  },
+  {
+    "participant_id": "thompson13a",
+    "session_id": "thompson13a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.7
+  },
+  {
+    "participant_id": "thompson14a",
+    "session_id": "thompson14a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.1
+  },
+  {
+    "participant_id": "tucson02a",
+    "session_id": "tucson02a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 38.8
+  },
+  {
+    "participant_id": "tucson03a",
+    "session_id": "tucson03a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 34.5
+  },
+  {
+    "participant_id": "tucson06a",
+    "session_id": "tucson06a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.6
+  },
+  {
+    "participant_id": "tucson07a",
+    "session_id": "tucson07a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 73.3
+  },
+  {
+    "participant_id": "tucson08a",
+    "session_id": "tucson08a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 73.4
+  },
+  {
+    "participant_id": "tucson08b",
+    "session_id": "tucson08b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 84.1
+  },
+  {
+    "participant_id": "tucson09a",
+    "session_id": "tucson09a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 51.7
+  },
+  {
+    "participant_id": "tucson10a",
+    "session_id": "tucson10a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 77.1
+  },
+  {
+    "participant_id": "tucson11a",
+    "session_id": "tucson11a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 53.9
+  },
+  {
+    "participant_id": "tucson12a",
+    "session_id": "tucson12a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 49.5
+  },
+  {
+    "participant_id": "tucson13a",
+    "session_id": "tucson13a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 68.6
+  },
+  {
+    "participant_id": "tucson14a",
+    "session_id": "tucson14a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 40.9
+  },
+  {
+    "participant_id": "tucson15a",
+    "session_id": "tucson15a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 43.1
+  },
+  {
+    "participant_id": "tucson15b",
+    "session_id": "tucson15b",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 57.8
+  },
+  {
+    "participant_id": "tucson16a",
+    "session_id": "tucson16a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 84.1
+  },
+  {
+    "participant_id": "tucson17a",
+    "session_id": "tucson17a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "tucson19a",
+    "session_id": "tucson19a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 47.8
+  },
+  {
+    "participant_id": "tucson20a",
+    "session_id": "tucson20a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 78.3
+  },
+  {
+    "participant_id": "tucson22a",
+    "session_id": "tucson22a",
+    "aphasia_subtype": "TransMotor",
+    "wab_aq": 72.0
+  },
+  {
+    "participant_id": "MBA01a",
+    "session_id": "MBA01a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.7
+  },
+  {
+    "participant_id": "MMA02a",
+    "session_id": "MMA02a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 87.6
+  },
+  {
+    "participant_id": "MMA03a",
+    "session_id": "MMA03a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.1
+  },
+  {
+    "participant_id": "MMA04a",
+    "session_id": "MMA04a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "MMA05a",
+    "session_id": "MMA05a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 87.1
+  },
+  {
+    "participant_id": "MMA06a",
+    "session_id": "MMA06a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 45.8
+  },
+  {
+    "participant_id": "MMA08a",
+    "session_id": "MMA08a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 49.5
+  },
+  {
+    "participant_id": "MMA10a",
+    "session_id": "MMA10a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 12.7
+  },
+  {
+    "participant_id": "MMA11a",
+    "session_id": "MMA11a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.4
+  },
+  {
+    "participant_id": "MMA12a",
+    "session_id": "MMA12a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.6
+  },
+  {
+    "participant_id": "MMA13a",
+    "session_id": "MMA13a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 62.9
+  },
+  {
+    "participant_id": "MMA14a",
+    "session_id": "MMA14a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 49.4
+  },
+  {
+    "participant_id": "MMA15a",
+    "session_id": "MMA15a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 65.9
+  },
+  {
+    "participant_id": "MMA16a",
+    "session_id": "MMA16a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 53.8
+  },
+  {
+    "participant_id": "MMA17a",
+    "session_id": "MMA17a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 81.6
+  },
+  {
+    "participant_id": "MMA19a",
+    "session_id": "MMA19a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 82.0
+  },
+  {
+    "participant_id": "UNH1041",
+    "session_id": "UNH1041",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "UNH02a",
+    "session_id": "UNH02a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 21.4
+  },
+  {
+    "participant_id": "UNH02b",
+    "session_id": "UNH02b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 33.9
+  },
+  {
+    "participant_id": "UNH03a",
+    "session_id": "UNH03a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.4
+  },
+  {
+    "participant_id": "UNH03b",
+    "session_id": "UNH03b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.4
+  },
+  {
+    "participant_id": "UNH04a",
+    "session_id": "UNH04a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 30.5
+  },
+  {
+    "participant_id": "UNH04b",
+    "session_id": "UNH04b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 29.2
+  },
+  {
+    "participant_id": "UNH05a",
+    "session_id": "UNH05a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.7
+  },
+  {
+    "participant_id": "UNH05b",
+    "session_id": "UNH05b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 93.6
+  },
+  {
+    "participant_id": "UNH05c",
+    "session_id": "UNH05c",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.4
+  },
+  {
+    "participant_id": "UNH06a",
+    "session_id": "UNH06a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 79.4
+  },
+  {
+    "participant_id": "UNH07a",
+    "session_id": "UNH07a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 33.0
+  },
+  {
+    "participant_id": "UNH07b",
+    "session_id": "UNH07b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 60.6
+  },
+  {
+    "participant_id": "UNH08a",
+    "session_id": "UNH08a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 61.3
+  },
+  {
+    "participant_id": "UNH09a",
+    "session_id": "UNH09a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 50.8
+  },
+  {
+    "participant_id": "UNH09b",
+    "session_id": "UNH09b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 46.2
+  },
+  {
+    "participant_id": "UNH09c",
+    "session_id": "UNH09c",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 45.8
+  },
+  {
+    "participant_id": "UNH09d",
+    "session_id": "UNH09d",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 55.6
+  },
+  {
+    "participant_id": "UNH10a",
+    "session_id": "UNH10a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.6
+  },
+  {
+    "participant_id": "UNH10b",
+    "session_id": "UNH10b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 56.8
+  },
+  {
+    "participant_id": "UNH10c",
+    "session_id": "UNH10c",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 61.2
+  },
+  {
+    "participant_id": "UNH10d",
+    "session_id": "UNH10d",
+    "aphasia_subtype": "Other",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "UNH11a",
+    "session_id": "UNH11a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.6
+  },
+  {
+    "participant_id": "UNH14a",
+    "session_id": "UNH14a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 85.3
+  },
+  {
+    "participant_id": "UNH14b",
+    "session_id": "UNH14b",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 77.9
+  },
+  {
+    "participant_id": "UNH15a",
+    "session_id": "UNH15a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 48.6
+  },
+  {
+    "participant_id": "UNH16a",
+    "session_id": "UNH16a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 42.7
+  },
+  {
+    "participant_id": "UNH16b",
+    "session_id": "UNH16b",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 63.8
+  },
+  {
+    "participant_id": "UNH16c",
+    "session_id": "UNH16c",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 67.0
+  },
+  {
+    "participant_id": "UNH17a",
+    "session_id": "UNH17a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 73.2
+  },
+  {
+    "participant_id": "whiteside01a",
+    "session_id": "whiteside01a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 84.0
+  },
+  {
+    "participant_id": "whiteside02a",
+    "session_id": "whiteside02a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 60.7
+  },
+  {
+    "participant_id": "whiteside03a",
+    "session_id": "whiteside03a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 47.2
+  },
+  {
+    "participant_id": "whiteside04a",
+    "session_id": "whiteside04a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 50.0
+  },
+  {
+    "participant_id": "whiteside05a",
+    "session_id": "whiteside05a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 82.1
+  },
+  {
+    "participant_id": "whiteside06a",
+    "session_id": "whiteside06a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 88.8
+  },
+  {
+    "participant_id": "whiteside07a",
+    "session_id": "whiteside07a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.8
+  },
+  {
+    "participant_id": "whiteside08a",
+    "session_id": "whiteside08a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.7
+  },
+  {
+    "participant_id": "whiteside09a",
+    "session_id": "whiteside09a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 78.7
+  },
+  {
+    "participant_id": "whiteside10a",
+    "session_id": "whiteside10a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 53.0
+  },
+  {
+    "participant_id": "whiteside11a",
+    "session_id": "whiteside11a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 72.8
+  },
+  {
+    "participant_id": "whiteside12a",
+    "session_id": "whiteside12a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 54.3
+  },
+  {
+    "participant_id": "whiteside13a",
+    "session_id": "whiteside13a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 91.9
+  },
+  {
+    "participant_id": "whiteside14a",
+    "session_id": "whiteside14a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 71.8
+  },
+  {
+    "participant_id": "whiteside15a",
+    "session_id": "whiteside15a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 72.2
+  },
+  {
+    "participant_id": "whiteside16a",
+    "session_id": "whiteside16a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 53.4
+  },
+  {
+    "participant_id": "whiteside19a",
+    "session_id": "whiteside19a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 87.4
+  },
+  {
+    "participant_id": "whiteside20a",
+    "session_id": "whiteside20a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 88.4
+  },
+  {
+    "participant_id": "williamson01a",
+    "session_id": "williamson01a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 70.9
+  },
+  {
+    "participant_id": "williamson02a",
+    "session_id": "williamson02a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.2
+  },
+  {
+    "participant_id": "williamson03a",
+    "session_id": "williamson03a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 62.5
+  },
+  {
+    "participant_id": "williamson04a",
+    "session_id": "williamson04a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 70.6
+  },
+  {
+    "participant_id": "williamson06a",
+    "session_id": "williamson06a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 61.1
+  },
+  {
+    "participant_id": "williamson07a",
+    "session_id": "williamson07a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 92.2
+  },
+  {
+    "participant_id": "williamson08a",
+    "session_id": "williamson08a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.4
+  },
+  {
+    "participant_id": "williamson09a",
+    "session_id": "williamson09a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 90.0
+  },
+  {
+    "participant_id": "williamson09b",
+    "session_id": "williamson09b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 84.7
+  },
+  {
+    "participant_id": "williamson11a",
+    "session_id": "williamson11a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 69.0
+  },
+  {
+    "participant_id": "williamson12a",
+    "session_id": "williamson12a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 64.4
+  },
+  {
+    "participant_id": "williamson12b",
+    "session_id": "williamson12b",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 70.4
+  },
+  {
+    "participant_id": "williamson14a",
+    "session_id": "williamson14a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 77.5
+  },
+  {
+    "participant_id": "williamson14b",
+    "session_id": "williamson14b",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 77.7
+  },
+  {
+    "participant_id": "williamson15a",
+    "session_id": "williamson15a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.3
+  },
+  {
+    "participant_id": "williamson16a",
+    "session_id": "williamson16a",
+    "aphasia_subtype": "TransSensory",
+    "wab_aq": 66.4
+  },
+  {
+    "participant_id": "williamson17a",
+    "session_id": "williamson17a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 86.0
+  },
+  {
+    "participant_id": "williamson18a",
+    "session_id": "williamson18a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 85.6
+  },
+  {
+    "participant_id": "williamson19a",
+    "session_id": "williamson19a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 69.4
+  },
+  {
+    "participant_id": "williamson21a",
+    "session_id": "williamson21a",
+    "aphasia_subtype": "Global",
+    "wab_aq": 17.1
+  },
+  {
+    "participant_id": "williamson22a",
+    "session_id": "williamson22a",
+    "aphasia_subtype": "aphasia",
+    "wab_aq": null
+  },
+  {
+    "participant_id": "williamson23a",
+    "session_id": "williamson23a",
+    "aphasia_subtype": "Wernicke",
+    "wab_aq": 36.8
+  },
+  {
+    "participant_id": "williamson24a",
+    "session_id": "williamson24a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 74.8
+  },
+  {
+    "participant_id": "wright201a",
+    "session_id": "wright201a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 57.6
+  },
+  {
+    "participant_id": "wright202a",
+    "session_id": "wright202a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 89.5
+  },
+  {
+    "participant_id": "wright203a",
+    "session_id": "wright203a",
+    "aphasia_subtype": "Conduction",
+    "wab_aq": 76.3
+  },
+  {
+    "participant_id": "wright204a",
+    "session_id": "wright204a",
+    "aphasia_subtype": "Anomic",
+    "wab_aq": 90.9
+  },
+  {
+    "participant_id": "wright205a",
+    "session_id": "wright205a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 59.7
+  },
+  {
+    "participant_id": "wright206a",
+    "session_id": "wright206a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 53.7
+  },
+  {
+    "participant_id": "wright207a",
+    "session_id": "wright207a",
+    "aphasia_subtype": "Broca",
+    "wab_aq": 61.5
+  }
+]

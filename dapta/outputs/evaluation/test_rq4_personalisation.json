@@ -1,0 +1,184 @@
+{
+  "best_personalised": "DAPTA",
+  "best_generalised": "G_DDQN",
+  "pooled_pers_vs_gen": {
+    "ciu_rate": {
+      "personalised_mean": 0.5451,
+      "generalised_mean": 0.5446,
+      "cohens_d": 0.005,
+      "effect_size": "negligible",
+      "clinically_meaningful": false,
+      "wilcoxon_stat": 5031.0,
+      "p_raw": 0.4791,
+      "ci_95": [
+        -0.013,
+        0.0141
+      ],
+      "p_corrected": 1.0,
+      "significant": false
+    },
+    "mc_score": {
+      "personalised_mean": 0.3367,
+      "generalised_mean": 0.3118,
+      "cohens_d": 0.256,
+      "effect_size": "small",
+      "clinically_meaningful": false,
+      "wilcoxon_stat": 5265.0,
+      "p_raw": 0.0058,
+      "ci_95": [
+        0.0086,
+        0.0412
+      ],
+      "p_corrected": 0.0292,
+      "significant": true
+    },
+    "mlu_morphemes": {
+      "personalised_mean": 0.6035,
+      "generalised_mean": 0.5861,
+      "cohens_d": 0.208,
+      "effect_size": "small",
+      "clinically_meaningful": false,
+      "wilcoxon_stat": 5818.0,
+      "p_raw": 0.0226,
+      "ci_95": [
+        0.0039,
+        0.0314
+      ],
+      "p_corrected": 0.1128,
+      "significant": false
+    },
+    "mattr": {
+      "personalised_mean": 0.2374,
+      "generalised_mean": 0.1207,
+      "cohens_d": 0.753,
+      "effect_size": "medium",
+      "clinically_meaningful": true,
+      "wilcoxon_stat": 8291.0,
+      "p_raw": 0.0,
+      "ci_95": [
+        0.0916,
+        0.141
+      ],
+      "p_corrected": 0.0,
+      "significant": true
+    },
+    "syntactic_complexity": {
+      "personalised_mean": -0.005,
+      "generalised_mean": -0.0723,
+      "cohens_d": 0.616,
+      "effect_size": "medium",
+      "clinically_meaningful": true,
+      "wilcoxon_stat": 7761.0,
+      "p_raw": 0.0,
+      "ci_95": [
+        0.0485,
+        0.0851
+      ],
+      "p_corrected": 0.0,
+      "significant": true
+    }
+  },
+  "ciu_variance_reduction_pct": 10.42,
+  "personalisation_beneficial": true,
+  "wabaq_moderates_personalisation": {
+    "pearson_r": -0.239,
+    "p_value": 0.0043,
+    "significant": true,
+    "interpretation": "lower WAB-AQ patients benefit more from personalisation"
+  },
+  "per_cluster": {
+    "0": {
+      "n": 23,
+      "dominant_subtype": "Broca",
+      "subtype_counts": {
+        "Broca": 12,
+        "aphasia": 1,
+        "Conduction": 1,
+        "Other": 2,
+        "Wernicke": 4,
+        "Global": 3
+      },
+      "personalised_ciu_mean": 0.5464,
+      "generalised_ciu_mean": 0.5571,
+      "cohens_d_ciu": -0.12,
+      "personalised_wins": false
+    },
+    "1": {
+      "n": 27,
+      "dominant_subtype": "Anomic",
+      "subtype_counts": {
+        "Wernicke": 2,
+        "Conduction": 3,
+        "Anomic": 19,
+        "Broca": 3
+      },
+      "personalised_ciu_mean": 0.4571,
+      "generalised_ciu_mean": 0.5251,
+      "cohens_d_ciu": -1.373,
+      "personalised_wins": false
+    },
+    "2": {
+      "n": 22,
+      "dominant_subtype": "Broca",
+      "subtype_counts": {
+        "Anomic": 1,
+        "Broca": 11,
+        "aphasia": 4,
+        "Conduction": 2,
+        "Other": 1,
+        "Wernicke": 1,
+        "Global": 1,
+        "TransSensory": 1
+      },
+      "personalised_ciu_mean": 0.5705,
+      "generalised_ciu_mean": 0.5665,
+      "cohens_d_ciu": 0.163,
+      "personalised_wins": true
+    },
+    "3": {
+      "n": 12,
+      "dominant_subtype": "Wernicke",
+      "subtype_counts": {
+        "Broca": 1,
+        "aphasia": 4,
+        "TransMotor": 1,
+        "Conduction": 1,
+        "Wernicke": 5
+      },
+      "personalised_ciu_mean": 0.6035,
+      "generalised_ciu_mean": 0.5312,
+      "cohens_d_ciu": 0.991,
+      "personalised_wins": true
+    },
+    "4": {
+      "n": 21,
+      "dominant_subtype": "Conduction",
+      "subtype_counts": {
+        "Conduction": 9,
+        "Anomic": 9,
+        "aphasia": 2,
+        "TransMotor": 1
+      },
+      "personalised_ciu_mean": 0.5173,
+      "generalised_ciu_mean": 0.5923,
+      "cohens_d_ciu": -1.37,
+      "personalised_wins": false
+    },
+    "5": {
+      "n": 36,
+      "dominant_subtype": "Broca",
+      "subtype_counts": {
+        "Anomic": 2,
+        "Broca": 22,
+        "aphasia": 3,
+        "Conduction": 6,
+        "Wernicke": 3
+      },
+      "personalised_ciu_mean": 0.5914,
+      "generalised_ciu_mean": 0.5146,
+      "cohens_d_ciu": 1.363,
+      "personalised_wins": true
+    }
+  },
+  "rq4_answered_positively": true
+}

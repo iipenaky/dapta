@@ -1,0 +1,44 @@
+{
+  "0": {
+    "n": 23,
+    "dapta_ciu_mean": 0.5464,
+    "gddqn_ciu_mean": 0.5571,
+    "cohens_d_ciu": -0.12,
+    "personalised_wins": false
+  },
+  "1": {
+    "n": 27,
+    "dapta_ciu_mean": 0.4571,
+    "gddqn_ciu_mean": 0.5251,
+    "cohens_d_ciu": -1.373,
+    "personalised_wins": false
+  },
+  "2": {
+    "n": 22,
+    "dapta_ciu_mean": 0.5705,
+    "gddqn_ciu_mean": 0.5665,
+    "cohens_d_ciu": 0.163,
+    "personalised_wins": true
+  },
+  "3": {
+    "n": 12,
+    "dapta_ciu_mean": 0.6035,
+    "gddqn_ciu_mean": 0.5312,
+    "cohens_d_ciu": 0.991,
+    "personalised_wins": true
+  },
+  "4": {
+    "n": 21,
+    "dapta_ciu_mean": 0.5173,
+    "gddqn_ciu_mean": 0.5923,
+    "cohens_d_ciu": -1.37,
+    "personalised_wins": false
+  },
+  "5": {
+    "n": 36,
+    "dapta_ciu_mean": 0.5914,
+    "gddqn_ciu_mean": 0.5146,
+    "cohens_d_ciu": 1.363,
+    "personalised_wins": true
+  }
+}
