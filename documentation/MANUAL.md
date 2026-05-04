@@ -1,6 +1,4 @@
-================================================================================
- DAPTA — Manual (overview, workflows, outputs, troubleshooting)
-================================================================================
+# DAPTA — Manual (overview, workflows, outputs, troubleshooting)
 
 1. Purpose
 -----------
