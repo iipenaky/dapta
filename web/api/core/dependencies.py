@@ -22,7 +22,7 @@ from services.user_service import UserService
 _bearer = HTTPBearer(auto_error=False)
 
 
-# ── Database session ──────────────────────────────────────────────────────────
+#  Database session 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Yield an async SQLAlchemy session; always closes on exit."""
@@ -36,7 +36,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
-# ── Current user ──────────────────────────────────────────────────────────────
+#  Current user 
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(_bearer),

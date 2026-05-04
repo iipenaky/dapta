@@ -11,7 +11,7 @@ from typing import Any
 from pydantic import BaseModel
 
 
-# ── Metrics ───────────────────────────────────────────────────────────────────
+#  Metrics 
 
 class SpeechMetrics(BaseModel):
     ciu_rate: float = 0.0
@@ -22,7 +22,7 @@ class SpeechMetrics(BaseModel):
     mean_surprisal: float | None = None
 
 
-# ── Assessment ────────────────────────────────────────────────────────────────
+#  Assessment 
 
 class AssessmentResult(BaseModel):
     session_id: str
@@ -30,7 +30,7 @@ class AssessmentResult(BaseModel):
     transcript: str | None = None
 
 
-# ── Recommendation ────────────────────────────────────────────────────────────
+#  Recommendation 
 
 class Exercise(BaseModel):
     id: str
@@ -53,7 +53,7 @@ class RecommendationResponse(BaseModel):
     plain_explanation: str  # convenience alias
 
 
-# ── Feedback ──────────────────────────────────────────────────────────────────
+#  Feedback 
 
 class FeedbackSummary(BaseModel):
     overall: str  # "excellent" | "good" | "stable" | "needs_practice"
@@ -70,7 +70,7 @@ class ExerciseFeedback(BaseModel):
     transcript: str | None = None
 
 
-# ── Session ───────────────────────────────────────────────────────────────────
+#  Session 
 
 class SessionResponse(BaseModel):
     id: str

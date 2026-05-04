@@ -1,37 +1,3 @@
-"""
-run_evaluation.py
------------------
-DAPTA Phase 3: Held-out test-set evaluation.
-
-Loads all trained agent checkpoints and evaluates them on the
-held-out TEST patients only — patients never seen during training
-or clustering.
-
-For personalised agents (DAPTA, No-GRU DAPTA, PPO-Pers):
-    Each test patient is assigned to the nearest cluster centroid
-    using PatientClusterer.predict(), then evaluated by that
-    cluster's trained agent.
-
-For generalised agents (G-DDQN, No-GRU G-DDQN, PPO-Gen):
-    A single pooled agent evaluates all test patients.
-
-Baselines (RBDE, RTS) run on all test patients.
-
-Outputs (all in outputs/evaluation/):
-    test_rq2_results.json          — main RQ2 results on test set
-    test_rq4_personalisation.json  — RQ4 personalisation results
-    test_rq3_transfer.json         — cross-task transfer (RQ3)
-    test_ablation_results.json     — ablation results on test set
-    test_all_agents_vs_rbde.json   — per-agent RQ2 detail
-    dapta_test_results.csv         — per-patient gains for RQ3
-    cluster_performance.json       — per-cluster breakdown
-    test_per_agent_arrays/         — raw .npy improvement arrays
-
-Run after:
-    python experiments/run_pes.py
-    python experiments/run_rl.py
-"""
-
 import argparse
 import json
 import pickle
@@ -43,7 +9,6 @@ import pandas as pd
 from scipy import stats as scipy_stats
 
 from dapta.pes.transition_model import TransitionModel
-from dapta.pes.cluster import PatientClusterer
 from dapta.pes.environment import TherapyEnv, build_env_population
 from dapta.prta.ddqn_agent import DDQNAgent
 from dapta.prta.trainer import RuleBasedBaseline, RandomBaseline
@@ -63,10 +28,7 @@ _STRUCTURED_TASK_INDICES  = [0, 1, 2]
 _CONVERSATION_TASK_INDEX  = 4
 _N_METRICS_PER_TASK       = 5
 
-
-# ──────────────────────────────────────────────────────────────────────
 # Statistical helpers
-# ──────────────────────────────────────────────────────────────────────
 
 def cohens_d_paired(before: np.ndarray, after: np.ndarray) -> float:
     diff = after - before
@@ -115,9 +77,9 @@ def effect_size_label(d: float) -> str:
     return "large"
 
 
-# ──────────────────────────────────────────────────────────────────────
+# 
 # PPO wrapper
-# ──────────────────────────────────────────────────────────────────────
+# 
 
 class PPOWrapper:
     def __init__(self, model) -> None:
@@ -128,11 +90,11 @@ class PPOWrapper:
         return int(action)
 
 
-# ──────────────────────────────────────────────────────────────────────
+# 
 # Episode runner
 # FIX: returns full discourse improvement array (25 dims), not just [:5]
 # This is required for RQ3 task-level gain extraction.
-# ──────────────────────────────────────────────────────────────────────
+# 
 
 def run_episode(
     agent,
@@ -168,12 +130,12 @@ def run_episode(
     # FIX: full 25-dim discourse block instead of [:5]
     disc_imp   = env.get_cumulative_discourse_improvement()
     final_surp = float(state[SURPRISAL_DIM])
-    return disc_imp, initial_surp - final_surp
+    return disc_imp, initial_surp - final_surp, action_history
 
 
-# ──────────────────────────────────────────────────────────────────────
+# 
 # Agent loaders
-# ──────────────────────────────────────────────────────────────────────
+# 
 
 def load_ddqn(checkpoint_path: str, use_gru: bool) -> Optional[DDQNAgent]:
     path = Path(checkpoint_path)
@@ -211,9 +173,9 @@ def load_ppo(save_path: str) -> Optional[PPOWrapper]:
         return None
 
 
-# ──────────────────────────────────────────────────────────────────────
+# 
 # RQ helpers
-# ──────────────────────────────────────────────────────────────────────
+# 
 
 def compute_rq2(
     agent_disc:  np.ndarray,
@@ -301,7 +263,6 @@ def compute_rq4(
     for i, metric in enumerate(METRIC_NAMES):
         entries[metric]["p_corrected"] = round(p_corr[i], 4)
         entries[metric]["significant"] = sig[i]
-
     ciu_pers = pd_[:, 0]
     ciu_gen  = gd_[:, 0]
     var_reduction = (
@@ -329,6 +290,8 @@ def compute_rq4(
             for p, m in zip(profiles_data, mask) if m
         ]
         dominant = max(set(subtypes), key=subtypes.count) if subtypes else "Unknown"
+        
+        
         per_cluster[str(c)] = {
             "n":                     int(n),
             "dominant_subtype":      dominant,
@@ -526,12 +489,12 @@ def compute_rq3_transfer(output_dir: Path) -> dict:
         return {"rq3_answered_positively": False, "error": str(e)}
 
 
-# ──────────────────────────────────────────────────────────────────────
+# 
 # Main
-# ──────────────────────────────────────────────────────────────────────
+# 
 
 def main(args) -> None:
-    output_dir = Path("outputs/evaluation")
+    output_dir = Path("outputs/evaluation3")
     output_dir.mkdir(parents=True, exist_ok=True)
     arrays_dir = output_dir / "test_per_agent_arrays"
     arrays_dir.mkdir(exist_ok=True)
@@ -541,7 +504,7 @@ def main(args) -> None:
     logger.info("DAPTA Phase 3: Held-out Test Evaluation")
     logger.info("=" * 60)
 
-    # ── 1. Load PES outputs ──────────────────────────────────────────
+    #  1. Load PES outputs 
     logger.info("\n[1/6] Loading PES outputs...")
     pes_dir = Path("outputs/pes")
     rl_dir  = Path("outputs/rl")
@@ -564,7 +527,7 @@ def main(args) -> None:
     transition_model.load()
     logger.info("Transition model loaded.")
 
-    # ── 2. Filter to TEST patients only ─────────────────────────────
+    #  2. Filter to TEST patients only 
     logger.info("\n[2/6] Filtering to test-split patients...")
 
     test_mask        = split_labels == "test"
@@ -591,7 +554,7 @@ def main(args) -> None:
     )
     logger.info(f"  Built {len(test_envs)} test environments.")
 
-    # ── 3. Load all trained agents ───────────────────────────────────
+    #  3. Load all trained agents 
     logger.info("\n[3/6] Loading trained agent checkpoints...")
 
     n_clusters = int(cluster_labels[cluster_labels >= 0].max()) + 1
@@ -626,7 +589,7 @@ def main(args) -> None:
         if ppo:
             ppo_pers_agents[c] = ppo
 
-    # ── 4. Assign test patients to clusters ─────────────────────────
+    # 4. Assign test patients to clusters
     logger.info("\n[4/6] Assigning test patients to clusters...")
 
     test_profiles_obj = [
@@ -653,7 +616,7 @@ def main(args) -> None:
         f"{np.bincount(predicted_clusters)}"
     )
 
-    # ── 5. Run all agents on test environments ───────────────────────
+    # 5. Run all agents on test environments
     logger.info("\n[5/6] Evaluating all agents on test patients...")
 
     def run_personalised(
@@ -661,47 +624,65 @@ def main(args) -> None:
         is_ddqn:        bool,
     ) -> np.ndarray:
         disc_list = []
+        actions_list = []
         for env, cluster_id in zip(test_envs, predicted_clusters):
             agent = cluster_agents.get(int(cluster_id)) or cluster_agents.get(0)
             if agent is None:
                 disc_list.append(np.zeros(25, dtype=np.float32))
+                actions_list.append([])
                 continue
-            disc, _ = run_episode(agent, env, is_ddqn=is_ddqn)
+            disc, _, actions = run_episode(agent, env, is_ddqn=is_ddqn)
             disc_list.append(disc)
-        return np.stack(disc_list)
+            actions_list.append(actions)
+        return np.stack(disc_list), actions_list
 
     def run_generalised(agent, is_ddqn: bool) -> np.ndarray:
         disc_list = []
+        actions_list = []
         for env in test_envs:
-            disc, _ = run_episode(agent, env, is_ddqn=is_ddqn)
+            disc, _, actions = run_episode(agent, env, is_ddqn=is_ddqn)
             disc_list.append(disc)
-        return np.stack(disc_list)
+            actions_list.append(actions)
+        return np.stack(disc_list), actions_list
 
     all_agent_results: Dict[str, np.ndarray] = {}
+    all_agent_actions: Dict[str, List[List[int]]] = {}
 
     if dapta_cluster_agents:
         logger.info("  Evaluating DAPTA (GRU personalised)...")
-        all_agent_results["DAPTA"] = run_personalised(dapta_cluster_agents, is_ddqn=True)
+        disc, actions = run_personalised(dapta_cluster_agents, is_ddqn=True)
+        all_agent_results["DAPTA"] = disc
+        all_agent_actions["DAPTA"] = actions
 
     if g_ddqn:
         logger.info("  Evaluating G-DDQN (GRU generalised)...")
-        all_agent_results["G_DDQN"] = run_generalised(g_ddqn, is_ddqn=True)
+        disc, actions = run_generalised(g_ddqn, is_ddqn=True)
+        all_agent_results["G_DDQN"] = disc
+        all_agent_actions["G_DDQN"] = actions
 
     if no_gru_cluster_agents:
         logger.info("  Evaluating No-GRU DAPTA (personalised)...")
-        all_agent_results["NO_GRU_DAPTA"] = run_personalised(no_gru_cluster_agents, is_ddqn=True)
+        disc, actions = run_personalised(no_gru_cluster_agents, is_ddqn=True)
+        all_agent_results["NO_GRU_DAPTA"] = disc
+        all_agent_actions["NO_GRU_DAPTA"] = actions
 
     if no_gru_g_ddqn:
         logger.info("  Evaluating No-GRU G-DDQN (generalised)...")
-        all_agent_results["NO_GRU_G_DDQN"] = run_generalised(no_gru_g_ddqn, is_ddqn=True)
+        disc, actions = run_generalised(no_gru_g_ddqn, is_ddqn=True)
+        all_agent_results["NO_GRU_G_DDQN"] = disc
+        all_agent_actions["NO_GRU_G_DDQN"] = actions    
 
     if ppo_gen:
         logger.info("  Evaluating PPO generalised...")
-        all_agent_results["PPO_GENERALISED"] = run_generalised(ppo_gen, is_ddqn=False)
+        disc, actions = run_generalised(ppo_gen, is_ddqn=False)
+        all_agent_results["PPO_GENERALISED"] = disc
+        all_agent_actions["PPO_GENERALISED"] = actions
 
     if ppo_pers_agents:
         logger.info("  Evaluating PPO personalised...")
-        all_agent_results["PPO_PERSONALISED"] = run_personalised(ppo_pers_agents, is_ddqn=False)
+        disc, actions = run_personalised(ppo_pers_agents, is_ddqn=False)
+        all_agent_results["PPO_PERSONALISED"] = disc
+        all_agent_actions["PPO_PERSONALISED"] = actions
 
     # RBDE baseline
     logger.info("  Evaluating RBDE baseline...")
@@ -739,7 +720,13 @@ def main(args) -> None:
     np.save(str(arrays_dir / "test_RTS.npy"),  rts_disc)
     logger.info(f"  Raw arrays saved to {arrays_dir}/")
 
-    # ── 6. Compute all RQ statistics ────────────────────────────────
+    actions_path = output_dir / "test_agent_actions.pkl"
+    with open(actions_path, "wb") as f:
+        pickle.dump(all_agent_actions, f)
+
+    logger.info(f"  Actions saved to {actions_path}")
+
+    #  6. Compute all RQ statistics 
     logger.info("\n[6/6] Computing test-set RQ statistics...")
 
     PERSONALISED = {"DAPTA", "NO_GRU_DAPTA", "PPO_PERSONALISED"}
@@ -846,13 +833,13 @@ def main(args) -> None:
     if "DAPTA" in all_agent_results:
         dapta_disc = all_agent_results["DAPTA"]
 
-        # Mean CIU gain across structured tasks (cookie_theft, cinderella, sandwich)
-        # structured_ciu_gain = np.mean(
-        #     [dapta_disc[:, t * _N_METRICS_PER_TASK + 0]
-        #      for t in _STRUCTURED_TASK_INDICES],
-        #     axis=0,
-        # )
-        structured_ciu_gain = dapta_disc[:, 1 * _N_METRICS_PER_TASK + 0]
+        structured_ciu_gain = np.mean(
+            np.stack([
+                dapta_disc[:, t * _N_METRICS_PER_TASK + 0]
+                for t in _STRUCTURED_TASK_INDICES
+            ], axis=1),
+            axis=1
+        )
         # CIU gain on conversation task
         conversation_ciu_gain = dapta_disc[
             :, _CONVERSATION_TASK_INDEX * _N_METRICS_PER_TASK + 0
@@ -886,19 +873,40 @@ def main(args) -> None:
         g_ddqn_disc = all_agent_results["G_DDQN"]
         for c in np.unique(predicted_clusters):
             mask  = predicted_clusters == c
-            d_ciu = dapta_disc[mask, 0]
-            g_ciu = g_ddqn_disc[mask, 0]
+            d_ciu = np.mean([
+                dapta_disc[mask][:, t * _N_METRICS_PER_TASK + 0]
+                for t in _STRUCTURED_TASK_INDICES
+            ], axis=0)
+
+            g_ciu = np.mean([
+                g_ddqn_disc[mask][:, t * _N_METRICS_PER_TASK + 0]
+                for t in _STRUCTURED_TASK_INDICES
+            ], axis=0)
+
+            # MC (mean across structured tasks)
+            d_mc = np.mean([
+                dapta_disc[mask][:, t * _N_METRICS_PER_TASK + 1]
+                for t in _STRUCTURED_TASK_INDICES
+            ], axis=0)
+
+            g_mc = np.mean([
+                g_ddqn_disc[mask][:, t * _N_METRICS_PER_TASK + 1]
+                for t in _STRUCTURED_TASK_INDICES
+            ], axis=0)
             cluster_perf[str(c)] = {
                 "n":                 int(mask.sum()),
                 "dapta_ciu_mean":    round(float(np.mean(d_ciu)), 4),
                 "gddqn_ciu_mean":    round(float(np.mean(g_ciu)), 4),
                 "cohens_d_ciu":      round(cohens_d_paired(g_ciu, d_ciu), 3),
+                "dapta_mc_mean":     round(float(np.mean(d_mc)), 4),
+                "gddqn_mc_mean":     round(float(np.mean(g_mc)), 4),
+                "cohens_d_mc":       round(cohens_d_paired(g_mc, d_mc), 3),
                 "personalised_wins": bool(np.mean(d_ciu) > np.mean(g_ciu)),
             }
         with open(output_dir / "cluster_performance.json", "w") as f:
             json.dump(cluster_perf, f, indent=2)
 
-    # ── Summary ──────────────────────────────────────────────────────
+    #  Summary 
     print("\n" + "=" * 70)
     print(f"DAPTA — HELD-OUT TEST SET RESULTS  (n={n_test} patients)")
     print("=" * 70)
@@ -977,4 +985,4 @@ if __name__ == "__main__":
         help="Device: 'cuda' or 'cpu'"
     )
     args = parser.parse_args()
-    main(args)
+    main(args) 

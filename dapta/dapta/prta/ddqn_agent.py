@@ -26,41 +26,72 @@ class GRUDuelingQNetwork(nn.Module):
 
     def __init__(
         self,
-        state_dim: int = STATE_DIM,
-        n_actions: int = N_ACTIONS,
-        gru_hidden: int = 128,
-        gru_layers: int = 2,
-        fc_hidden: int = 256,
+        state_dim: int = STATE_DIM,   # number of features describing the patient (47)
+        n_actions: int = N_ACTIONS,   # number of therapy options (12)
+        gru_hidden: int = 128,        # size of the GRU memory
+        gru_layers: int = 2,          # number of GRU layers (depth of memory)
+        fc_hidden: int = 256,         # size of fully connected layers
     ) -> None:
         super().__init__()
+
+        # Store basic settings
         self.state_dim  = state_dim
         self.n_actions  = n_actions
         self.gru_hidden = gru_hidden
 
+       
+        # GRU: learns from past sessions
+        # Input = (patient state + action taken)
+        # Output = a "memory" of what has happened over time
         self.gru = nn.GRU(
-            input_size=state_dim + 1,
-            hidden_size=gru_hidden,
-            num_layers=gru_layers,
-            batch_first=True,
-            dropout=0.1 if gru_layers > 1 else 0.0,
+            input_size=state_dim + 1,     # 47 (state) + 1 (action)
+            hidden_size=gru_hidden,       # memory size (128)
+            num_layers=gru_layers,        # stacked GRU layers
+            batch_first=True,             # input format: (batch, time, features)
+            dropout=0.1 if gru_layers > 1 else 0.0,  # prevent overfitting
         )
 
+       
+        # Combine current state + memory
+        # We take:
+        # - current patient state (47)
+        # - GRU memory (128)
+        # → combine into one vector
         shared_input = state_dim + gru_hidden
+
+        # Fully connected layers to process this combined information
         self.shared_fc = nn.Sequential(
-            nn.Linear(shared_input, fc_hidden),
-            nn.ReLU(),
-            nn.Linear(fc_hidden, fc_hidden // 2),
+            nn.Linear(shared_input, fc_hidden),   # 175 → 256
+            nn.ReLU(),                            # activation
+            nn.Linear(fc_hidden, fc_hidden // 2), # 256 → 128
             nn.ReLU(),
         )
 
-        fc_out = fc_hidden // 2
+       
+        # Dueling Network Split
+       
+        # After shared processing, we split into TWO parts
+
+        fc_out = fc_hidden // 2  # = 128
+
+        # 1. VALUE STREAM
+        # Outputs ONE number:
+        # "How good is this patient state overall?"
         self.value_stream = nn.Sequential(
-            nn.Linear(fc_out, 64), nn.ReLU(), nn.Linear(64, 1)
-        )
-        self.advantage_stream = nn.Sequential(
-            nn.Linear(fc_out, 64), nn.ReLU(), nn.Linear(64, n_actions)
+            nn.Linear(fc_out, 64),
+            nn.ReLU(),
+            nn.Linear(64, 1)   # single value
         )
 
+        # 2. ADVANTAGE STREAM
+        # Outputs one number per action:
+        # "How good is each therapy option compared to others?"
+        self.advantage_stream = nn.Sequential(
+            nn.Linear(fc_out, 64),
+            nn.ReLU(),
+            nn.Linear(64, n_actions)  # 12 scores (one per therapy)
+        )
+   
     def forward(
         self,
         state: "torch.Tensor",
@@ -411,6 +442,7 @@ class DDQNAgent:
             )
         return history
 
+    
     def save(self, path: Optional[str | Path] = None) -> None:
         path = Path(path or self.checkpoint_path)
         path.parent.mkdir(parents=True, exist_ok=True)

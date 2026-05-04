@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
   const [user,    setUser]    = useState(null)
   const [loading, setLoading] = useState(true)   // true until initial /me resolves
 
-  // ── Bootstrap: restore session on page load ───────────────────────────────
+  //  Bootstrap: restore session on page load 
   useEffect(() => {
     if (!tokens.access) {
       setLoading(false)
@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false))
   }, [])
 
-  // ── Actions ───────────────────────────────────────────────────────────────
+  //  Actions 
 
   const login = useCallback(async (email, password) => {
     const res = await auth.login({ email, password })

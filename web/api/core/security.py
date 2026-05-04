@@ -18,7 +18,7 @@ from core.config import settings
 _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-# ── Passwords ─────────────────────────────────────────────────────────────────
+#  Passwords
 
 def hash_password(plain: str) -> str:
     """Return a bcrypt hash of *plain*."""
@@ -32,7 +32,7 @@ def verify_password(plain: str, hashed: str) -> bool:
     return _pwd_context.verify(plain[:72], hashed)
 
 
-# ── JWT ───────────────────────────────────────────────────────────────────────
+#  JWT 
 
 def create_access_token(subject: str) -> str:
     """

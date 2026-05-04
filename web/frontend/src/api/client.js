@@ -11,7 +11,7 @@
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
-// ── Token storage ─────────────────────────────────────────────────────────────
+//  Token storage 
 
 export const tokens = {
   get access()  { return localStorage.getItem('access_token')  },
@@ -26,7 +26,7 @@ export const tokens = {
   },
 }
 
-// ── Core fetch wrapper ────────────────────────────────────────────────────────
+//  Core fetch wrapper 
 
 let _isRefreshing    = false
 let _refreshQueue    = []   // Pending requests waiting for token refresh
@@ -55,7 +55,7 @@ async function request(path, opts = {}, retry = true) {
 
   const res = await fetch(`${BASE}${path}`, { ...opts, headers })
 
-  // ── 401 handling ──────────────────────────────────────────────────────────
+  //  401 handling 
   if (res.status === 401 && retry && tokens.refresh) {
     if (_isRefreshing) {
       // Queue this request until the in-flight refresh completes
@@ -90,7 +90,7 @@ async function request(path, opts = {}, retry = true) {
     }
   }
 
-  // ── Parse body ────────────────────────────────────────────────────────────
+  //  Parse body 
   if (res.status === 204) return null
 
   const body = await res.json().catch(() => ({ detail: res.statusText }))
@@ -102,7 +102,7 @@ async function request(path, opts = {}, retry = true) {
   return body
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+//  Auth 
 
 export const auth = {
   /** @param {{ full_name: string, email: string, password: string }} data */
@@ -130,7 +130,7 @@ export const auth = {
   logout: () => request('/api/auth/logout', { method: 'POST' }),
 }
 
-// ── Sessions ──────────────────────────────────────────────────────────────────
+//  Sessions 
 
 export const sessions = {
   list: (limit = 20, offset = 0) =>
@@ -141,7 +141,7 @@ export const sessions = {
   delete: (id) => request(`/api/sessions/${id}`, { method: 'DELETE' }),
 }
 
-// ── Assessment ────────────────────────────────────────────────────────────────
+//  Assessment 
 
 export const assessment = {
   /** @param {FormData} fd — must contain `text` field */
@@ -151,7 +151,7 @@ export const assessment = {
   fromUpload: (fd) => request('/api/assessment/upload', { method: 'POST', body: fd }),
 }
 
-// ── Recommendations ───────────────────────────────────────────────────────────
+//  Recommendations 
 
 export const recommendations = {
   /** @param {string} sessionId */

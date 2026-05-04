@@ -1,35 +1,37 @@
 # DAPTA Web — Full-Stack Application
 
-Discourse-Aware Personalised Therapy Agent — web interface with authentication, session management, and the full 4-step therapy flow.
+Discourse-Aware Personalised Therapy Agent — web interface with authentication, session management, and the four-step therapy flow (assess → recommend → exercise → feedback).
 
 ---
 
-## Project Structure
+## Project structure
 
 ```
 web/
 ├── api/                        # FastAPI backend
 │   ├── core/
-│   │   ├── config.py           # All env vars / settings (pydantic-settings)
+│   │   ├── config.py           # Env / settings (pydantic-settings)
 │   │   ├── security.py         # bcrypt hashing + JWT create/verify
 │   │   ├── dependencies.py     # FastAPI Depends() providers
-│   │   └── middleware.py       # Global error handler middleware
+│   │   └── middleware.py       # Global error-handler middleware
 │   ├── models/
-│   │   ├── user.py             # User ORM model (SQLAlchemy)
-│   │   └── session.py          # Session ORM model
+│   │   ├── user.py             # User ORM (SQLAlchemy)
+│   │   └── session.py          # Session ORM
 │   ├── schemas/
-│   │   ├── auth.py             # Pydantic request/response shapes for auth
-│   │   └── session.py          # Shapes for assessment, recommendation, feedback
+│   │   ├── auth.py             # Auth request/response models
+│   │   └── session.py          # Assessment, recommendation, feedback shapes
 │   ├── services/
-│   │   ├── user_service.py     # All DB operations for users
-│   │   ├── session_service.py  # All DB operations for sessions
-│   │   └── dapta_service.py    # DAPTA ML pipeline wrapper (singleton)
+│   │   ├── user_service.py
+│   │   ├── session_service.py
+│   │   └── dapta_service.py    # DAPTA ML singleton (startup load)
 │   ├── routers/
-│   │   ├── auth.py             # POST /signup /login /refresh /logout, GET/PATCH /me
-│   │   ├── sessions.py         # GET / (list), GET /:id, DELETE /:id
+│   │   ├── auth.py             # POST /signup, /login, /refresh, /logout; GET/PATCH /me
+│   │   ├── sessions.py         # GET /, GET/{id}, DELETE/{id}
 │   │   ├── assessment.py       # POST /text, POST /upload
-│   │   └── recommendations.py  # GET /:sessionId, POST /:sessionId/submit-audio
-│   ├── database.py             # Async SQLAlchemy engine + Base
+│   │   └── recommendations.py  # GET /{session_id}, POST /{session_id}/submit-audio
+│   ├── utils/
+│   │   └── audio_to_cha.py     # Whisper text → provisional CHAT (audio pipeline)
+│   ├── database.py             # Async engine + metadata
 │   ├── main.py                 # App factory, lifespan, router wiring
 │   ├── requirements.txt
 │   └── .env.example
@@ -37,12 +39,12 @@ web/
 └── frontend/                   # React + Vite
     ├── src/
     │   ├── api/
-    │   │   └── client.js       # All fetch calls, token storage, auto-refresh
+    │   │   └── client.js       # Fetch helper, tokens, refresh on 401
     │   ├── context/
-    │   │   └── AuthContext.jsx # Global auth state + login/signup/logout actions
+    │   │   └── AuthContext.jsx
     │   ├── hooks/
-    │   │   ├── useSession.js   # Full 4-step therapy session state machine
-    │   │   └── useAudioRecorder.js  # MediaRecorder abstraction
+    │   │   ├── useSession.js
+    │   │   └── useAudioRecorder.js
     │   ├── pages/
     │   │   ├── LoginPage.jsx
     │   │   ├── SignupPage.jsx
@@ -51,37 +53,19 @@ web/
     │   │   └── ProfilePage.jsx
     │   ├── components/
     │   │   ├── auth/
-    │   │   │   ├── ProtectedRoute.jsx   # Redirects to /login if not authed
-    │   │   │   ├── AuthForm.jsx         # Card shell for login/signup
-    │   │   │   └── FormField.jsx        # Labelled input with error state
     │   │   ├── layout/
-    │   │   │   └── AppShell.jsx         # Sidebar nav + <Outlet />
     │   │   ├── session/
-    │   │   │   ├── StepIndicator.jsx
-    │   │   │   ├── AssessStep.jsx
-    │   │   │   ├── RecommendStep.jsx
-    │   │   │   ├── ExerciseStep.jsx
-    │   │   │   └── FeedbackStep.jsx
     │   │   ├── input/
-    │   │   │   ├── RecordTab.jsx
-    │   │   │   ├── UploadTab.jsx
-    │   │   │   └── TypeTab.jsx
     │   │   ├── shared/
-    │   │   │   ├── Card.jsx
-    │   │   │   ├── TabBar.jsx
-    │   │   │   ├── MetricBar.jsx
-    │   │   │   ├── ConfidenceBadge.jsx
-    │   │   │   ├── ErrorBanner.jsx
-    │   │   │   ├── SkeletonLoader.jsx
-    │   │   │   └── Spinner.jsx
+    │   │   │   └── index.js
     │   │   └── AudioRecorder.jsx
     │   ├── utils/
-    │   │   ├── constants.js     # METRIC_LIST, APHASIA_SUBTYPES, etc.
-    │   │   └── styles.js        # Shared inline style objects
+    │   │   ├── constants.js
+    │   │   └── styles.js
     │   ├── styles/
-    │   │   └── global.css       # Design tokens, reset, animations
-    │   ├── App.jsx              # Router + AuthProvider
-    │   └── main.jsx             # React DOM entry
+    │   │   └── global.css
+    │   ├── App.jsx
+    │   └── main.jsx
     ├── index.html
     ├── vite.config.js
     └── package.json
@@ -93,8 +77,13 @@ web/
 
 ### 1. Database
 
+**Default (no extra services):** the API uses **SQLite** — `DATABASE_URL` defaults to `sqlite+aiosqlite:///./dapta.db` (file created relative to the current working directory when you run the app; typical layout is alongside `main.py` under `web/api`). No Docker step required.
+
+**Optional — PostgreSQL** (e.g. production): start a server and set `DATABASE_URL` to a `postgresql+asyncpg://…` DSN. Note: `database.py` currently passes SQLite-oriented `connect_args`; you may need to adjust the engine setup for Postgres.
+
+Example PostgreSQL container:
+
 ```bash
-# Start PostgreSQL (Docker)
 docker run -d \
   --name dapta-db \
   -e POSTGRES_USER=dapta \
@@ -106,19 +95,28 @@ docker run -d \
 
 ### 2. Backend
 
+The API imports the **same `dapta` Python package** as the research codebase (DAE, Whisper-assisted paths, checkpoints). Install the inner ML project first, then API extras.
+
+From the repository root (parent of `web/` and inner `dapta/`):
+
 ```bash
-cd web/api
+cd dapta
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+pip install -e .
+
+cd ../web/api
 python -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate
 
 pip install -r requirements.txt
 
 cp .env.example .env
-# Edit .env — set SECRET_KEY and DAPTA_PATH
+# Edit .env — set SECRET_KEY at minimum
 
 python main.py
-# API runs on http://localhost:8000
-# Docs at http://localhost:8000/docs
+# API → http://localhost:8000
+# Docs → http://localhost:8000/docs (disabled when ENVIRONMENT=production)
 ```
 
 ### 3. Frontend
@@ -127,65 +125,77 @@ python main.py
 cd web/frontend
 npm install
 npm run dev
-# App runs on http://localhost:5173
+# → http://localhost:5173
 ```
 
 ---
 
-## API Routes
+## API routes
+
+Routers are mounted with prefix `/api/...` as declared in `main.py`. Paths below omit the host.
 
 | Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| POST | `/api/auth/signup` | — | Create account, returns token pair |
-| POST | `/api/auth/login` | — | Login, returns token pair |
-| POST | `/api/auth/refresh` | — | Swap refresh token for new pair |
-| POST | `/api/auth/logout` | ✓ | Sign out (client discards tokens) |
-| GET | `/api/auth/me` | ✓ | Get current user |
+|--------|------|:----:|-------------|
+| POST | `/api/auth/signup` | — | Sign up → token pair (`token_type`: `bearer`) |
+| POST | `/api/auth/login` | — | Login → token pair |
+| POST | `/api/auth/refresh` | — | New pair from refresh token |
+| POST | `/api/auth/logout` | ✓ | Stateless logout (discard tokens client-side) |
+| GET | `/api/auth/me` | ✓ | Current user |
 | PATCH | `/api/auth/me` | ✓ | Update clinical profile |
-| GET | `/api/sessions/` | ✓ | List sessions |
-| GET | `/api/sessions/:id` | ✓ | Get one session |
-| DELETE | `/api/sessions/:id` | ✓ | Delete session |
-| POST | `/api/assessment/text` | ✓ | Assess from text |
-| POST | `/api/assessment/upload` | ✓ | Assess from .cha or audio file |
-| GET | `/api/recommendations/:id` | ✓ | Get exercise recommendation |
-| POST | `/api/recommendations/:id/submit-audio` | ✓ | Submit exercise, get feedback |
-| GET | `/api/health` | — | Health check |
+| GET | `/api/sessions/` | ✓ | List sessions (`limit` / `offset` query params) |
+| GET | `/api/sessions/{session_id}` | ✓ | One session |
+| DELETE | `/api/sessions/{session_id}` | ✓ | Delete session |
+| POST | `/api/assessment/text` | ✓ | Assess pasted text |
+| POST | `/api/assessment/upload` | ✓ | Upload `.cha` or audio (see backend for supported suffixes) |
+| GET | `/api/recommendations/{session_id}` | ✓ | Recommendation for that session |
+| POST | `/api/recommendations/{session_id}/submit-audio` | ✓ | Post-exercise audio → feedback |
+| GET | `/api/health` | — | Basic health payload |
 
 ---
 
-## Authentication Flow
+## Authentication flow
 
-1. `POST /signup` or `POST /login` → returns `{ access_token, refresh_token }`
-2. Client stores both in `localStorage`
-3. Every request attaches `Authorization: Bearer <access_token>`
-4. On 401, client automatically calls `POST /refresh` once
-5. If refresh fails → tokens cleared → redirect to `/login`
+1. `POST /api/auth/signup` or `POST /api/auth/login` → `{ access_token, refresh_token, token_type }`.
+2. Client stores tokens (e.g. `localStorage`).
+3. Requests send `Authorization: Bearer <access_token>`.
+4. On `401`, the bundled client attempts `POST /api/auth/refresh` with `{ refresh_token }` once (with queuing for concurrent requests).
+5. If refresh fails, tokens are cleared and the SPA navigates to `/login`.
 
-Access tokens expire in **60 minutes**. Refresh tokens expire in **30 days**.
+Defaults in config: **access tokens 60 minutes**, **refresh tokens 30 days** (overridable via env vars).
 
 ---
 
-## Environment Variables
+## Environment variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DATABASE_URL` | `postgresql+asyncpg://dapta:dapta_password@localhost:5432/dapta_db` | PostgreSQL DSN |
-| `SECRET_KEY` | `CHANGE_ME_IN_PRODUCTION` | JWT signing key |
+Values below match `core/config.py` / `.env.example`. Override via `.env` or deployment env.
+
+| Variable | Typical default | Description |
+|----------|-----------------|-------------|
+| `DATABASE_URL` | `sqlite+aiosqlite:///./dapta.db` | Async SQLAlchemy URL |
+| `SECRET_KEY` | `CHANGE_ME_IN_PRODUCTION` | JWT signing secret |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `60` | Access token TTL |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | `30` | Refresh token TTL |
-| `ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:3000` | CORS origins |
-| `DAPTA_PATH` | `../dapta` | Path to DAPTA ML library |
-| `DAPTA_MODELS_PATH` | `../models` | Path to trained model checkpoints |
-| `ENVIRONMENT` | `development` | `development` or `production` |
+| `ALLOWED_ORIGINS` | `http://localhost:5173`, `http://localhost:3000` | CORS (comma-separated string or list) |
+| `DAPTA_PATH` | Repository root (resolved from `core/config.py`) | Prepended to `sys.path` for `import dapta` |
+| `DAPTA_MODELS_PATH` | `<repo>/outputs` (resolved path) | Whisper: subdirectory `whisper_aphasiabank`, else Hugging Face `openai/whisper-base` |
+| `ENVIRONMENT` | `development` | `production` hides `/docs` and `/redoc` |
+
+### Where artefacts are loaded
+
+Startup logic in `services/dapta_service.py`:
+
+- **Scaler + DDQN checkpoints + `clusterer.pkl`** resolve under **`<repo>/dapta/outputs/…`** (`dae/scaler.npz`, `rl/ddqn_cluster_*.pt`, `pes/clusterer.pkl`), **not** via `DAPTA_MODELS_PATH` alone.
+
+So for recommendations to work you need those files under the inner ML project’s `outputs/` tree (after training or copying checkpoints).
 
 ---
 
-## Before DAPTA Models Are Trained
+## When ML components are missing
 
-`DAPTAService` degrades gracefully — if model files are not found it returns
-mock metric values and a mock recommendation. The entire web app is fully
-usable and testable before any training has run.
+Unlike a mock fallback, **`DAPTAService` raises errors** when required pieces are missing:
 
-Once models are trained:
-1. Set `DAPTA_PATH` and `DAPTA_MODELS_PATH` in `.env`
-2. Restart the API — `DAPTAService.load()` picks them up automatically
+- **Assessment / upload** — DAE + parser must load; otherwise metric extraction fails at request time.
+- **Audio upload** — Whisper must load for transcription (`torch`, `librosa`, etc., via the ML environment).
+- **Recommendation** — needs `PatientStateBuilder` scaler (`outputs/dae/`) **and** at least one loaded cluster DDQN (`outputs/rl/ddqn_cluster_*.pt`); if no agent can act, `RuntimeError` is raised. If the clusterer is absent, routing defaults to cluster `0`, so **`ddqn_cluster_0.pt`** must exist for a recommendation.
+
+Authentication, sessions, health, and much of the UI still operate without ML artefacts; run Phase 1–3 in inner `dapta/` (see inner `README.md`) and restart the API so `load()` can pick up checkpoints.

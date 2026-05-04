@@ -19,7 +19,7 @@ class UserService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    # ── Queries ───────────────────────────────────────────────────────────────
+    #  Queries 
 
     async def get_by_id(self, user_id: str) -> Optional[User]:
         result = await self.db.execute(select(User).where(User.id == user_id))
@@ -34,7 +34,7 @@ class UserService:
     async def email_exists(self, email: str) -> bool:
         return await self.get_by_email(email) is not None
 
-    # ── Mutations ─────────────────────────────────────────────────────────────
+    #  Mutations 
 
     async def create(self, data: SignupRequest) -> User:
         user = User(

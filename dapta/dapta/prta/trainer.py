@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 from dapta.pes.environment import TherapyEnv
-from dapta.prta.action_space import N_ACTIONS, THERAPY_EXERCISES
+from dapta.prta.action_space import N_ACTIONS
 from dapta.prta.ddqn_agent import DDQNAgent
 from dapta.utils.logger import get_logger
 
@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 
 try:
     from stable_baselines3 import PPO
-    from stable_baselines3.common.env_util import make_vec_env
+    from stable_baselines3.common.vec_env import DummyVecEnv
     _SB3 = True
 except ImportError:
     _SB3 = False
@@ -27,9 +27,7 @@ def train_ddqn(
     n_eval_episodes: int = 10,
     log_freq: int = 500,
 ) -> Dict[str, List[float]]:
-    logs: Dict[str, List] = {
-        "steps": [], "mean_reward": [], "mean_ciu_improvement": [], "loss": []
-    }
+    logs: Dict[str, List] = {"steps": [], "mean_reward": [], "mean_ciu_improvement": [], "loss": []}
 
     step = 0
     episode_rewards = []
@@ -38,7 +36,7 @@ def train_ddqn(
     logger.info(f"Training DDQN on {len(envs)} patient environments for {total_steps} steps.")
 
     while step < total_steps:
-        env = np.random.choice(envs)
+        env = envs[np.random.randint(len(envs))]
         state, _ = env.reset()
         state_history: List[np.ndarray] = []
         action_history: List[int] = []
@@ -53,8 +51,11 @@ def train_ddqn(
             done = terminated or truncated
             episode_reward += reward
 
+            temp_states = state_history + [state]
+            temp_actions = action_history + [action]
+
             next_history = agent.build_history_tensor(
-                state_history + [state], action_history + [action]
+                temp_states, temp_actions
             )
             agent.replay_buffer.push(
                 state, history_tensor, action, reward,
@@ -73,7 +74,7 @@ def train_ddqn(
             step += 1
 
             if step % eval_freq == 0:
-                mean_r, mean_ciu = evaluate_agent(agent, envs[:n_eval_episodes])
+                mean_r, mean_ciu = evaluate_agent(agent, envs, n_episodes=n_eval_episodes)
                 logs["steps"].append(step)
                 logs["mean_reward"].append(mean_r)
                 logs["mean_ciu_improvement"].append(mean_ciu)
@@ -125,7 +126,7 @@ def evaluate_agent(
 
 
 def train_ppo(
-    env: TherapyEnv,
+    envs,
     total_steps: int = 50_000,
     save_path: Optional[str | Path] = None,
     **ppo_kwargs,
@@ -150,7 +151,30 @@ def train_ppo(
     )
     default_ppo_cfg.update(ppo_kwargs)
 
-    model = PPO("MlpPolicy", env, **default_ppo_cfg)
+    def make_env_factory(transition_model, initial_state, episode_horizon, reward_clip, noise_std):
+        def _init():
+            return TherapyEnv(
+                transition_model=transition_model,
+                initial_state=initial_state,
+                episode_horizon=episode_horizon,
+                reward_clip=reward_clip,
+                noise_std=noise_std,
+            )
+        return _init
+
+    vec_env = DummyVecEnv([
+        make_env_factory(
+            env.transition_model,
+            env.initial_state,
+            env.episode_horizon,
+            env.reward_clip,
+            env.noise_std,
+        )
+        for env in envs
+    ])
+
+
+    model = PPO("MlpPolicy", vec_env, **default_ppo_cfg)
     logger.info(f"Training PPO for {total_steps} steps...")
     model.learn(total_timesteps=total_steps)
 
@@ -160,10 +184,6 @@ def train_ppo(
         logger.info(f"PPO model saved to {save_path}")
 
     return model
-
-
-
-
 
 class RuleBasedBaseline:
     FIXED_SEQUENCE = [10, 1, 0, 9, 8, 2, 3, 6, 5, 4, 7, 11]
@@ -190,9 +210,6 @@ class RuleBasedBaseline:
             if done:
                 break
         return total_reward, env.get_cumulative_discourse_improvement()
-
-
-
 
 
 class RandomBaseline:

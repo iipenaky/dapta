@@ -2,9 +2,6 @@
 Central configuration loader.
 Loads configs/default.yaml and allows dot-notation access.
 """
-
-
-import os
 import yaml
 from pathlib import Path
 from typing import Any
@@ -27,10 +24,7 @@ class Config:
                 setattr(self, key, Config(value))
             else:
                 setattr(self, key, value)
-
-    # ------------------------------------------------------------------
     # Factory
-    # ------------------------------------------------------------------
     @classmethod
     def load(cls, path: str | Path | None = None) -> "Config":
         """Load config from YAML file. Defaults to configs/default.yaml."""
@@ -51,9 +45,8 @@ class Config:
             data = yaml.safe_load(f)
         return cls(data)
 
-    # ------------------------------------------------------------------
+    
     # Helpers
-    # ------------------------------------------------------------------
     def to_dict(self) -> dict:
         """Recursively convert back to a plain dict."""
         result = {}

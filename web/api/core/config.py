@@ -23,18 +23,18 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    # ── Database ───────────────────────────────────────────────────────────────
+    #  Database 
     database_url: str = (
         "sqlite+aiosqlite:///./dapta.db"
     )
 
-    # ── Auth ───────────────────────────────────────────────────────────────────
+    #  Auth 
     secret_key: str = "CHANGE_ME_IN_PRODUCTION"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     refresh_token_expire_days: int = 30
 
-    # ── CORS ───────────────────────────────────────────────────────────────────
+    #  CORS 
     allowed_origins: List[str] = [
         "http://localhost:5173",
         "http://localhost:3000",
@@ -47,14 +47,14 @@ class Settings(BaseSettings):
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
 
-    # ── DAPTA ─────────────────────────────────────────────────────────────────
-    dapta_path: Path = Path(__file__).resolve().parents[3] / "dapta"
-    dapta_models_path: Path = Path(__file__).resolve().parents[3] / "models"
+    #  DAPTA 
+    dapta_path: Path = Path(__file__).resolve().parents[3]
+    dapta_models_path: Path = Path(__file__).resolve().parents[3] / "outputs"
     wab_aq_mild_threshold: float = 75.0
     no_gru_g_ddqn_checkpoint: str = "no_gru_ddqn_generalised.pt"
     ppo_personalised_checkpoint: str = "ppo_personalised"
 
-    # ── Runtime ────────────────────────────────────────────────────────────────
+    #  Runtime 
     environment: str = "development"
 
     @property

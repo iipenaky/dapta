@@ -4,8 +4,8 @@ __pycache__
 *.pyd
 .Python
 .env
-web
 logs
-*.zip
-results
 models
+aphasiabank
+clan
+.vscode

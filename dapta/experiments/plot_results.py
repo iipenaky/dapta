@@ -1,15 +1,13 @@
 """
-plot_dapta_thesis.py
---------------------
 Comprehensive thesis-ready plotting for the DAPTA system.
 Covers all outputs from run_pes.py, run_rl.py, run_evaluation.py,
 and run_sensitivity_analysis.py.
 
 Usage:
-    python plot_dapta_thesis.py
+    python plot_results.py
 
     # Or with custom output directories:
-    python plot_dapta_thesis.py --pes_dir outputs/pes --rl_dir outputs/rl \
+    python plot_results.py --pes_dir outputs/pes --rl_dir outputs/rl \
         --eval_dir outputs/evaluation --sens_dir outputs/sensitivity \
         --out_dir figures/
 
@@ -27,8 +25,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.ticker as mticker
-from matplotlib.gridspec import GridSpec
-from matplotlib.lines import Line2D
 from scipy import stats as scipy_stats
 from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.decomposition import PCA
@@ -36,9 +32,7 @@ from sklearn.manifold import TSNE
 
 warnings.filterwarnings("ignore")
 
-# ─────────────────────────────────────────────────────────────────────
-# House style — thesis-ready
-# ─────────────────────────────────────────────────────────────────────
+# House style
 matplotlib.rcParams.update({
     "font.family":        "serif",
     "font.size":          11,
@@ -95,11 +89,8 @@ NOISE_COLORS = {
     "medium": "#FEE08B",
     "high":   "#D73027",
 }
-
-# ─────────────────────────────────────────────────────────────────────
+ 
 # Helpers
-# ─────────────────────────────────────────────────────────────────────
-
 def save(fig, out_dir: Path, name: str) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     fig.savefig(str(out_dir / f"{name}.pdf"))
@@ -148,10 +139,7 @@ def bootstrap_ci(diff: np.ndarray, n=1000, seed=42):
     return np.percentile(boot, 2.5), np.percentile(boot, 97.5)
 
 
-# ─────────────────────────────────────────────────────────────────────
 # PES figures
-# ─────────────────────────────────────────────────────────────────────
-
 def fig_cluster_distribution(pes_dir: Path, out_dir: Path):
     """Bar chart of patient counts per cluster."""
     data = load_json(pes_dir / "cluster_assignments.json")
@@ -299,11 +287,7 @@ def fig_cluster_aphasia_subtypes(pes_dir: Path, eval_dir: Path, out_dir: Path):
     fig.tight_layout()
     save(fig, out_dir, "pes_cluster_subtype_composition")
 
-
-# ─────────────────────────────────────────────────────────────────────
 # Training curve figures
-# ─────────────────────────────────────────────────────────────────────
-
 def _smooth(arr: list, w: int = 5) -> np.ndarray:
     """Simple moving-average smoother."""
     a = np.array(arr, dtype=float)
@@ -326,7 +310,7 @@ def fig_training_curves(rl_dir: Path, out_dir: Path):
     if not logs:
         return
 
-    # ── Classify every key ──────────────────────────────────────────
+    #  Classify every key 
     # skip PPO entries that only have {"status": ..., "steps": ...}
     def has_curves(val):
         return (isinstance(val, dict)
@@ -343,7 +327,7 @@ def fig_training_curves(rl_dir: Path, out_dir: Path):
         print("  [INFO] No reward curves found in training_logs.json — skipping")
         return
 
-    # ── Colour map ───────────────────────────────────────────────────
+    #  Colour map 
     # DAPTA clusters: shades of blue; No-GRU clusters: shades of teal
     # Generalised agents: fixed colours from AGENT_COLORS
     cluster_blues = plt.cm.Blues(np.linspace(0.4, 0.9, max(len(dapta_keys), 1)))
@@ -481,11 +465,7 @@ def fig_training_curves_ciu_per_cluster(rl_dir: Path, out_dir: Path):
     fig.tight_layout()
     save(fig, out_dir, "rl_training_ciu_per_cluster")
 
-
-# ─────────────────────────────────────────────────────────────────────
 # RQ2 figures (DAPTA vs baselines)
-# ─────────────────────────────────────────────────────────────────────
-
 def fig_rq2_grouped_bar(eval_dir: Path, out_dir: Path):
     """
     Grouped bar chart of mean CIU rate across all agents + baselines.
@@ -683,10 +663,7 @@ def fig_rq2_effect_sizes_with_ci(eval_dir: Path, out_dir: Path):
     save(fig, out_dir, "rq2_forest_plot")
 
 
-# ─────────────────────────────────────────────────────────────────────
 # RQ3 figures (cross-task transfer)
-# ─────────────────────────────────────────────────────────────────────
-
 def fig_rq3_transfer_scatter(eval_dir: Path, out_dir: Path):
     """Scatter: structured task CIU gain vs conversation CIU gain."""
     csv_path = eval_dir / "dapta_test_results.csv"
@@ -758,10 +735,7 @@ def fig_rq3_task_gains_violin(eval_dir: Path, out_dir: Path):
     save(fig, out_dir, "rq3_task_gains_violin")
 
 
-# ─────────────────────────────────────────────────────────────────────
 # RQ4 figures (personalisation)
-# ─────────────────────────────────────────────────────────────────────
-
 def fig_rq4_personalised_vs_generalised(eval_dir: Path, out_dir: Path):
     """
     Side-by-side boxplots of DAPTA vs G-DDQN CIU rate across all test patients.
@@ -943,11 +917,7 @@ def fig_rq4_wabaq_moderation(eval_dir: Path, out_dir: Path):
     fig.tight_layout()
     save(fig, out_dir, "rq4_wabaq_moderation")
 
-
-# ─────────────────────────────────────────────────────────────────────
 # Ablation figures
-# ─────────────────────────────────────────────────────────────────────
-
 def fig_ablation_summary(eval_dir: Path, out_dir: Path):
     """
     Grouped bar: CIU Cohen's d vs RBDE for every ablated agent.
@@ -1038,11 +1008,7 @@ def fig_ablation_gru_effect(eval_dir: Path, out_dir: Path):
     fig.tight_layout()
     save(fig, out_dir, "ablation_gru_effect")
 
-
-# ─────────────────────────────────────────────────────────────────────
 # Sensitivity analysis figures
-# ─────────────────────────────────────────────────────────────────────
-
 def fig_sensitivity_overview(sens_dir: Path, out_dir: Path):
     """
     Multi-panel: how key statistics change across noise levels.
@@ -1219,11 +1185,7 @@ def fig_sensitivity_stability_table(sens_dir: Path, out_dir: Path):
     fig.tight_layout()
     save(fig, out_dir, "sensitivity_stability_table")
 
-
-# ─────────────────────────────────────────────────────────────────────
 # Summary / overview figures
-# ─────────────────────────────────────────────────────────────────────
-
 def fig_all_agents_metric_profile(eval_dir: Path, out_dir: Path):
     """
     Line chart: all agents' mean improvement across the 5 discourse metrics.
@@ -1312,10 +1274,7 @@ def _best_d_rq2(rq2: dict) -> str:
     return f"{best_d:.3f}"
 
 
-# ─────────────────────────────────────────────────────────────────────
 # Discourse improvement distributions
-# ─────────────────────────────────────────────────────────────────────
-
 def fig_ciu_improvement_distributions(eval_dir: Path, out_dir: Path):
     """
     Overlapping KDE plots of per-patient CIU improvement for all agents.
@@ -1385,11 +1344,7 @@ def fig_pairwise_improvement_scatter(eval_dir: Path, out_dir: Path):
     fig.tight_layout()
     save(fig, out_dir, "rq4_pairwise_improvement_scatter")
 
-
-# ─────────────────────────────────────────────────────────────────────
 # Main
-# ─────────────────────────────────────────────────────────────────────
-
 def main(args):
     pes_dir  = Path(args.pes_dir)
     rl_dir   = Path(args.rl_dir)
@@ -1401,47 +1356,47 @@ def main(args):
     print("DAPTA thesis plotting — generating all figures")
     print(f"{'='*60}\n")
 
-    # ── PES figures ──────────────────────────────────────────────────
+    #  PES figures 
     print("PES figures:")
     fig_cluster_distribution(pes_dir, out_dir / "pes")
     fig_state_space_tsne(pes_dir, out_dir / "pes")
     fig_transition_model_validation(pes_dir, out_dir / "pes")
     fig_cluster_aphasia_subtypes(pes_dir, eval_dir, out_dir / "pes")
 
-    # ── Training figures ─────────────────────────────────────────────
+    #  Training figures 
     print("\nTraining figures:")
     fig_training_curves(rl_dir, out_dir / "training")
     fig_training_curves_ciu_per_cluster(rl_dir, out_dir / "training")
 
-    # ── RQ2 figures ──────────────────────────────────────────────────
+    #  RQ2 figures 
     print("\nRQ2 figures:")
     fig_rq2_grouped_bar(eval_dir, out_dir / "rq2")
     fig_rq2_radar(eval_dir, out_dir / "rq2")
     fig_rq2_cohens_d_heatmap(eval_dir, out_dir / "rq2")
     fig_rq2_effect_sizes_with_ci(eval_dir, out_dir / "rq2")
 
-    # ── RQ3 figures ──────────────────────────────────────────────────
+    #  RQ3 figures 
     print("\nRQ3 figures:")
     fig_rq3_transfer_scatter(eval_dir, out_dir / "rq3")
     fig_rq3_task_gains_violin(eval_dir, out_dir / "rq3")
 
-    # ── RQ4 figures ──────────────────────────────────────────────────
+    #  RQ4 figures 
     print("\nRQ4 figures:")
     fig_rq4_personalised_vs_generalised(eval_dir, out_dir / "rq4")
     fig_rq4_per_cluster(eval_dir, out_dir / "rq4")
     fig_rq4_wabaq_moderation(eval_dir, out_dir / "rq4")
 
-    # ── Ablation figures ─────────────────────────────────────────────
+    #  Ablation figures 
     print("\nAblation figures:")
     fig_ablation_summary(eval_dir, out_dir / "ablation")
     fig_ablation_gru_effect(eval_dir, out_dir / "ablation")
 
-    # ── Sensitivity figures ──────────────────────────────────────────
+    #  Sensitivity figures 
     print("\nSensitivity figures:")
     fig_sensitivity_overview(sens_dir, out_dir / "sensitivity")
     fig_sensitivity_stability_table(sens_dir, out_dir / "sensitivity")
 
-    # ── Overview / summary figures ───────────────────────────────────
+    #  Overview / summary figures 
     print("\nOverview / summary figures:")
     fig_all_agents_metric_profile(eval_dir, out_dir / "overview")
     fig_ciu_improvement_distributions(eval_dir, out_dir / "overview")
@@ -1459,6 +1414,6 @@ if __name__ == "__main__":
     parser.add_argument("--rl_dir",   default="outputs/rl")
     parser.add_argument("--eval_dir", default="outputs/evaluation")
     parser.add_argument("--sens_dir", default="outputs/sensitivity")
-    parser.add_argument("--out_dir",  default="figures")
+    parser.add_argument("--out_dir",  default="outputs/evaluation/figures")
     args = parser.parse_args()
     main(args)

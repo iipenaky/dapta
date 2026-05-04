@@ -28,7 +28,7 @@ export function useSession(initialSessionId = null) {
   const [loading,          setLoading]          = useState(false)
   const [error,            setError]            = useState('')
 
-  // ── Load existing session ─────────────────────────────────────────────────
+  //  Load existing session 
   useEffect(() => {
     if (!initialSessionId) return
     setLoading(true)
@@ -51,7 +51,7 @@ export function useSession(initialSessionId = null) {
       .finally(() => setLoading(false))
   }, [initialSessionId])
 
-  // ── Shared async runner ───────────────────────────────────────────────────
+  //  Shared async runner 
   const call = useCallback(async (fn) => {
     setLoading(true)
     setError('')
@@ -65,7 +65,7 @@ export function useSession(initialSessionId = null) {
     }
   }, [])
 
-  // ── Step 1 ────────────────────────────────────────────────────────────────
+  //  Step 1 
   const handleTextAssess = useCallback(async (text) => {
     const fd = new FormData()
     fd.append('text', text)
@@ -96,7 +96,7 @@ export function useSession(initialSessionId = null) {
     setStep('recommend')
   }, [call])
 
-  // ── Step 2 ────────────────────────────────────────────────────────────────
+  //  Step 2 
   const handleGetRecommendation = useCallback(async () => {
     const res = await call(() => recommendations.get(sessionId))
     if (!res) return
@@ -107,7 +107,7 @@ export function useSession(initialSessionId = null) {
     setStep('exercise')
   }, [call, sessionId])
 
-  // ── Step 3 ────────────────────────────────────────────────────────────────
+  //  Step 3 
   const handleExerciseAudio = useCallback(async (blob) => {
     const fd = new FormData()
     fd.append('audio', blob, 'exercise.webm')

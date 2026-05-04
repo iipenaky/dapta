@@ -1,6 +1,4 @@
 """
-run_sensitivity_analysis.py
----------------------------
 DAPTA External Validity: Sensitivity Analysis.
 
 Tests whether the core conclusions from run_evaluation.py hold up
@@ -55,9 +53,9 @@ _STRUCTURED_TASK_INDICES = [0, 1, 2]
 _CONVERSATION_TASK_INDEX = 4
 
 
-# ──────────────────────────────────────────────────────────────────────
+# 
 # Helpers
-# ──────────────────────────────────────────────────────────────────────
+# 
 
 def cohens_d_paired(before: np.ndarray, after: np.ndarray) -> float:
     diff = after - before
@@ -395,9 +393,9 @@ def print_report(summaries: List[dict], output_dir: Path) -> None:
     logger.info(f"Report saved to {output_dir}/sensitivity_report.txt")
 
 
-# ──────────────────────────────────────────────────────────────────────
+# 
 # Main
-# ──────────────────────────────────────────────────────────────────────
+# 
 
 def main() -> None:
     output_dir = Path("outputs/sensitivity")
@@ -408,7 +406,7 @@ def main() -> None:
     logger.info("DAPTA Sensitivity Analysis — Transition Model Noise")
     logger.info("=" * 60)
 
-    # ── Load shared inputs ───────────────────────────────────────────
+    #  Load shared inputs 
     pes_dir = Path("outputs/pes")
     rl_dir  = Path("outputs/rl")
 
@@ -484,7 +482,7 @@ def main() -> None:
         g_ddqn = load_ddqn(ckpt_g, use_gru=True)
         logger.info("  G-DDQN loaded.")
 
-    # ── Run across noise levels ──────────────────────────────────────
+    #  Run across noise levels 
     all_summaries = []
     all_raw       = {}
 
@@ -520,7 +518,7 @@ def main() -> None:
             f"answered={summary.get('rq3', {}).get('rq3_answered_positively', 'N/A')}"
         )
 
-    # ── Save outputs ─────────────────────────────────────────────────
+    #  Save outputs 
     with open(output_dir / "sensitivity_results.json", "w") as f:
         json.dump({"summaries": all_summaries}, f, indent=2)
 
